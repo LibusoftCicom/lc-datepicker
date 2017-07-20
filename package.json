@@ -23,8 +23,8 @@
     "e2e": "ng e2e",
     "clean": "rm -rf dist",
     "build:library": "nglb --tsconfig tsconfig-ngc.json --rootDir src/lib --outDir lib-dist",
-    "build:dist": "ng build --prod --aot",
-    "prepublishOnly": "npm run build:dist && npm run build:library"
+    "build:dist": "ng build --prod --aot --base-href /lc-datepicker/",
+    "prepublishOnly": "npm run build:dist  && npm run build:library"
   },
   "main": "./lib-dist/lc-date-picker.module.js",
   "module": "./lib-dist/lc-date-picker.module.js",

@@ -3,6 +3,10 @@
 # LC DatePicker
 > Pure Angular date and time picker component.
 
+
+# [Demo](https://libusoftcicom.github.io/lc-datepicker/)
+
+
 # Description
 
 - LC DatePicker is an Angular component that generates a datepicker calendar on your input element
