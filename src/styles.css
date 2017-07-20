@@ -1,0 +1,22 @@
+/* You can add global styles to this file, and also import other style files */
+body{
+    font-family: 'Roboto', sans-serif;
+    background-color: #f3f3f3;
+}
+
+.navbar  {
+    background-color: #748086!important;
+}
+
+.jumbotron {
+    background-color: #dde0e2;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    font-weight: 600;
+}
+
+img {
+    height: 35px;
+}

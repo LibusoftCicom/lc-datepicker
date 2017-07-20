@@ -1,0 +1,114 @@
+button {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 14px;
+  text-align: center;
+  border: none;
+  outline: none;
+}
+
+.yearsCal td {
+  min-width: 30px;
+  padding: 5px 0;
+  outline: 1px solid transparent;    
+}
+
+.calendar {
+  box-shadow: rgba(0, 0, 0, 0.156863) 0px 1px 5px 0px, rgba(0, 0, 0, 0.26) -2px -1px 5px 0px;
+  box-sizing: border-box;
+  display: block;
+  font-size: 12px;
+  line-height: 14px;
+  margin: 5px;
+  width: 220px;
+}
+
+table {
+  width: 100%;
+  height: 220px;
+  border-collapse: collapse;
+  border: none;
+  box-sizing: border-box;
+  display: table;
+  background: white;
+}
+
+.dateTimeToggle {
+  width: 220px;
+  height: 20px;
+  background: #e4e4e4;
+  border-top: 1px solid #e4e4e4;
+}
+
+.dateTimeToggle button {
+  width: 50%;
+  height: 100%;
+  float: left;
+  background: transparent;
+}
+
+.dateTimeToggle button.active {
+  background: white;
+}
+
+.dateTimeToggle :first-child button {
+  border-right: 1px solid #efefef;
+}
+
+.confirmDate {
+  width: 220px;
+  height: 20px;
+  background: #efefef;
+}
+
+.confirmDate button {
+  width: 100%;
+  height: 100%;
+  border-top: 1px solid #efefef;
+}
+
+thead tr {
+  height: 25px;
+  background: #5e666f;
+  color: aliceblue;
+}
+
+thead tr button{  
+  color: aliceblue;
+}
+
+td.active {
+  background: rgb(230, 232, 234);
+}
+
+.selectbtn{
+    cursor: pointer;
+    color: #e0e0e0;
+    float: left;
+    width: 30px;
+}
+
+.pullRight{
+  float: right;
+}
+
+.monthlabel{
+  width: 80px;
+}
+
+.yearlabel{
+  width: 50px;
+}
+
+.yearsCal td:hover{
+  outline: 1px solid #5e666f;
+}
+
+.yearsCal td.active {    
+  background: rgba(94, 102, 111, 0.05);
+  outline: 1px solid #5e666f;
+}
