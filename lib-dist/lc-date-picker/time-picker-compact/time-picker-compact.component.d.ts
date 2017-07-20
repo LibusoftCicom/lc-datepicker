@@ -1,4 +1,3 @@
-/// <reference types="moment" />
 import { EventEmitter, ChangeDetectorRef, OnInit } from '@angular/core';
 import * as moment from 'moment';
 export declare class LCTimePickerCompactComponent implements OnInit {

@@ -1,4 +1,3 @@
-/// <reference types="moment" />
 import { EventEmitter, ChangeDetectorRef, ElementRef, OnInit, OnChanges } from '@angular/core';
 import { DatePickerConfig, ECalendarType } from './lc-date-picker-config-helper';
 import * as moment from 'moment';

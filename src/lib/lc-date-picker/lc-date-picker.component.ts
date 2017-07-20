@@ -24,7 +24,7 @@ export enum panels {
 
 @Component({
     moduleId: module.id,
-    selector: 'lc-date-picker',
+    selector: 'lc-datepicker',
     template: `
     <div [ngSwitch]="activePanel" class="calendar" *ngIf="opened">
         <lc-year-picker

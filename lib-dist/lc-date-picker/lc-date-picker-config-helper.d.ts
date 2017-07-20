@@ -1,4 +1,3 @@
-/// <reference types="moment" />
 import * as Moment from 'moment';
 export declare enum ECalendarType {
     Time = 0,

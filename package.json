@@ -1,6 +1,6 @@
 {
   "name": "@libusoftcicom/lc-datepicker",
-  "version": "0.8.3",  
+  "version": "0.8.4",
   "description": "LC DatePicker - Pure Angular date and time picker component.",
   "homepage": "https://github.com/LibusoftCicom/lc-datepicker",
   "bugs": "https://github.com/LibusoftCicom/lc-datepicker/issues",
@@ -16,15 +16,15 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test",
+    "start": "ng serve --base-href /",
+    "build": "ng build --base-href /",
+    "test": "ng test --base-href /",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "clean": "rm -rf dist",
     "build:library": "nglb --tsconfig tsconfig-ngc.json --rootDir src/lib --outDir lib-dist",
     "build:dist": "ng build --prod --aot --base-href /lc-datepicker/",
-    "prepublishOnly": "npm run build:dist  && npm run build:library"
+    "build:publish": "npm run build:dist  && npm run build:library"
   },
   "main": "./lib-dist/lc-date-picker.module.js",
   "module": "./lib-dist/lc-date-picker.module.js",

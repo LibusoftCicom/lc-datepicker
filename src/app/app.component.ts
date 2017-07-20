@@ -38,12 +38,10 @@ export class AppComponent {
 
   public openCalendar() {
     this.CalendarOpened = !this.CalendarOpened;
-    //this.detectorRef.detectChanges();
   }
 
   public clearCalendar() {
     this.dateInput.nativeElement.value = '';
-    //this.detectorRef.detectChanges();
   }
 
   public get setDate() {
@@ -79,6 +77,7 @@ export class AppComponent {
 
   public set Format(value){
     this.config.Format = value;
+    this.dateInput.nativeElement.value = '';
   }
 
 

@@ -4,7 +4,9 @@
 > Pure Angular date and time picker component.
 
 
-# [Demo](https://libusoftcicom.github.io/lc-datepicker/)
+# Demo
+
+[Click here for preview](https://libusoftcicom.github.io/lc-datepicker/)
 
 
 # Description
@@ -13,7 +15,7 @@
 - Compatible with Angular 2 and Angular 4 versions
 - Only dependency is MomentJS and Font Awesome
 - Customizable date format and language 
-- Can be configured as Time, DateTime, Date, Month or Year picker
+- Can be configured as time, date-time, date, month or year picker
 
 
 # Tested with
