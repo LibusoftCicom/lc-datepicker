@@ -19,7 +19,6 @@ describe('LCYearPickerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [ LcDatePickerModule ],
       declarations: [
         LCYearPickerComponent
       ]
