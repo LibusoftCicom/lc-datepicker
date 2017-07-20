@@ -29,7 +29,7 @@ export interface ILabels {
 
 export interface IColorTheme {
     primaryColor: string;
-    secondaryColor;
+    fontColor: string;
 }
 
 export class DatePickerConfig {
@@ -48,7 +48,12 @@ export class DatePickerConfig {
     private theme: IColorTheme; 
     private format : Moment.MomentInput;
 
-    constructor() { }
+    constructor() { 
+        this.theme = {
+            primaryColor: 'black',
+            fontColor: 'black'
+        };
+    }
 
     get CalendarType() {
         return this.calendarType;
@@ -210,12 +215,12 @@ export class DatePickerConfig {
         this.theme.primaryColor = primaryColor;
     }
 
-    get SecondaryColor() {
-        return this.theme.secondaryColor;
+    get FontColor() {
+        return this.theme.fontColor;
     }
 
-    set SecondaryColor(secondaryColor: string) {
-        this.theme.secondaryColor = secondaryColor;
+    set FontColor(fontColor: string) {
+        this.theme.fontColor = fontColor;
     }
 
     get Format() {

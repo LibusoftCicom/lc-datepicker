@@ -12,7 +12,7 @@ export enum Panels {
     selector: 'lc-month-picker',
     template: `
     <table class="monthsCal">
-        <thead align="center">
+        <thead align="center"  [style.background]="config.PrimaryColor">
             <tr>
                 <th colspan="4">
                     <div class="selectbtn"> &nbsp; </div>
@@ -25,7 +25,7 @@ export enum Panels {
         <tbody align="center">
             <tr *ngFor="let row of shortMonthName">
             <td *ngFor="let item of row" [ngClass]="{'active': this.newDate.month() === item.index}">
-                <button (click)="setMonth($event, item.key)">{{item.key}}</button>
+                <button (click)="setMonth($event, item.key)" [style.color]="config.FontColor">{{item.key}}</button>
             </td>
             </tr>
         </tbody>

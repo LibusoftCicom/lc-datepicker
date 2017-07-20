@@ -7,7 +7,7 @@ import * as moment from 'moment';
     selector: 'lc-year-picker',
     template: `
     <table class="yearsCal" (wheel)="yearScroll($event)">
-    <thead align="center">
+    <thead align="center"  [style.background]="config.PrimaryColor">
         <tr>
             <th colspan="5">
                 <div class="selectbtn" >
@@ -23,13 +23,13 @@ import * as moment from 'moment';
     <tbody align="center">
         <tr *ngFor="let row of yearsArrayFormated">
         <td *ngFor="let item of row" (click)="setYear($event, item)" [ngClass]="{'active': item === initYear}">
-            <button>{{item}}</button>
+            <button [style.color]="config.FontColor">{{item}}</button>
         </td>
         </tr>
     </tbody>
     </table>
 `,
-    styles: [`button{width:100%;height:100%;background:0 0;cursor:pointer;display:inline-block;line-height:14px;text-align:center;border:0;outline:0}.yearsCal td{min-width:30px;padding:5px 0;outline:1px solid transparent}.calendar,button,table{-webkit-box-sizing:border-box;box-sizing:border-box}.calendar{-webkit-box-shadow:rgba(0,0,0,.156863) 0 1px 5px 0,rgba(0,0,0,.26) -2px -1px 5px 0;box-shadow:rgba(0,0,0,.156863) 0 1px 5px 0,rgba(0,0,0,.26) -2px -1px 5px 0;display:block;font-size:12px;line-height:14px;margin:5px;width:220px}table{width:100%;height:220px;border-collapse:collapse;border:0;display:table}.dateTimeToggle{width:220px;height:20px;background:#e4e4e4;border-top:1px solid #e4e4e4}.dateTimeToggle button{width:50%;height:100%;float:left;background:0 0}.dateTimeToggle button.active,table{background:#fff}.dateTimeToggle :first-child button{border-right:1px solid #efefef}.confirmDate{width:220px;height:20px;background:#efefef}.confirmDate button{width:100%;height:100%;border-top:1px solid #efefef}thead tr{height:25px;background:#5e666f}thead tr,thead tr button{color:#f0f8ff}td.active{background:#e6e8ea}.selectbtn{cursor:pointer;color:#e0e0e0;float:left;width:30px}.pullRight{float:right}.monthlabel{width:80px}.yearlabel{width:50px}.yearsCal td.active,.yearsCal td:hover{outline:1px solid #5e666f}.yearsCal td.active{background:rgba(94,102,111,.05)}`],
+    styles: [`button{width:100%;height:100%;background:0 0;cursor:pointer;display:inline-block;line-height:14px;text-align:center;border:0;outline:0}.yearsCal td{min-width:30px;padding:5px 0;outline:1px solid transparent}.calendar,button,table{-webkit-box-sizing:border-box;box-sizing:border-box}.calendar{-webkit-box-shadow:rgba(0,0,0,.156863) 0 1px 5px 0,rgba(0,0,0,.26) -2px -1px 5px 0;box-shadow:rgba(0,0,0,.156863) 0 1px 5px 0,rgba(0,0,0,.26) -2px -1px 5px 0;display:block;font-size:12px;line-height:14px;margin:5px;width:220px}table{width:100%;height:220px;border-collapse:collapse;border:0;display:table}.dateTimeToggle{width:220px;height:20px;background:#e4e4e4;border-top:1px solid #e4e4e4}.dateTimeToggle button{width:50%;height:100%;float:left;background:0 0}.dateTimeToggle button.active,table{background:#fff}.dateTimeToggle :first-child button{border-right:1px solid #efefef}.confirmDate{width:220px;height:20px;background:#efefef}.confirmDate button{width:100%;height:100%;border-top:1px solid #efefef}thead tr{height:25px}thead tr,thead tr button{color:#f0f8ff}td.active{background:#e6e8ea}.selectbtn{cursor:pointer;color:#e0e0e0;float:left;width:30px}.pullRight{float:right}.monthlabel{width:80px}.yearlabel{width:50px}.yearsCal td.active,.yearsCal td:hover{outline:1px solid #5e666f}.yearsCal td.active{background:rgba(94,102,111,.05)}`],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LCYearPickerComponent implements OnInit, OnChanges {

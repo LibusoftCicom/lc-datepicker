@@ -10,6 +10,10 @@ var ECalendarType;
 })(ECalendarType = exports.ECalendarType || (exports.ECalendarType = {}));
 var DatePickerConfig = (function () {
     function DatePickerConfig() {
+        this.theme = {
+            primaryColor: 'black',
+            fontColor: 'black'
+        };
     }
     Object.defineProperty(DatePickerConfig.prototype, "CalendarType", {
         get: function () {
@@ -211,12 +215,12 @@ var DatePickerConfig = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(DatePickerConfig.prototype, "SecondaryColor", {
+    Object.defineProperty(DatePickerConfig.prototype, "FontColor", {
         get: function () {
-            return this.theme.secondaryColor;
+            return this.theme.fontColor;
         },
-        set: function (secondaryColor) {
-            this.theme.secondaryColor = secondaryColor;
+        set: function (fontColor) {
+            this.theme.fontColor = fontColor;
         },
         enumerable: true,
         configurable: true

@@ -81,7 +81,7 @@ table {
 
 thead tr {
   height: 25px;        
-  background: #5e666f;
+  /*background: #5e666f;*/
   color: aliceblue;
 }
 
@@ -91,7 +91,7 @@ thead tr button{
 
 tr.days {    
   height: 25px;
-  color: #5e666f;
+  /*color: #5e666f;*/
   border-bottom: 1px solid #d8d8d8;
   background: aliceblue;
 }

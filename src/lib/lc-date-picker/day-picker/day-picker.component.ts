@@ -13,7 +13,7 @@ export enum Panels {
     selector: 'lc-day-picker',
     template: `
     <table class="dayPicker" (wheel)="monthScroll($event)">
-        <thead align="center">
+        <thead align="center" [style.background]="config.PrimaryColor">
             <tr>
                 <th colspan=7>
                     <div class="selectbtn" >
@@ -34,13 +34,13 @@ export enum Panels {
                 </th>
             </tr>
         </thead>
-        <tbody align="center">
+        <tbody align="center" >
             <tr class="days">
-            <td *ngFor="let item of shortDayName" class="dayName"><span>{{item}}</span></td>
+            <td *ngFor="let item of shortDayName" class="dayName" [style.color]="config.FontColor"><span>{{item}}</span></td>
             </tr>
             <tr *ngFor="let row of monthData">
             <td *ngFor="let item of row" (click)="dayClick($event, item)" [ngClass]="{'active': item?.active}">
-                <button *ngIf="item">{{item?.date}}</button>
+                <button *ngIf="item" [style.color]="config.FontColor">{{item?.date}}</button>
             </td>
             </tr>
         </tbody>

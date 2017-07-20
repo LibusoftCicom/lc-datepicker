@@ -64,8 +64,8 @@ export enum panels {
             [newDate]="newDate" ></lc-time-picker-compact>
         </div>
 
-        <div class="confirmDate"  *ngIf="config.CalendarType <= 1">
-            <button (click)="confirm()">{{config.ConfirmLabel}}</button>
+        <div class="confirmDate"  *ngIf="config.CalendarType <= 1" [style.background]="config.PrimaryColor">
+            <button (click)="confirm()" >{{config.ConfirmLabel}}</button>
         </div>
 
     </div>

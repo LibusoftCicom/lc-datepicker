@@ -21,7 +21,7 @@ export interface ILabels {
 }
 export interface IColorTheme {
     primaryColor: string;
-    secondaryColor: any;
+    fontColor: string;
 }
 export declare class DatePickerConfig {
     private dayLabels;
@@ -59,6 +59,6 @@ export declare class DatePickerConfig {
     ConfirmLabel: string;
     ColorTheme: IColorTheme;
     PrimaryColor: string;
-    SecondaryColor: string;
+    FontColor: string;
     Format: Moment.MomentInput;
 }

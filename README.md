@@ -1,9 +1,24 @@
 ![Logo of the project](./src/assets/logo.png)
 
 # LC DatePicker
-> LC DatePicker is an Angular component that generates a datepicker calendar on your input element.
-Compatible with Angular2 and Angular4 versions.
-Only dependency is MomentJS.
+> Pure Angular date and time picker component.
+
+# Description
+
+- LC DatePicker is an Angular component that generates a datepicker calendar on your input element
+- Compatible with Angular 2 and Angular 4 versions
+- Only dependency is MomentJS
+- Customizable the date format and language 
+- Can be configured as Time, DateTime, Date, Month or Year picker
+
+
+# Tested with
+
+- Firefox (latest)
+- Chrome (latest)
+- Chromium (latest)
+- Edge
+- IE11
 
 ## Installing / Getting started
 
@@ -58,10 +73,14 @@ npm install
 npm test
 ```
 
-## Versioning
+## Contributing
 
-See our  [contributing guide](https://github.com/LibusoftCicom/lc-datepicker/blob/master/CONTRIBUTING.md).
+### Want to help?
+
+Want to file a bug, contribute some code, or improve documentation? Excellent! Read up on our [contributing guide](https://github.com/LibusoftCicom/lc-datepicker/blob/master/CONTRIBUTING.md) and [code of conduct](https://github.com/LibusoftCicom/lc-datepicker/blob/master/CODE_OF_CONDUCT.md) and then check out one of our [issues](https://github.com/LibusoftCicom/lc-datepicker/issues).
+
+
 
 ## Licensing
 
-Lc datepicker is freely distributable under the terms of the [MIT license](https://github.com/moment/moment/blob/develop/LICENSE).
+Lc DatePicker is freely distributable under the terms of the [MIT license](https://github.com/LibusoftCicom/lc-datepicker/blob/master/LICENSE).

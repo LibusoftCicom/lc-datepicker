@@ -4,18 +4,8 @@
         <span class="navbar-toggler-icon"></span>
       </button>
   <a href="www.spi.hr"><img src="./assets/logo.png"></a>
-  <a class="navbar-brand" href="#">Lc Datepicker</a>
+  <a class="navbar-brand" href="#">Lc DatePicker</a>
 
-  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Demo <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" href="#">Documentation</a>
-      </li>
-    </ul>
-  </div>
 </nav>
 
 <!-- Main jumbotron for a primary marketing message or call to action -->
@@ -23,6 +13,7 @@
   <div class="container">
     <h1 class="display-3">Lc DatePicker</h1>
     <p>AngularJS date time picker component</p>
+    <a href="https://github.com/LibusoftCicom/lc-datepicker" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">GitHub</a>
   </div>
 </div>
 
@@ -32,7 +23,7 @@
     <div class="col-lg-3">
       <div class="card">
         <div class="card-header">
-          Datepicker
+          DatePicker
         </div>
         <div class="card-block">
           <blockquote class="card-blockquote">
@@ -132,10 +123,6 @@
             <input type="text" class="form-control col-sm-8 col-lg-8" [(ngModel)]="PrimaryColor">
           </div>
           <div class="form-group row">
-            <label for="lgFormGroupInput" class="col-4 col-form-label">Background color:</label>
-            <input type="text" class="form-control col-sm-8 col-lg-8" [(ngModel)]="BackgroundColor">
-          </div>
-          <div class="form-group row">
             <label for="lgFormGroupInput" class="col-4 col-form-label">Font color:</label>
             <input type="text" class="form-control col-sm-8 col-lg-8" [(ngModel)]="FontColor">
           </div>
@@ -160,7 +147,14 @@
   <div class="card">
     <h3 class="card-header">Description</h3>
     <div class="card-block">
-      <p class="card-text">Simple Angular2 date picker.</p>
+      <p class="card-text">Pure Angular date and time picker component.</p>
+      <div><ul>
+        <li>LC DatePicker is an Angular component that generates a datepicker calendar on your input element</li>
+        <li>Compatible with Angular 2 and Angular 4 versions</li>
+        <li>Only dependency is MomentJS</li>
+        <li>Customizable the date format and language</li>
+        <li>Can be configured as Time, DateTime, Date, Month or Year picker</li>
+      </ul></div>
     </div>
   </div>
   <br>
@@ -187,15 +181,23 @@
           <li><code>npm install lc/lc-date-picker</code></li>
           <li><code>import &#123;LCDatePickerComponent&#125; from '../lib/lc-date-picker/lc-date-picker.component';</code></li>
           <li>Use the following snippet inside your template:
-            <code>&lt;lc-date-picker [(opened)]="CalendarOpened" [config]="config" [(date)]="setDate"p&gt;&lt;/lc-date-picker&gt;</code>
+            <code>&lt;lc-date-picker [(opened)]="CalendarOpened" [config]="config" [(date)]="setDate"&gt;&lt;/lc-date-picker&gt;</code>
           </li>
         </ol>
     </div>
   </div>
 
+  <div class="card">
+    <h3 class="card-header">Contributing</h3>
+    <div class="card-block">
+      <p class="card-text">
+        Want to file a bug, contribute some code, or improve documentation? Excellent! Read up on our <a href="https://github.com/LibusoftCicom/lc-datepicker/blob/master/CONTRIBUTING.md">contributing guide</a> and <a href="https://github.com/LibusoftCicom/lc-datepicker/blob/master/CODE_OF_CONDUCT.md">code of conduct</a> and then check out one of our <a href="https://github.com/LibusoftCicom/lc-datepicker/issues">issues</a>.</p>
+    </div>
+  </div>
+
   <hr> 
   <footer>
-    <p>&copy; Company 2017</p>
+    <p>&copy; Libusoft Cicom 2017</p>
   </footer>
 </div>
 <!-- /container -->

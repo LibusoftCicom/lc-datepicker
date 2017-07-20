@@ -7,7 +7,7 @@ import * as moment from 'moment';
     selector: 'lc-year-picker',
     template: `
     <table class="yearsCal" (wheel)="yearScroll($event)">
-    <thead align="center">
+    <thead align="center"  [style.background]="config.PrimaryColor">
         <tr>
             <th colspan="5">
                 <div class="selectbtn" >
@@ -23,7 +23,7 @@ import * as moment from 'moment';
     <tbody align="center">
         <tr *ngFor="let row of yearsArrayFormated">
         <td *ngFor="let item of row" (click)="setYear($event, item)" [ngClass]="{'active': item === initYear}">
-            <button>{{item}}</button>
+            <button [style.color]="config.FontColor">{{item}}</button>
         </td>
         </tr>
     </tbody>

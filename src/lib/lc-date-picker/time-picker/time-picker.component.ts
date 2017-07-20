@@ -7,24 +7,24 @@ import * as moment from 'moment';
     selector: 'lc-time-picker',
     template: `
     <table>
-        <thead align="center">
+        <thead align="center"  [style.background]="config.PrimaryColor">
             <tr>
             <th [attr.colspan]="is24HourFormat ? 5 : 6">
                 <div class="resetBtn"> &nbsp; </div>
                 <div class="resetBtn" (click)="resetDate($event)"> <i class="fa fa-home" aria-hidden="true"></i> </div>
             </th></tr>
         </thead>
-        <tbody align="center">
+        <tbody align="center" [style.color]="config.FontColor">
             <tr>
             <td rowspan="3"></td>
-            <td class="selectbtn" (click)="addHour()" (wheel)="hourScroll($event)">
-                <i class="fa fa-caret-up" aria-hidden="true"></i>
+            <td class="selectbtn" (click)="addHour()" (wheel)="hourScroll($event)" >
+                <i class="fa fa-caret-up" aria-hidden="true" [style.color]="config.FontColor"></i>
             </td>
             <td rowspan="3" class="divider">:</td>
-            <td class="selectbtn" (click)="addMinute()" (wheel)="minuteScroll($event)">
+            <td class="selectbtn" (click)="addMinute()" (wheel)="minuteScroll($event)" [style.color]="config.FontColor">
                 <i class="fa fa-caret-up" aria-hidden="true"></i>
             </td>
-            <td class="selectbtn" (click)="toggleMeridiem()" (wheel)="toggleMeridiem($event)" *ngIf="!is24HourFormat">
+            <td class="selectbtn" (click)="toggleMeridiem()" (wheel)="toggleMeridiem($event)" *ngIf="!is24HourFormat" [style.color]="config.FontColor">
                 <i class="fa fa-caret-up" aria-hidden="true"></i>
             </td>
             <td rowspan="3"></td>
@@ -35,13 +35,13 @@ import * as moment from 'moment';
             <td class="timeDigit" (wheel)="toggleMeridiem($event)" *ngIf="!is24HourFormat">{{newDate.format('A')}}</td>
             </tr>
             <tr>
-            <td class="selectbtn" (click)="subtractHour()" (wheel)="hourScroll($event)">
+            <td class="selectbtn" (click)="subtractHour()" (wheel)="hourScroll($event)" [style.color]="config.FontColor">
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
             </td>
-            <td class="selectbtn" (click)="subtractMinute()" (wheel)="minuteScroll($event)">
+            <td class="selectbtn" (click)="subtractMinute()" (wheel)="minuteScroll($event)" [style.color]="config.FontColor">
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
             </td>
-            <td class="selectbtn" (click)="toggleMeridiem()" (wheel)="toggleMeridiem($event)" *ngIf="!is24HourFormat">
+            <td class="selectbtn" (click)="toggleMeridiem()" (wheel)="toggleMeridiem($event)" *ngIf="!is24HourFormat" [style.color]="config.FontColor">
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
                 </td>
             </tr>

@@ -1,6 +1,6 @@
 # Contributing
 
-First off, thank you for considering contributing to Lc datepicker.
+First off, thank you for considering contributing to LC DatePicker.
 
 Before you submit an issue, please search the issue tracker, maybe an issue for your problem already exists and the discussion might inform you of workarounds readily available.
 

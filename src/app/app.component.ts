@@ -9,7 +9,7 @@ import * as moment from 'moment';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'app';
+  title = 'LC DatePicker';
   public CalendarOpened = false;
   public config = new DatePickerConfig();
   private availableLocalizations: String[];
@@ -19,7 +19,6 @@ export class AppComponent {
 
   @ViewChild('dateInput')
   dateInput: ElementRef;
-
 
   constructor() {
 
@@ -32,8 +31,9 @@ export class AppComponent {
       confirmLabel: 'Ok',
       timeLabel: 'Time'
     }
-
-    this.availableLocalizations = ['hr', 'en'];
+    
+    this.config.PrimaryColor = '#5e666f';
+    this.config.FontColor = '#5e666f';
   }
 
   public openCalendar() {
@@ -92,25 +92,19 @@ export class AppComponent {
 
 
   public get PrimaryColor(){
-    return this.config.ConfirmLabel;
+    return this.config.PrimaryColor;
   }
 
   public set PrimaryColor(value){
-    this.config.ConfirmLabel = value;
-  }
-  public get BackgroundColor(){
-    return this.config.ConfirmLabel;
+    this.config.PrimaryColor = value;
   }
 
-  public set BackgroundColor(value){
-    this.config.ConfirmLabel = value;
-  }
   public get FontColor(){
-    return this.config.ConfirmLabel;
+    return this.config.ColorTheme.fontColor;
   }
 
   public set FontColor(value){
-    this.config.ConfirmLabel = value;
+    this.config.ColorTheme.fontColor = value;
   }
 
 

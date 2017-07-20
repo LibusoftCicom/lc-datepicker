@@ -1,7 +1,7 @@
 {
-  "name": "lc-date-picker",
+  "name": "@libusoftcicom/lc-datepicker",
   "version": "0.8.0",  
-  "description": "LC DatePicker - Angular datepicker component",
+  "description": "LC DatePicker - Pure Angular date and time picker component.",
   "homepage": "https://github.com/LibusoftCicom/lc-datepicker",
   "bugs": "https://github.com/LibusoftCicom/lc-datepicker/issues",
   "license": "MIT",
@@ -29,7 +29,6 @@
   "main": "./lib-dist/lc-date-picker.module.js",
   "module": "./lib-dist/lc-date-picker.module.js",
   "types": "./lib-dist/lc-date-picker.module.d.ts",
-  "private": true,
   "dependencies": {
     "font-awesome": "4.7.0",
     "moment": "2.18.1"
