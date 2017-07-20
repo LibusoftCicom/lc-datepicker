@@ -90,4 +90,4 @@ Want to file a bug, contribute some code, or improve documentation? Excellent! R
 
 ## Licensing
 
-Lc DatePicker is freely distributable under the terms of the [MIT license](https://github.com/LibusoftCicom/lc-datepicker/blob/master/LICENSE).
+LC DatePicker is freely distributable under the terms of the [MIT license](https://github.com/LibusoftCicom/lc-datepicker/blob/master/LICENSE).
