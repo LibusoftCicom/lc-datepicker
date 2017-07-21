@@ -34,7 +34,6 @@ npm install libusoftcicom/lc-datepicker
 ```
 Use the following snippet inside your app module: 
 ```shell
-import {LCDatePickerComponent} from '@libusoftcicom/lc-datepicker';
 
 @NgModule({
   imports: [
@@ -44,13 +43,35 @@ import {LCDatePickerComponent} from '@libusoftcicom/lc-datepicker';
   ]
 })
 export class AppModule { }
-
-
 ```
+
+Use the following snippet inside your component: 
+```shell
+import {LCDatePickerComponent, DatePickerConfig, ECalendarType} from '@libusoftcicom/lc-datepicker';
+
+public config = new DatePickerConfig();
+```
+
 Use the following snippet inside your template: 
 ```shell
 <lc-datepicker [(opened)]="CalendarOpened" [config]="config" [(date)]="setDate"></lc-datepicker>
 ```
+## DatePicker config parameters
+
+* CalendarType: ECalendarType
+* Localization: String
+* MaxYear: Number
+* MinYear: Number
+* MaxMonth: Number
+* MinMonth: Number
+* MaxDay: Number
+* MinDay: Number
+* ConfirmLabel: String
+* PrimaryColor: String
+* FontColor: String
+* Format: Moment.MomentInput
+
+
 
 ## Developing
 

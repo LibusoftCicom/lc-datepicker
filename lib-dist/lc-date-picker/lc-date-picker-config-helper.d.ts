@@ -14,8 +14,6 @@ export interface IDate {
     minutes?: number;
 }
 export interface ILabels {
-    dateLabel?: string;
-    timeLabel?: string;
     confirmLabel?: string;
 }
 export interface IColorTheme {
@@ -23,14 +21,7 @@ export interface IColorTheme {
     fontColor: string;
 }
 export declare class DatePickerConfig {
-    private dayLabels;
-    private monthLabels;
     private calendarType;
-    private dateFormat;
-    private showTodayBtn;
-    private disabledDates;
-    private disabledDateRanges;
-    private disableWeekends;
     private localization;
     private minDate;
     private maxDate;
@@ -53,8 +44,6 @@ export declare class DatePickerConfig {
     MinMinutes: number;
     MaxMinutes: number;
     Labels: ILabels;
-    TimeLabel: string;
-    DateLabel: string;
     ConfirmLabel: string;
     ColorTheme: IColorTheme;
     PrimaryColor: string;

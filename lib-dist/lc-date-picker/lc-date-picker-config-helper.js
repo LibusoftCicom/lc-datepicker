@@ -165,26 +165,6 @@ var DatePickerConfig = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(DatePickerConfig.prototype, "TimeLabel", {
-        get: function () {
-            return this.labels.timeLabel;
-        },
-        set: function (timeLabel) {
-            this.labels.timeLabel = timeLabel;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(DatePickerConfig.prototype, "DateLabel", {
-        get: function () {
-            return this.labels.dateLabel;
-        },
-        set: function (dateLabel) {
-            this.labels.dateLabel = dateLabel;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(DatePickerConfig.prototype, "ConfirmLabel", {
         get: function () {
             return this.labels.confirmLabel;

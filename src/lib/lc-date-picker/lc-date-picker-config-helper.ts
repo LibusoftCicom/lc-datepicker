@@ -22,8 +22,6 @@ interface IDateRange {
 }
 
 export interface ILabels {
-    dateLabel?: string;
-    timeLabel?: string;
     confirmLabel?: string;
 }
 
@@ -33,14 +31,7 @@ export interface IColorTheme {
 }
 
 export class DatePickerConfig {
-    private dayLabels: Array<string>;
-    private monthLabels: Array<string>;
     private calendarType: ECalendarType;
-    private dateFormat: string;
-    private showTodayBtn: boolean;
-    private disabledDates: Array<IDate>;
-    private disabledDateRanges: Array<IDateRange>;
-    private disableWeekends: boolean;
     private localization: string;
     private minDate: IDate;
     private maxDate: IDate;
@@ -173,22 +164,6 @@ export class DatePickerConfig {
 
     set Labels(label: ILabels) {
         this.labels = label;
-    }
-
-    get TimeLabel() {
-        return this.labels.timeLabel;
-    }
-
-    set TimeLabel(timeLabel: string) {
-        this.labels.timeLabel = timeLabel;
-    }
-
-    get DateLabel() {
-        return this.labels.dateLabel;
-    }
-
-    set DateLabel(dateLabel: string) {
-        this.labels.dateLabel = dateLabel;
     }
 
     get ConfirmLabel() {

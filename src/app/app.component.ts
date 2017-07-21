@@ -27,9 +27,7 @@ export class AppComponent {
     this.config.MinDate = { years: 1900 };
     this.config.MaxDate = { years: 2100 };
     this.config.Labels = {
-      dateLabel: 'Date',
       confirmLabel: 'Ok',
-      timeLabel: 'Time'
     }
     
     this.config.PrimaryColor = '#5e666f';

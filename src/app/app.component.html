@@ -132,7 +132,7 @@
     <div class="col-lg-3">
       <div class="card">
         <div class="card-header">
-          Methodes
+          Methods
         </div>
         <div class="card-block">
           <blockquote class="card-blockquote">
@@ -179,13 +179,35 @@
       <p class="card-text">
         <ol>
           <li><code>npm install libusoftcicom/lc-datepicker</code></li>
-          <li><code>import &#123;LCDatePickerComponent&#125; from '@libusoftcicom/lc-datepicker';</code></li>
+          <li><code>import &#123;LCDatePickerComponent, DatePickerConfig, ECalendarType&#125; from '@libusoftcicom/lc-datepicker';</code></li>
+          <li><code>public config = new DatePickerConfig();</code></li>
           <li>Use the following snippet inside your template:
             <code>&lt;lc-datepicker [(opened)]="CalendarOpened" [config]="config" [(date)]="setDate"&gt;&lt;/lc-datepicker&gt;</code>
           </li>
         </ol>
     </div>
   </div>
+
+    <div class="card">
+      <h3 class="card-header">DatePicker config parameters</h3>
+      <div class="card-block">
+        <p class="card-text">
+          <ul>
+            <li> CalendarType: ECalendarType</li>
+            <li> Localization: String</li>
+            <li> MaxYear: Number</li>
+            <li> MinYear: Number</li>
+            <li> MaxMonth: Number</li>
+            <li> MinMonth: Number</li>
+            <li> MaxDay: Number</li>
+            <li> MinDay: Number</li>
+            <li> ConfirmLabel: String</li>
+            <li> PrimaryColor: String</li>
+            <li> FontColor: String</li>
+            <li> Format: Moment.MomentInput</li>
+          </ul>
+      </div>
+    </div>
 
   <div class="card">
     <h3 class="card-header">Contributing</h3>
