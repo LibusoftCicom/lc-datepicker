@@ -28,15 +28,29 @@
 
 ## Installing / Getting started
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.1.3.
 
 ```shell
-git clone https://github.com/LibusoftCicom/lc-datepicker.git
-cd lc-datepicker/
-npm install
-npm serve
+npm install libusoftcicom/lc-datepicker
 ```
-Open "http://localhost:4200" in browser
+Use the following snippet inside your app module: 
+```shell
+import {LCDatePickerComponent} from '@libusoftcicom/lc-datepicker';
+
+@NgModule({
+  imports: [
+    ...
+    LcDatePickerModule,
+    ...
+  ]
+})
+export class AppModule { }
+
+
+```
+Use the following snippet inside your template: 
+```shell
+<lc-datepicker [(opened)]="CalendarOpened" [config]="config" [(date)]="setDate"></lc-datepicker>
+```
 
 ## Developing
 
@@ -47,23 +61,39 @@ Open "http://localhost:4200" in browser
 
 ### Setting up Dev
 
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.1.3.
+
+[Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
+
+```shell
+npm install -g @angular/cli
+```
+
 ```shell
 git clone https://github.com/LibusoftCicom/lc-datepicker.git
 cd lc-datepicker/
 npm install
-npm serve
+npm run start
 ```
 Open "http://localhost:4200" in browser
 
 
 ### Building
 
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.1.3.
+
+
+[Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
+
+```shell
+npm install -g @angular/cli
+```
 
 ```shell
 git clone https://github.com/LibusoftCicom/lc-datepicker.git
 cd lc-datepicker/
 npm install
-npm build:dist
+npm run build
 ```
 
 ## Versioning
@@ -72,12 +102,21 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Tests
 
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.1.3.
+
+
+[Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
+
+```shell
+npm install -g @angular/cli
+```
+
 
 ```shell
 git clone https://github.com/LibusoftCicom/lc-datepicker.git
 cd lc-datepicker/
 npm install
-npm test
+npm run test
 ```
 
 ## Contributing
