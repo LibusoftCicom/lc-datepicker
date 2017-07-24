@@ -4,6 +4,12 @@
 > Pure Angular date and time picker component.
 
 
+
+[![npm version](https://badge.fury.io/js/%40libusoftcicom%2Flc-datepicker.svg)](https://www.npmjs.com/package/@libusoftcicom/lc-datepicker)
+
+
+
+
 # Demo
 
 [Click here for preview](https://libusoftcicom.github.io/lc-datepicker/)

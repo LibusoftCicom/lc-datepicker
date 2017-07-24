@@ -7,8 +7,12 @@
   "license": "MIT",
   "keywords": [
     "datepicker",
+    "timepicker",
+    "datetimepicker",
     "calendar",
-    "angular"
+    "angular",
+    "angular2+",
+    "angular4",
   ],
   "repository": {
     "type": "git",
