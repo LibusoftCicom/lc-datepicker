@@ -18,4 +18,4 @@ install:
   - npm install
 
 script:
-  - ng tests --watch=false
+  - ng test --watch=false
