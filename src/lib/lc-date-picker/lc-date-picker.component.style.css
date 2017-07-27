@@ -58,7 +58,7 @@ td:hover {
 }
 
 table {
-  width: 100%;
+  width: 220px;
   height: calc(100% - 36px);
   border-collapse: collapse;
   border: none;
