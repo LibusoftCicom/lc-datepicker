@@ -26,8 +26,8 @@ var LCDatePickerComponent = (function () {
         var format = this.config.Format || '';
         this.locale = this.config.Localization || 'hr';
         moment.locale(this.locale);
-        this.originalDate = !this.date || moment(this.date, format).isValid() ? moment().locale(this.locale) : moment(this.date, format).locale(this.locale);
-        this.newDate = !this.date || moment(this.date, format).isValid() ? moment().locale(this.locale) : moment(this.date, format).locale(this.locale);
+        this.originalDate = !this.date || !moment(this.date, format).isValid() ? moment().locale(this.locale) : moment(this.date, format).locale(this.locale);
+        this.newDate = !this.date || !moment(this.date, format).isValid() ? moment().locale(this.locale) : moment(this.date, format).locale(this.locale);
         this.setPanel(this.config.CalendarType);
     };
     LCDatePickerComponent.prototype.ngOnChanges = function (changes) {

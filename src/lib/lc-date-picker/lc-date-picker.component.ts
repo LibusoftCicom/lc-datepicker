@@ -103,8 +103,8 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
         let format = this.config.Format || ''
         this.locale = this.config.Localization || 'hr';
         moment.locale(this.locale);
-        this.originalDate = !this.date || moment(this.date, <string>format).isValid() ? moment().locale(this.locale) : moment(this.date, <string>format).locale(this.locale);
-        this.newDate = !this.date || moment(this.date, <string>format).isValid() ? moment().locale(this.locale) : moment(this.date, <string>format).locale(this.locale);
+        this.originalDate = !this.date || !moment(this.date, <string>format).isValid() ? moment().locale(this.locale) : moment(this.date, <string>format).locale(this.locale);
+        this.newDate = !this.date || !moment(this.date, <string>format).isValid() ? moment().locale(this.locale) : moment(this.date, <string>format).locale(this.locale);
         this.setPanel(this.config.CalendarType);
 
     }
