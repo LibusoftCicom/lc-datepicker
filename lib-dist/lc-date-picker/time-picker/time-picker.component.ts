@@ -24,7 +24,7 @@ import * as moment from 'moment';
             <td class="selectbtn" (click)="addMinute()" (wheel)="minuteScroll($event)" [style.color]="config.FontColor">
                 <i class="fa fa-caret-up" aria-hidden="true"></i>
             </td>
-            <td class="selectbtn" (click)="toggleMeridiem()" (wheel)="toggleMeridiem($event)" *ngIf="!is24HourFormat" [style.color]="config.FontColor">
+            <td class="selectbtn" (click)="toggleMeridiem($event)" (wheel)="toggleMeridiem($event)" *ngIf="!is24HourFormat" [style.color]="config.FontColor">
                 <i class="fa fa-caret-up" aria-hidden="true"></i>
             </td>
             <td rowspan="3"></td>
@@ -41,7 +41,7 @@ import * as moment from 'moment';
             <td class="selectbtn" (click)="subtractMinute()" (wheel)="minuteScroll($event)" [style.color]="config.FontColor">
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
             </td>
-            <td class="selectbtn" (click)="toggleMeridiem()" (wheel)="toggleMeridiem($event)" *ngIf="!is24HourFormat" [style.color]="config.FontColor">
+            <td class="selectbtn" (click)="toggleMeridiem($event)" (wheel)="toggleMeridiem($event)" *ngIf="!is24HourFormat" [style.color]="config.FontColor">
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
                 </td>
             </tr>
