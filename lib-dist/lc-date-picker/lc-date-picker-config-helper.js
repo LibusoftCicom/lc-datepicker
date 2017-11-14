@@ -8,7 +8,7 @@ var ECalendarType;
     ECalendarType[ECalendarType["MonthYear"] = 3] = "MonthYear";
     ECalendarType[ECalendarType["Year"] = 4] = "Year";
 })(ECalendarType = exports.ECalendarType || (exports.ECalendarType = {}));
-var DatePickerConfig = (function () {
+var DatePickerConfig = /** @class */ (function () {
     function DatePickerConfig() {
         this.theme = {
             primaryColor: 'black',

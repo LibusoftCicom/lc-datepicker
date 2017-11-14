@@ -18,7 +18,7 @@
 # Description
 
 - LC DatePicker is an Angular component that generates a datepicker calendar on your input element
-- Compatible with Angular 2 and Angular 4 versions
+- Compatible with Angular 2+ up to Angular v5.0.0
 - Only dependency is MomentJS and Font Awesome
 - Customizable date format and language 
 - Can be configured as time, date-time, date, month or year picker

@@ -11,31 +11,31 @@ var day_picker_component_1 = require("./lc-date-picker/day-picker/day-picker.com
 var month_picker_component_1 = require("./lc-date-picker/month-picker/month-picker.component");
 var year_picker_component_1 = require("./lc-date-picker/year-picker/year-picker.component");
 var lc_date_picker_component_1 = require("./lc-date-picker/lc-date-picker.component");
-var LcDatePickerModule = (function () {
+var LcDatePickerModule = /** @class */ (function () {
     function LcDatePickerModule() {
     }
+    LcDatePickerModule.decorators = [
+        { type: core_1.NgModule, args: [{
+                    imports: [
+                        common_1.CommonModule
+                    ],
+                    declarations: [
+                        lc_date_picker_component_1.LCDatePickerComponent,
+                        time_picker_component_1.LCTimePickerComponent,
+                        time_picker_compact_component_1.LCTimePickerCompactComponent,
+                        day_picker_component_1.LCDayPickerComponent,
+                        month_picker_component_1.LCMonthPickerComponent,
+                        year_picker_component_1.LCYearPickerComponent
+                    ],
+                    exports: [
+                        lc_date_picker_component_1.LCDatePickerComponent,
+                    ]
+                },] },
+    ];
+    /** @nocollapse */
+    LcDatePickerModule.ctorParameters = function () { return []; };
     return LcDatePickerModule;
 }());
-LcDatePickerModule.decorators = [
-    { type: core_1.NgModule, args: [{
-                imports: [
-                    common_1.CommonModule
-                ],
-                declarations: [
-                    lc_date_picker_component_1.LCDatePickerComponent,
-                    time_picker_component_1.LCTimePickerComponent,
-                    time_picker_compact_component_1.LCTimePickerCompactComponent,
-                    day_picker_component_1.LCDayPickerComponent,
-                    month_picker_component_1.LCMonthPickerComponent,
-                    year_picker_component_1.LCYearPickerComponent
-                ],
-                exports: [
-                    lc_date_picker_component_1.LCDatePickerComponent,
-                ]
-            },] },
-];
-/** @nocollapse */
-LcDatePickerModule.ctorParameters = function () { return []; };
 exports.LcDatePickerModule = LcDatePickerModule;
 __export(require("./lc-date-picker/lc-date-picker-config-helper"));
 __export(require("./lc-date-picker/lc-date-picker.component"));
