@@ -81,8 +81,25 @@ thead tr button{
   color: aliceblue;
 }
 
-td.active {
+/* td.active {
   background: rgb(230, 232, 234);
+} */
+
+.yearsCal td.active,
+.yearsCal td:hover{
+  outline: 1px solid #5e666f;
+}
+
+.yearsCal td.disabled {
+  background: rgba(234,234,234,0.05);
+}
+
+.yearsCal td.current {
+  background: rgba(94, 102, 111, 0.05);
+}
+
+.yearsCal td.disabled button {
+  color: rgb(187, 201, 216) !important;
 }
 
 .selectbtn{
@@ -104,11 +121,4 @@ td.active {
   width: 50px;
 }
 
-.yearsCal td:hover{
-  outline: 1px solid #5e666f;
-}
 
-.yearsCal td.active {    
-  background: rgba(94, 102, 111, 0.05);
-  outline: 1px solid #5e666f;
-}

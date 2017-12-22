@@ -1,10 +1,11 @@
 import { EventEmitter, ChangeDetectorRef, OnInit, OnChanges } from '@angular/core';
+import { DatePickerConfig } from './../lc-date-picker-config-helper';
 import * as moment from 'moment';
 export declare class LCTimePickerComponent implements OnInit, OnChanges {
     private cd;
     is24HourFormat: boolean;
     newDate: moment.Moment;
-    config: any;
+    config: DatePickerConfig;
     selected: EventEmitter<moment.Moment>;
     reset: EventEmitter<void>;
     constructor(cd: ChangeDetectorRef);

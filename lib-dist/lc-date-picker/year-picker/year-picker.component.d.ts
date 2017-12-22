@@ -1,13 +1,20 @@
 import { EventEmitter, ChangeDetectorRef, OnInit, OnChanges } from '@angular/core';
+import { DatePickerConfig } from './../lc-date-picker-config-helper';
 import * as moment from 'moment';
+export interface IYearobject {
+    year: number;
+    active?: boolean;
+    disabled?: boolean;
+    current?: boolean;
+}
 export declare class LCYearPickerComponent implements OnInit, OnChanges {
     private cd;
     tempDate: number;
     initYear: number;
-    yearsArray: number[];
-    yearsArrayFormated: number[][];
+    yearsArray: IYearobject[];
+    yearsArrayFormated: IYearobject[][];
     newDate: moment.Moment;
-    config: any;
+    config: DatePickerConfig;
     selected: EventEmitter<moment.Moment>;
     reset: EventEmitter<void>;
     constructor(cd: ChangeDetectorRef);
@@ -17,7 +24,7 @@ export declare class LCYearPickerComponent implements OnInit, OnChanges {
     formatYears(): void;
     prevYears(): void;
     nextYears(): void;
-    setYear(event: any, item: any): void;
+    setYear(event: any, item?: IYearobject): void;
     yearScroll(event: any): void;
     private preventDefault(e);
     private stopPropagation(e);

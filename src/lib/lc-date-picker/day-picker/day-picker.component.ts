@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnInit, OnChanges } from '@angular/core';
+import { DatePickerConfig } from './../lc-date-picker-config-helper';
 import * as moment from 'moment';
 
 export enum Panels {
@@ -6,6 +7,19 @@ export enum Panels {
     Day,
     Month,
     Year
+}
+
+export interface IDateObject {
+    milliseconds: number;
+    seconds: number;
+    minutes: number;
+    hours: number;
+    date: number;
+    months: number;
+    years: number;
+    active?: boolean;
+    disabled?: boolean;
+    current?: boolean;
 }
 
 @Component({
@@ -39,7 +53,7 @@ export enum Panels {
             <td *ngFor="let item of shortDayName" class="dayName" [style.color]="config.FontColor"><span>{{item}}</span></td>
             </tr>
             <tr *ngFor="let row of monthData">
-            <td *ngFor="let item of row" (click)="dayClick($event, item)" [ngClass]="{'active': item?.active}">
+            <td *ngFor="let item of row" (click)="dayClick($event, item)" [ngClass]="{'active': item?.active, 'disabled': item?.disabled, 'current': item?.current}">
                 <button *ngIf="item" [style.color]="config.FontColor">{{item?.date}}</button>
             </td>
             </tr>
@@ -51,13 +65,17 @@ export enum Panels {
 })
 export class LCDayPickerComponent implements OnInit, OnChanges {
     public tempDate: moment.Moment;
-    public monthData;
+    public monthData: Array<Array<IDateObject>>;
     public shortDayName;
     public shortMonthName;
     public panels = Panels;
 
+    private currentDate: moment.Moment = moment(moment.now()).startOf('day');
+    private minDate: moment.Moment = null;
+    private maxDate: moment.Moment = null;
+
     @Input() newDate: moment.Moment;
-    @Input() config;
+    @Input() config: DatePickerConfig;
     @Output() selected: EventEmitter<moment.Moment> = new EventEmitter<moment.Moment>();
     @Output() switchPannel: EventEmitter<Panels> = new EventEmitter<Panels>();
     @Output() reset: EventEmitter<void> = new EventEmitter<void>();
@@ -72,7 +90,8 @@ export class LCDayPickerComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(changes) {
-        if (changes.newDate) {
+        // ignore initial detection
+        if (changes.newDate && !changes.newDate.firstChange) {
             this.tempDate = moment(changes.newDate.currentValue.toISOString());
             this.formatMonthData();
             this.cd.detectChanges();
@@ -83,7 +102,8 @@ export class LCDayPickerComponent implements OnInit, OnChanges {
         const currentDate = moment(this.tempDate.toISOString());
         const daysInPrevMonth = currentDate.startOf('month').weekday() % 7;
 
-        const currentMonth = this.setActiveDate(this.createMonthArray());
+        this.prepareMaxMinDates();
+        const currentMonth = this.createMonthArray();
 
         Array.from(Array(daysInPrevMonth).keys()).map((val, index) => {
             currentMonth.unshift(null);
@@ -93,40 +113,106 @@ export class LCDayPickerComponent implements OnInit, OnChanges {
             ? rows.push([key])
             : rows[rows.length - 1].push(key)) && rows, []);
 
+        // if final week is shorter than should be
         while (this.monthData[this.monthData.length - 1].length < 7) {
             this.monthData[this.monthData.length - 1].push(null);
         }
-
     }
 
     createMonthArray() {
-        const currentDate = moment(this.tempDate.toISOString());
-        const daysinMonth = currentDate.daysInMonth();
-        const monthObj = currentDate.startOf('month').toObject();
+        const selectedDate = this.newDate.toObject();
 
+        // day used to create calendar
+        const date = moment(this.tempDate.toISOString());
+        const daysinMonth = date.daysInMonth();
+        const monthObj = date.startOf('month').toObject();
+
+        // create date objects
         return Array.from(Array(daysinMonth).keys()).map((val, index) => {
-            return { ...monthObj, date: monthObj.date + index };
+            let date: IDateObject = { ...monthObj, date: monthObj.date + index };
+
+            if (date.date === selectedDate.date) {
+                date = { ...date, active: true };
+            }
+
+            // mark current date
+            if (this.isCurrentDate(date)) {
+                date = { ...date, current: true };
+            }
+
+            // if date isn't in allowed range
+            if( this.isDateDisabled( date ) ){
+                date = { ...date, disabled: true };
+            }
+
+            return date;
         });
     }
 
-    setActiveDate(date: any) {
-        const currentDate = this.newDate.toObject();
-        if (currentDate.years !== date[0].years || currentDate.months !== date[0].months) {
-            return date;
+    private isCurrentDate( date: IDateObject ): boolean {
+        return moment(date).isSame( this.currentDate );
+    }
+
+    private isDateDisabled( date: IDateObject ): boolean {
+        let momentDate = moment(date);
+
+        let disabled = this.config.DisabledDates[ momentDate.format('YYYY-MM-DD') ];
+        if( disabled != null ){
+            return disabled.isSame(momentDate);
         }
-        return date.map(item => {
-            if (item.date === currentDate.date) {
-                return { ...item, active: true };
+
+        const maxDate = this.maxDate;
+        if( maxDate && maxDate.isValid() && maxDate.isBefore( momentDate ) ){
+            return true;
+        }
+
+        const minDate = this.minDate;
+        if( minDate && minDate.isValid() && minDate.isAfter( momentDate ) ){
+            return true;
+        }
+
+        return false;
+    }
+
+    private prepareMaxMinDates(){
+        let minDate = this.minDate = this.config.MinDate ? moment(this.config.MinDate) : null;
+        let maxDate = this.maxDate = this.config.MaxDate ? moment(this.config.MaxDate) : null;
+
+        if(maxDate){
+            /**
+             * if year is known and month isn't set maxDate to the end of year
+             */
+            if( this.config.MaxYear != null && this.config.MaxMonth == null ){
+                maxDate = maxDate.endOf('year');
             }
-            return item;
-        });
+
+            /**
+             * if month is known and date isn't, set maxDate to the end of month
+             */
+            if( this.config.MaxMonth != null && this.config.MaxDay == null ){
+                maxDate = maxDate.endOf('month');
+            }
+        }
+
+        if(minDate){
+            /**
+             * if year is known and month isn't set minDate to first day of the year
+             */
+            if( this.config.MinYear != null && this.config.MinMonth == null ){
+                minDate = minDate.startOf('year');
+            }
+
+            /**
+             * if month is known and date isn't set minDate to first day of the month
+             */
+            if( this.config.MinMonth != null && this.config.MinDay == null ){
+                minDate = minDate.startOf('month');
+            }
+        }
     }
 
     nextMonth(event?) {
         const nDate = moment(this.tempDate).add(1, 'months');
-        if (nDate.year() > this.config.maxDate.year) {
-            return;
-        }
         this.tempDate = nDate;
         this.formatMonthData();
         this.cd.detectChanges();
@@ -134,16 +220,13 @@ export class LCDayPickerComponent implements OnInit, OnChanges {
 
     prevMonth(event?) {
         const nDate = moment(this.tempDate).subtract(1, 'months');
-        if (nDate.year() < this.config.minDate.year) {
-            return;
-        }
         this.tempDate = nDate;
         this.formatMonthData();
         this.cd.detectChanges();
     }
 
     dayClick(event: Event, item: any) {
-        if (!item) {
+        if (!item || item.disabled) {
             return;
         }
 

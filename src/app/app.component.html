@@ -12,7 +12,7 @@
 <div class="jumbotron">
   <div class="container">
     <h1 class="display-3">LC DatePicker</h1>
-    <p>AngularJS date time picker component</p>
+    <p>Angular date time picker component</p>
     <a href="https://github.com/LibusoftCicom/lc-datepicker" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">GitHub</a>
   </div>
 </div>
@@ -85,7 +85,6 @@
           <hr>
 
 
-
           <div class="form-group ">
             <blockquote class="card-blockquote col-12">
               <b>Output format:</b> 
@@ -113,6 +112,7 @@
           <hr>
 
 
+
           <div class="form-group ">
             <blockquote class="card-blockquote col-12">
               <b>Color theme:</b>
@@ -126,6 +126,36 @@
             <label for="lgFormGroupInput" class="col-4 col-form-label">Font color:</label>
             <input type="text" class="form-control col-sm-8 col-lg-8" [(ngModel)]="FontColor">
           </div>
+          <hr>
+
+          <div class="form-group">
+            <blockquote class="card-blockquote col-12">
+              <b>Define allowed/disabled dates:</b>
+            </blockquote>
+          </div>
+          <div class="form-group">
+              <p>To configure range of available dates in calendar you can use 
+                config.MinDate and config.MaxDate, all dates out of that range are disabled
+              </p>
+              <p>
+                <code class="small-text">const config = new DatePickerConfig();
+config.MinDate = &#123; years: {{ fromDateObject.years }}, months: {{ fromDateObject.months }}, date: {{ fromDateObject.date }} &#125;;
+config.MaxDate = &#123; years: {{ toDateObject.years }}, months: {{ toDateObject.months }}, date: {{ toDateObject.date }} &#125;;</code>
+              </p>
+          </div>
+          <hr>
+          <div class="form-group">
+            <p>or to configure dates which are disabled you can use config.setDisabledDates( Array&lt;MomentInput&gt; )</p>
+            <p>
+              <code class="small-text">const config = new DatePickerConfig();
+config.setDisabledDates({{ randomDisabledDates | json }});</code>
+            </p>
+          </div>
+          <hr>
+          <div class="form-group">
+            <p>if <i class="fa fa-home"></i> is pressed and that day is in previously defined disabled list, calendar will pick next available date</p>
+          </div>
+
         </div>
       </div>
     </div>
@@ -152,7 +182,7 @@
         <li>LC DatePicker is an Angular component that generates a datepicker calendar on your input element</li>
         <li>Compatible with Angular 2+ up to Angular v5.0.0<li>/
         <li>Only dependency is MomentJS and Font Awesome</li>
-        <li>Customizable the date format and language</li>
+        <li>Customizable date format and language</li>
         <li>Can be configured as time, date-time, date, month or year picker</li>
       </ul></div>
     </div>
@@ -205,6 +235,7 @@
             <li> PrimaryColor: String</li>
             <li> FontColor: String</li>
             <li> Format: Moment.MomentInput</li>
+            <li> setDisabledDates: Array&lt;Moment.MomentInput&gt;</li>
           </ul>
       </div>
     </div>

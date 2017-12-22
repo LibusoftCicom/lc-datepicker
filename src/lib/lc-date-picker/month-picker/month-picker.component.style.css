@@ -91,12 +91,19 @@ tr.days td {
 }
 
 td.active {    
-  background: rgba(94, 102, 111, 0.05);
   outline: 1px solid #5e666f;
 }
 
-td:hover{
-  outline: 1px solid #5e666f;
+td.disabled {
+  background: rgba(234,234,234,0.05);
+}
+
+td.current {
+  background: rgba(94, 102, 111, 0.05);
+}
+
+td.disabled button {
+  color: rgb(187, 201, 216) !important;
 }
 
 .selectbtn{

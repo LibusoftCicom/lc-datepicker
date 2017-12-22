@@ -1,6 +1,14 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnInit, OnChanges } from '@angular/core';
+import { DatePickerConfig } from './../lc-date-picker-config-helper';
 import * as moment from 'moment';
 
+
+export interface IYearobject {
+    year: number;
+    active?: boolean;
+    disabled?: boolean;
+    current?: boolean;
+}
 
 @Component({
     moduleId: module.id,
@@ -22,8 +30,8 @@ import * as moment from 'moment';
     </thead>
     <tbody align="center">
         <tr *ngFor="let row of yearsArrayFormated">
-        <td *ngFor="let item of row" (click)="setYear($event, item)" [ngClass]="{'active': item === initYear}">
-            <button [style.color]="config.FontColor">{{item}}</button>
+        <td *ngFor="let item of row" (click)="setYear($event, item)" [ngClass]="{'active': item?.active, 'current': item?.current, 'disabled': item?.disabled}">
+            <button [style.color]="config.FontColor">{{item?.year}}</button>
         </td>
         </tr>
     </tbody>
@@ -36,11 +44,11 @@ export class LCYearPickerComponent implements OnInit, OnChanges {
 
     public tempDate: number;
     public initYear: number;
-    public yearsArray: number[] = [];
-    public yearsArrayFormated: number[][];
+    public yearsArray: IYearobject[] = [];
+    public yearsArrayFormated: IYearobject[][];
 
     @Input() newDate: moment.Moment;
-    @Input() config;
+    @Input() config: DatePickerConfig;
     @Output() selected: EventEmitter<moment.Moment> = new EventEmitter<moment.Moment>();
     @Output() reset: EventEmitter<void> = new EventEmitter<void>();
 
@@ -62,30 +70,46 @@ export class LCYearPickerComponent implements OnInit, OnChanges {
 
     checkInitYear() {
         let year = this.tempDate;
-        if (this.config.minDate.years) {
-            year = Math.max(year, this.config.minDate.years);
+        if (this.config.MinDate.years) {
+            year = Math.max(year, this.config.MinYear);
         }
-        if (this.config.maxDate.years) {
-            year = Math.min(year, this.config.maxDate.years);
+        if (this.config.MaxDate.years) {
+            year = Math.min(year, this.config.MaxYear);
         }
         this.tempDate = this.initYear = year;
     }
 
     formatYears() {
-        const currentYear = this.tempDate;
+        const selectedYear = this.tempDate;
+        const currentYear = moment(moment.now()).year();
+
         for (let i = 0; i <= 12; i++) {
-            this.yearsArray[12 - i] = +currentYear - i;
-            this.yearsArray[12 + i] = +currentYear + i;
-        }
 
-        this.yearsArray = this.yearsArray.filter((year) => year >= this.config.minDate.years && year <= this.config.maxDate.years);
+            let yearBefore: IYearobject = this.yearsArray[12 - i] = { year: +selectedYear - i };
+            let yearAfter: IYearobject = this.yearsArray[12 + i] = { year: +selectedYear + i };
 
-        while (this.yearsArray.length < 25) {
-            if (this.yearsArray[0] === this.config.minDate.years) {
-                this.yearsArray.push(this.yearsArray[this.yearsArray.length - 1] + 1);
+            if( yearBefore.year == currentYear ){
+                yearBefore.current = true;
             }
-            else {
-                this.yearsArray.unshift(this.yearsArray[0] - 1);
+
+            if( yearBefore.year == selectedYear ){
+                yearBefore.active = true;
+            }
+
+            if( yearBefore.year > this.config.MaxYear || yearBefore.year < this.config.MinYear){
+                yearBefore.disabled = true;
+            }
+
+            if( yearAfter.year == currentYear ){
+                yearAfter.current = true;
+            }
+
+            if( yearAfter.year == selectedYear ){
+                yearAfter.active = true;
+            }
+
+            if( yearAfter.year > this.config.MaxYear || yearAfter.year < this.config.MinYear){
+                yearAfter.disabled = true;
             }
         }
 
@@ -95,9 +119,6 @@ export class LCYearPickerComponent implements OnInit, OnChanges {
     }
 
     prevYears() {
-        if (this.yearsArray[0] - 1 < this.config.minDate.years) {
-            return;
-        }
         this.tempDate -= 25;
         this.formatYears();
         this.cd.detectChanges();
@@ -105,20 +126,17 @@ export class LCYearPickerComponent implements OnInit, OnChanges {
 
 
     nextYears() {
-        if (this.yearsArray[this.yearsArray.length - 1] + 1 >= this.config.maxDate.years) {
-            return;
-        }
         this.tempDate += 25;
         this.formatYears();
         this.cd.detectChanges();
     }
 
-    setYear(event, item) {
-        if (!item) {
+    setYear(event, item?: IYearobject) {
+        if (!item || item.disabled) {
             return;
         }
-        this.newDate.year(item);
-        this.initYear = item;
+        this.newDate.year(item.year);
+        this.initYear = item.year;
         this.selected.emit(this.newDate);
     }
 

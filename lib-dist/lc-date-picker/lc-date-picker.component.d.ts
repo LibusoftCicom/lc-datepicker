@@ -32,6 +32,7 @@ export declare class LCDatePickerComponent implements OnInit, OnChanges {
     onYearSelected(date: moment.Moment): void;
     onSwitchPannel(panel: panels): void;
     onResetDate(): void;
+    private isDateAvailable(date);
     confirm(): void;
     close(): void;
     calendarSize(type: ECalendarType): number;

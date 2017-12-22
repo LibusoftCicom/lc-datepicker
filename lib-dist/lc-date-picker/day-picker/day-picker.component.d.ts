@@ -1,4 +1,5 @@
 import { EventEmitter, ChangeDetectorRef, OnInit, OnChanges } from '@angular/core';
+import { DatePickerConfig } from './../lc-date-picker-config-helper';
 import * as moment from 'moment';
 export declare enum Panels {
     Time = 0,
@@ -6,15 +7,30 @@ export declare enum Panels {
     Month = 2,
     Year = 3,
 }
+export interface IDateObject {
+    milliseconds: number;
+    seconds: number;
+    minutes: number;
+    hours: number;
+    date: number;
+    months: number;
+    years: number;
+    active?: boolean;
+    disabled?: boolean;
+    current?: boolean;
+}
 export declare class LCDayPickerComponent implements OnInit, OnChanges {
     private cd;
     tempDate: moment.Moment;
-    monthData: any;
+    monthData: Array<Array<IDateObject>>;
     shortDayName: any;
     shortMonthName: any;
     panels: typeof Panels;
+    private currentDate;
+    private minDate;
+    private maxDate;
     newDate: moment.Moment;
-    config: any;
+    config: DatePickerConfig;
     selected: EventEmitter<moment.Moment>;
     switchPannel: EventEmitter<Panels>;
     reset: EventEmitter<void>;
@@ -22,16 +38,10 @@ export declare class LCDayPickerComponent implements OnInit, OnChanges {
     ngOnInit(): void;
     ngOnChanges(changes: any): void;
     formatMonthData(): void;
-    createMonthArray(): {
-        date: number;
-        years: number;
-        months: number;
-        hours: number;
-        minutes: number;
-        seconds: number;
-        milliseconds: number;
-    }[];
-    setActiveDate(date: any): any;
+    createMonthArray(): IDateObject[];
+    private isCurrentDate(date);
+    private isDateDisabled(date);
+    private prepareMaxMinDates();
     nextMonth(event?: any): void;
     prevMonth(event?: any): void;
     dayClick(event: Event, item: any): void;

@@ -76,7 +76,7 @@ Use the following snippet inside your template:
 * PrimaryColor: String
 * FontColor: String
 * Format: Moment.MomentInput
-
+* setDisabledDates: Array<Moment.MomentInput>
 
 
 ## Developing

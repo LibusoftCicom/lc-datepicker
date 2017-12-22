@@ -1,6 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { DatePickerConfig, ECalendarType, } from '../lib/lc-date-picker/lc-date-picker-config-helper';
-import { LCDatePickerComponent } from '../lib/lc-date-picker/lc-date-picker.component';
+import { LCDatePickerComponent } from './../lib/lc-date-picker/lc-date-picker.component';
 import * as moment from 'moment';
 
 @Component({
@@ -14,6 +14,13 @@ export class AppComponent {
   public config = new DatePickerConfig();
   private availableLocalizations: String[];
 
+  public todayDateObject = moment(moment.now()).startOf('day');
+  public randomDisabledDates = [];
+
+  public fromDateObject = moment(moment.now()).startOf('day').subtract(20, 'day').toObject();
+  public toDateObject = moment(moment.now()).startOf('day').add(20, 'day').toObject();
+
+
   @ViewChild('calendar')
   calendar: LCDatePickerComponent;
 
@@ -22,16 +29,33 @@ export class AppComponent {
 
   constructor() {
 
+    const today = this.todayDateObject.toObject();
+
     this.config.CalendarType = ECalendarType.Date;
     this.config.Localization = 'hr';
-    this.config.MinDate = { years: 1900 };
-    this.config.MaxDate = { years: 2100 };
-    this.config.Labels = {
+    this.config.MinDate = { years: this.fromDateObject.years, months: this.fromDateObject.months, date: this.fromDateObject.date };
+    this.config.MaxDate = { years: this.toDateObject.years, months: this.toDateObject.months, date: this.toDateObject.date };
+
+    this.generateRandDates();
+
+    // define range of unavailable dates
+    this.config.setDisabledDates( this.randomDisabledDates );
+
+    this.config.Labels = { 
       confirmLabel: 'Ok',
     }
     
     this.config.PrimaryColor = '#5e666f';
     this.config.FontColor = '#5e666f';
+  }
+
+  private generateRandDates(){
+    this.randomDisabledDates = Array(3).fill(null).map(() => {
+      let rand = Math.random() * (15 - (-15)) + (-15);
+      return moment(moment.now()).startOf('day').add( rand, 'day' ).format('YYYY-MM-DD');
+    })
+
+    this.randomDisabledDates.push( moment(moment.now()).format('YYYY-MM-DD') )
   }
 
   public openCalendar() {
@@ -103,6 +127,5 @@ export class AppComponent {
   public set FontColor(value){
     this.config.ColorTheme.fontColor = value;
   }
-
 
 }

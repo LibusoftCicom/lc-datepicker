@@ -20,6 +20,9 @@ export interface IColorTheme {
     primaryColor: string;
     fontColor: string;
 }
+export interface IDisabledDates {
+    [date: string]: Moment.Moment;
+}
 export declare class DatePickerConfig {
     private calendarType;
     private localization;
@@ -28,7 +31,14 @@ export declare class DatePickerConfig {
     private labels;
     private theme;
     private format;
+    private disabledDates;
     constructor();
+    readonly DisabledDates: IDisabledDates;
+    /**
+     * to set list of dates which will be used as disabled
+     * @param dates
+     */
+    setDisabledDates(dates: Array<Moment.MomentInput>): void;
     CalendarType: ECalendarType;
     Localization: string;
     MinDate: IDate;
@@ -36,6 +46,10 @@ export declare class DatePickerConfig {
     MinYear: number;
     MaxYear: number;
     MinMonth: number;
+    /**
+     * moment use 6 for 7th month, that's why we
+     * subtract -1
+     */
     MaxMonth: number;
     MinDay: number;
     MaxDay: number;

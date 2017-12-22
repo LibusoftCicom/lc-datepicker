@@ -207,12 +207,45 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
     }
 
     onResetDate() {
-        this.newDate = moment(moment.now());
+        this.newDate = this.isDateAvailable( moment(moment.now()) );
+        
          // this.dateChange.emit(moment(moment.now()).toISOString());
         if (this.config.CalendarType > 1) {
             this.confirm();
         }
         this.cd.markForCheck();
+    }
+
+    private isDateAvailable( date: moment.Moment ): moment.Moment {
+        if( this.config.MinDate && this.config.MaxDate ){
+            let minDate = moment( this.config.MinDate );
+            let maxDate = moment( this.config.MaxDate );
+            if( minDate.isSame( maxDate ) ) {
+                return null;
+            }
+        }
+
+        if( this.config.DisabledDates[ date.format('YYYY-MM-DD') ] ){
+            return this.isDateAvailable( date.add(1, 'day') );
+        }
+
+        if( this.config.MinDate ){
+            let minDate = moment( this.config.MinDate );
+
+            if( date.isBefore( minDate ) ){
+                return this.isDateAvailable( date.add(1, 'day') );
+            }
+        }
+
+        if( this.config.MaxDate ){
+            let maxDate = moment( this.config.MaxDate );
+
+            if( date.isAfter( maxDate ) ){
+                return this.isDateAvailable( date.subtract(1, 'day') );
+            }
+        }
+
+        return date;
     }
 
     confirm() {

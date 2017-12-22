@@ -30,20 +30,40 @@ export interface IColorTheme {
     fontColor: string;
 }
 
+export interface IDisabledDates {
+    [date:string]: Moment.Moment;
+}
+
 export class DatePickerConfig {
     private calendarType: ECalendarType;
     private localization: string;
-    private minDate: IDate;
-    private maxDate: IDate;
+    private minDate: IDate = null;
+    private maxDate: IDate = null;
     private labels: ILabels;
     private theme: IColorTheme; 
     private format : Moment.MomentInput;
+    private disabledDates: IDisabledDates = {};
 
     constructor() { 
         this.theme = {
             primaryColor: 'black',
             fontColor: 'black'
         };
+    }
+
+    get DisabledDates(): IDisabledDates {
+        return this.disabledDates;
+    }
+
+    /**
+     * to set list of dates which will be used as disabled
+     * @param dates 
+     */
+    setDisabledDates( dates: Array<Moment.MomentInput> ) {
+        dates.forEach(( date ) => {
+            let d = Moment(date);
+            this.disabledDates[ d.format('YYYY-MM-DD') ] = d;
+        });
     }
 
     get CalendarType() {
@@ -79,7 +99,7 @@ export class DatePickerConfig {
     }
 
     get MinYear() {
-        return this.minDate.years;
+        return this.minDate && this.minDate.years;
     }
 
     set MinYear(minYear: number) {
@@ -87,7 +107,7 @@ export class DatePickerConfig {
     }
 
     get MaxYear() {
-        return this.maxDate.years;
+        return this.maxDate && this.maxDate.years;
     }
 
     set MaxYear(minYear: number) {
@@ -95,7 +115,7 @@ export class DatePickerConfig {
     }
 
     get MinMonth() {
-        return this.minDate.months;
+        return this.minDate && this.minDate.months;
     }
 
     set MinMonth(minMonth: number) {
@@ -103,15 +123,19 @@ export class DatePickerConfig {
     }
 
     get MaxMonth() {
-        return this.maxDate.months;
+        return this.maxDate && this.maxDate.months;
     }
 
+    /**
+     * moment use 6 for 7th month, that's why we
+     * subtract -1
+     */
     set MaxMonth(minMonth: number) {
-        this.maxDate.months = minMonth;
+        this.maxDate.months = minMonth - 1;
     }
 
     get MinDay() {
-        return this.minDate.date;
+        return this.minDate && this.minDate.date;
     }
 
     set MinDay(minDay: number) {
@@ -119,7 +143,7 @@ export class DatePickerConfig {
     }
 
     get MaxDay() {
-        return this.maxDate.date;
+        return this.maxDate && this.maxDate.date;
     }
 
     set MaxDay(maxDay: number) {
@@ -127,7 +151,7 @@ export class DatePickerConfig {
     }
 
     get MinHour() {
-        return this.minDate.hours;
+        return this.minDate && this.minDate.hours;
     }
 
     set MinHour(minHour: number) {
@@ -135,7 +159,7 @@ export class DatePickerConfig {
     }
 
     get MaxHour() {
-        return this.maxDate.hours;
+        return this.maxDate && this.maxDate.hours;
     }
 
     set MaxHour(maxHour: number) {
@@ -143,7 +167,7 @@ export class DatePickerConfig {
     }
 
     get MinMinutes() {
-        return this.minDate.minutes;
+        return this.minDate && this.minDate.minutes;
     }
 
     set MinMinutes(minMinutes: number) {
@@ -151,7 +175,7 @@ export class DatePickerConfig {
     }
 
     get MaxMinutes() {
-        return this.maxDate.minutes;
+        return this.maxDate && this.maxDate.minutes;
     }
 
     set MaxMinutes(maxMinutes: number) {
