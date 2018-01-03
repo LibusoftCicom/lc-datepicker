@@ -3,15 +3,10 @@ import { By } from '@angular/platform-browser';
 
 import { LCDayPickerComponent } from './day-picker.component';
 
-import { LcDatePickerModule } from '../../lc-date-picker.module';
+import { LcDatePickerModule, DatePickerConfig, ECalendarType } from '../../lc-date-picker.module';
 import * as moment from 'moment';
-export enum CalendarType {
-    Time,
-    DateTime,
-    Date,
-    Month,
-    Year
-}
+
+
 describe('LCDayPickerComponent', () => {
   let component: LCDayPickerComponent;
   let element: HTMLElement;
@@ -31,21 +26,16 @@ describe('LCDayPickerComponent', () => {
     component = fixture.componentInstance;
     element = fixture.debugElement.nativeElement;
     component.newDate = moment();
-    component.config ={
-        type: CalendarType.Date,
-        localization: 'hr',
-        minDate: {
-            year: 1900
-        },
-        maxDate: {
-            year: 2100
-        },
-        labels: {
-            date: 'Datum',
-            time: 'Vrijeme',
-            confirm: 'Odabir'
-        }
+
+    component.config = new DatePickerConfig();
+    component.config.CalendarType = ECalendarType.Date;
+    component.config.Localization = 'hr';
+    component.config.MinDate = { years: 1900 };
+    component.config.MaxDate = { years: 2100 };
+    component.config.Labels = {
+      confirmLabel: 'Odabir'
     };
+
     fixture.detectChanges();
   });
 
@@ -56,24 +46,57 @@ describe('LCDayPickerComponent', () => {
   it('should set active date', () => {
     const date = moment().date(5);
     component.newDate = date;
-    const monthArray = component.createMonthArray();
-    const activeDate = component.setActiveDate(monthArray).filter(item => item.active === true);
+    component.formatMonthData();
+    const activeDate = component.monthData.reduce(( source, second ) => source.concat(second)).filter(item => item != null ? item.active === true : false );
+
     expect(activeDate.length).toBe(1);
     expect(activeDate[0].date).toBe(date.toObject().date);
-  })
+  });
+
+  it('should set inactive dates', () => {
+    const date = moment();
+    const minDate = moment().add(-10, 'day');
+    const maxDate = moment().add(10, 'day');
+
+    component.newDate = date;
+    component.config.MinDate = minDate.toObject();
+    component.config.MaxDate = maxDate.toObject();
+    component.config.setDisabledDates([ moment().add(-5, 'day').format('YYYY-MM-DD'), moment().add(3, 'day').format('YYYY-MM-DD') ]);
+  
+    component.formatMonthData();
+
+    const flatDates = component.monthData.reduce(( source, second ) => [...source, ...second]);
+    const activeDateIndex = flatDates.findIndex((date) => date != null ? date.active == true : false );
+
+    if(flatDates[activeDateIndex+3] ){
+      expect( flatDates[activeDateIndex+3].disabled ).toBe( true );
+    }
+    if(flatDates[activeDateIndex+2] ){
+      expect( flatDates[activeDateIndex+2].disabled ).toBe( undefined );
+    }
+    if(flatDates[activeDateIndex+10] ){
+      expect( flatDates[activeDateIndex+10].disabled ).toBe( undefined );
+    }
+    if(flatDates[activeDateIndex+11] ){
+      expect( flatDates[activeDateIndex+11].disabled ).toBe( true );
+    }
+    if(flatDates[activeDateIndex-5]){
+      expect( flatDates[activeDateIndex-5].disabled ).toBe( true );
+    }
+  });
 
   it('should switch to previous month on click', () => {
     const currentMonth = component.newDate.month();
     component.prevMonth();
-    const monthArray = component.createMonthArray();
-    expect(monthArray[0].months).toBe(currentMonth - 1);
+    const monthArray = component.monthData.reduce(( source, second ) => source.concat(second));
+    expect(monthArray[10].months).toBe(currentMonth == 0 ? 11 : currentMonth - 1);
   })
 
   it('should switch to next month on click', () => {
     const currentMonth = component.newDate.month();
     component.nextMonth();
-    const monthArray = component.createMonthArray();
-    expect(monthArray[0].months).toBe(currentMonth + 1);
+    const monthArray = component.monthData.reduce(( source, second ) => source.concat(second));
+    expect(monthArray[10].months).toBe( currentMonth == 11 ? 0 : currentMonth + 1);
   })
   
   // it('should switch to previous month on scroll up', () => {

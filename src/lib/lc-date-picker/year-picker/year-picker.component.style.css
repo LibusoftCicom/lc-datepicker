@@ -73,21 +73,11 @@ table {
 
 thead tr {
   height: 25px;
-  /*background: #5e666f*/;
   color: aliceblue;
 }
 
 thead tr button{  
   color: aliceblue;
-}
-
-/* td.active {
-  background: rgb(230, 232, 234);
-} */
-
-.yearsCal td.active,
-.yearsCal td:hover{
-  outline: 1px solid #5e666f;
 }
 
 .yearsCal td.disabled {
@@ -100,6 +90,12 @@ thead tr button{
 
 .yearsCal td.disabled button {
   color: rgb(187, 201, 216) !important;
+  cursor: default;
+}
+
+.yearsCal td.active,
+.yearsCal td:not(.disabled):hover {
+  outline: 1px solid #5e666f;
 }
 
 .selectbtn{

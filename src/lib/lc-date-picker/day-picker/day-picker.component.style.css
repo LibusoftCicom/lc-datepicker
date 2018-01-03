@@ -113,9 +113,10 @@ td.current {
 
 td.disabled button {
   color: rgb(187, 201, 216) !important;
+  cursor: default;
 }
 
-td:hover{
+td:not(.disabled):hover {
   outline: 1px solid #5e666f;
 }
 
