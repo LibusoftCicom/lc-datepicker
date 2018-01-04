@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-//import { LcKeyShortcut } from 'lcfmw/services/shortcuts/LcKeyShortcuts';
-//import { LcL10n  } from 'lcfmw/services/localization/LcL10nService';
 
 import { LCDatePickerComponent } from './lc-date-picker.component';
 import { LCTimePickerComponent } from './time-picker/time-picker.component';

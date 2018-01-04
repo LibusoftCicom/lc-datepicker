@@ -11,7 +11,6 @@ import {
     OnInit,
     OnChanges
 } from '@angular/core';
-    // import { LcKeyShortcut } from 'lcfmw/services/shortcuts/LcKeyShortcuts';
 import { DatePickerConfig, ECalendarType } from './lc-date-picker-config-helper';
 import * as moment from 'moment';
 

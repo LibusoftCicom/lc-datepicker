@@ -5,13 +5,7 @@ import { LCTimePickerComponent } from './time-picker.component';
 import { LcDatePickerModule, DatePickerConfig, ECalendarType } from '../../lc-date-picker.module';
 
 import * as moment from 'moment';
-export enum CalendarType {
-    Time,
-    DateTime,
-    Date,
-    Month,
-    Year
-}
+
 describe('LCTimePickerComponent', () => {
   let component: LCTimePickerComponent;
   let element: HTMLElement;

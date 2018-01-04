@@ -35,11 +35,13 @@ export interface IDisabledDates {
 }
 
 export class DatePickerConfig {
-    private calendarType: ECalendarType;
-    private localization: string;
+    private calendarType: ECalendarType = ECalendarType.Date;
+    private localization: string = 'en';
     private minDate: IDate = null;
     private maxDate: IDate = null;
-    private labels: ILabels;
+    private labels: ILabels = {
+        confirmLabel: 'Ok'
+    };
     private theme: IColorTheme; 
     private format : Moment.MomentInput;
     private disabledDates: IDisabledDates = {};

@@ -128,7 +128,7 @@
           </div>
           <hr>
 
-          <div class="form-group">
+          <div class="form-group" id="allowed-disabled-dates">
             <blockquote class="card-blockquote col-12">
               <b>Define allowed/disabled dates:</b>
             </blockquote>
@@ -180,7 +180,7 @@ config.setDisabledDates({{ randomDisabledDates | json }});</code>
       <p class="card-text">Pure Angular date and time picker component.</p>
       <div><ul>
         <li>LC DatePicker is an Angular component that generates a datepicker calendar on your input element</li>
-        <li>Compatible with Angular 2+ up to Angular v5.0.0<li>/
+        <li>Compatible with Angular 2+ up to Angular v5.0.0</li>
         <li>Only dependency is MomentJS and Font Awesome</li>
         <li>Customizable date format and language</li>
         <li>Can be configured as time, date-time, date, month or year picker</li>
@@ -196,49 +196,112 @@ config.setDisabledDates({{ randomDisabledDates | json }});</code>
         <ol>
           <li>Fork and clone this repo</li>
           <li>npm install</li>
-          <li>Open a terminal and type "npm serve"</li>
+          <li>Open a terminal and type "npm run start"</li>
           <li>Open "http://localhost:4200" to browser</li>
         </ol>
     </div>
   </div>
+  <br>
 
-  <div class="card">
+  <div class="card" id="installation">
     <h3 class="card-header">Installation</h3>
     <div class="card-block">
       <p>To install this component to an external project, follow the procedure:</p>
       <p class="card-text">
         <ol>
           <li><code>npm install libusoftcicom/lc-datepicker</code></li>
-          <li><code>import &#123;LCDatePickerComponent, DatePickerConfig, ECalendarType&#125; from '@libusoftcicom/lc-datepicker';</code></li>
-          <li><code>public config = new DatePickerConfig();</code></li>
-          <li>Use the following snippet inside your template:
-            <code>&lt;lc-datepicker [(opened)]="CalendarOpened" [config]="config" [(date)]="setDate"&gt;&lt;/lc-datepicker&gt;</code>
+          <li>
+            <p>skip this if SystemJS is not used as module loader</p>
+<code>System.config(&#123;
+    paths: &#123;
+      'npm:': 'node_modules/'
+    &#125;,
+    map: &#123;
+      '@libusoftcicom/lc-datepicker' : 'npm:@libusoftcicom/lc-datepicker/lib-dist/lc-date-picker.module'
+    &#125;
+&#125;)</code>
+          </li>
+          <li>
+<code>import &#123;LcDatePickerModule&#125; from '@libusoftcicom/lc-datepicker';
+
+
+@NgModule(&#123;
+  declarations: [
+    ...
+  ],
+  imports: [
+    ...
+    ,LcDatePickerModule
+  ],
+  providers: [
+    ...
+  ],
+  bootstrap: [...]
+&#125;)
+export class AppModule &#123;&#125;</code>
+        </li>
+          <li>
+<code>import &#123;DatePickerConfig, ECalendarType&#125; from '@libusoftcicom/lc-datepicker';
+
+
+@Component(&#123;
+  ...
+&#125;)
+export class AppComponent &#123;
+
+  private dateValue: string = null;
+  public config = new DatePickerConfig();
+  public calendarOpened: boolean = false;
+
+  constructor() &#123;
+
+    // configuration is optional
+    this.config.CalendarType = ECalendarType.Date;
+    this.config.Localization = 'en';
+    ...
+  &#125;
+
+  public get setDate() &#123;
+    return this.dateValue;
+  &#125;
+
+  public set setDate(value: string) &#123;
+    this.dateValue = value;
+  &#125;
+
+&#125;
+</code></li>
+          <li>
+            <p>Use the following snippet inside your template:</p>
+            <code>&lt;lc-datepicker [(opened)]="calendarOpened" [config]="config" [(date)]="setDate"&gt;&lt;/lc-datepicker&gt;</code>
           </li>
         </ol>
     </div>
   </div>
+  <br>
 
-    <div class="card">
-      <h3 class="card-header">DatePicker config parameters</h3>
-      <div class="card-block">
-        <p class="card-text">
-          <ul>
-            <li> CalendarType: ECalendarType</li>
-            <li> Localization: String</li>
-            <li> MaxYear: Number</li>
-            <li> MinYear: Number</li>
-            <li> MaxMonth: Number</li>
-            <li> MinMonth: Number</li>
-            <li> MaxDay: Number</li>
-            <li> MinDay: Number</li>
-            <li> ConfirmLabel: String</li>
-            <li> PrimaryColor: String</li>
-            <li> FontColor: String</li>
-            <li> Format: Moment.MomentInput</li>
-            <li> setDisabledDates: Array&lt;Moment.MomentInput&gt;</li>
-          </ul>
-      </div>
+  <div class="card">
+    <h3 class="card-header">DatePicker config parameters</h3>
+    <div class="card-block">
+      <p class="card-text">
+        <ul>
+          <li> CalendarType: ECalendarType</li>
+          <li> Localization: String</li>
+          <li> MaxYear: Number</li>
+          <li> MinYear: Number</li>
+          <li> MaxMonth: Number</li>
+          <li> MinMonth: Number</li>
+          <li> MaxDay: Number</li>
+          <li> MinDay: Number</li>
+          <li> ConfirmLabel: String</li>
+          <li> PrimaryColor: String</li>
+          <li> FontColor: String</li>
+          <li> Format: Moment.MomentInput</li>
+          <li> setDisabledDates( Array&lt;Moment.MomentInput&gt; )</li>
+        </ul>
     </div>
+  </div>
+  <br>
 
   <div class="card">
     <h3 class="card-header">Contributing</h3>

@@ -38,24 +38,70 @@
 ```shell
 npm install libusoftcicom/lc-datepicker
 ```
+
+skip this if SystemJS is not used as module loader:
+```shell
+System.config({
+  paths: {
+    'npm:': 'node_modules/'
+  },
+  map: {
+    '@libusoftcicom/lc-datepicker' : 'npm:@libusoftcicom/lc-datepicker/lib-dist/lc-date-picker.module'
+  }
+})
+```
+
 Use the following snippet inside your app module: 
 ```shell
+import {LcDatePickerModule} from '@libusoftcicom/lc-datepicker';
 
 @NgModule({
+  declarations: [
+    ...
+  ],
   imports: [
     ...
-    LcDatePickerModule,
+    ,LcDatePickerModule
+  ],
+  providers: [
     ...
-  ]
+  ],
+  bootstrap: [...]
 })
-export class AppModule { }
+export class AppModule {}
 ```
 
 Use the following snippet inside your component: 
 ```shell
-import {LCDatePickerComponent, DatePickerConfig, ECalendarType} from '@libusoftcicom/lc-datepicker';
+import {DatePickerConfig, ECalendarType} from '@libusoftcicom/lc-datepicker';
 
-public config = new DatePickerConfig();
+
+@Component({
+  ...
+})
+export class AppComponent {
+
+  private dateValue: string = null;
+  public config = new DatePickerConfig();
+  public calendarOpened: boolean = false;
+
+  constructor() {
+
+    // configuration is optional
+    this.config.CalendarType = ECalendarType.Date;
+    this.config.Localization = 'en';
+    ...
+  }
+
+  public get setDate() {
+    return this.dateValue;
+  }
+
+  public set setDate(value: string) {
+    this.dateValue = value;
+  }
+
+}
 ```
 
 Use the following snippet inside your template: 
@@ -76,7 +122,7 @@ Use the following snippet inside your template:
 * PrimaryColor: String
 * FontColor: String
 * Format: Moment.MomentInput
-* setDisabledDates: Array<Moment.MomentInput>
+* setDisabledDates( Array<Moment.MomentInput> )
 
 
 ## Developing
