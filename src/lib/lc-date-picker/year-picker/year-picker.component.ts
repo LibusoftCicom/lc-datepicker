@@ -70,10 +70,10 @@ export class LCYearPickerComponent implements OnInit, OnChanges {
 
     checkInitYear() {
         let year = this.tempDate;
-        if (this.config.MinDate.years) {
+        if (this.config.MinDate && this.config.MinDate.years) {
             year = Math.max(year, this.config.MinYear);
         }
-        if (this.config.MaxDate.years) {
+        if (this.config.MaxDate && this.config.MaxDate.years) {
             year = Math.min(year, this.config.MaxYear);
         }
         this.tempDate = this.initYear = year;
@@ -96,7 +96,8 @@ export class LCYearPickerComponent implements OnInit, OnChanges {
                 yearBefore.active = true;
             }
 
-            if( yearBefore.year > this.config.MaxYear || yearBefore.year < this.config.MinYear){
+            if( this.config.MaxYear && yearBefore.year > this.config.MaxYear || 
+                this.config.MinYear && yearBefore.year < this.config.MinYear){
                 yearBefore.disabled = true;
             }
 
@@ -108,7 +109,8 @@ export class LCYearPickerComponent implements OnInit, OnChanges {
                 yearAfter.active = true;
             }
 
-            if( yearAfter.year > this.config.MaxYear || yearAfter.year < this.config.MinYear){
+            if( this.config.MaxYear && yearAfter.year > this.config.MaxYear || 
+                this.config.MinYear && yearAfter.year < this.config.MinYear){
                 yearAfter.disabled = true;
             }
         }

@@ -36,7 +36,7 @@
 
 
 ```shell
-npm install libusoftcicom/lc-datepicker
+npm install @libusoftcicom/lc-datepicker
 ```
 
 skip this if SystemJS is not used as module loader:
