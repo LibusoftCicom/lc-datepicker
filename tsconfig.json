@@ -2,9 +2,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "outDir": "./dist/out-tsc",
-    "baseUrl": "src",
+    "rootDir": "src",
     "sourceMap": true,
-    "declaration": false,
+    "declaration": true,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -13,8 +13,11 @@
       "node_modules/@types"
     ],
     "lib": [
-      "es2016",
+      "es2015",
       "dom"
-    ]
+    ],
+    "paths": {
+      "@libusoftcicom/lc-datepicker": ["lib/lc-date-picker.module"]
+    }
   }
 }

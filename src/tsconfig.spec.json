@@ -4,11 +4,14 @@
     "outDir": "../out-tsc/spec",
     "module": "commonjs",
     "target": "es5",
-    "baseUrl": "",
+    "baseUrl": "./",
     "types": [
       "jasmine",
       "node"
-    ]
+    ],
+    "paths": {
+      "@libusoftcicom/lc-datepicker": ["lib/lc-date-picker.module"]
+    }
   },
   "files": [
     "test.ts"

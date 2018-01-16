@@ -12,7 +12,8 @@ import {
     OnChanges
 } from '@angular/core';
 import { DatePickerConfig, ECalendarType } from './lc-date-picker-config-helper';
-import * as moment from 'moment';
+import moment from 'moment-es6';
+
 
 export enum panels {
     Time,

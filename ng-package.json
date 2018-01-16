@@ -1,0 +1,11 @@
+{
+    "$schema": "./node_modules/ng-packagr/ng-package.schema.json",
+    "src": "./",
+    "dest": "lib-dist",
+    "lib": {
+        "entryFile": "src/lib/lc-date-picker.module.ts",
+        "externals": {
+            "moment": "moment"
+        }
+    }
+}

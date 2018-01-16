@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnInit, OnChanges } from '@angular/core';
 import { DatePickerConfig } from './../lc-date-picker-config-helper';
-import * as moment from 'moment';
+import moment from 'moment-es6';
+
+
 
 export enum Panels {
     Time,

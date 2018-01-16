@@ -46,7 +46,7 @@ System.config({
     'npm:': 'node_modules/'
   },
   map: {
-    '@libusoftcicom/lc-datepicker' : 'npm:@libusoftcicom/lc-datepicker/lib-dist/lc-date-picker.module'
+    '@libusoftcicom/lc-datepicker' : 'npm:@libusoftcicom/lc-datepicker/bundles/lc-datepicker.umd'
   }
 })
 ```

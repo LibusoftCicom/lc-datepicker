@@ -8,6 +8,8 @@ import { LCYearPickerComponent } from './lc-date-picker/year-picker/year-picker.
 import { LCDatePickerComponent } from './lc-date-picker/lc-date-picker.component';
 import { DatePickerConfig } from './lc-date-picker/lc-date-picker-config-helper';
 
+
+
 @NgModule({
   imports: [
     CommonModule
@@ -25,5 +27,8 @@ import { DatePickerConfig } from './lc-date-picker/lc-date-picker-config-helper'
   ]
 })
 export class LcDatePickerModule { }
+
+
+
 export * from './lc-date-picker/lc-date-picker-config-helper';
 export * from './lc-date-picker/lc-date-picker.component';

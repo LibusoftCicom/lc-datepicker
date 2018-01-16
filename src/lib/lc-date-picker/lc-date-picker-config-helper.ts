@@ -1,4 +1,7 @@
-import * as Moment from 'moment';
+import moment from 'moment-es6';
+
+
+
 
 export enum ECalendarType {
     Time,
@@ -31,7 +34,7 @@ export interface IColorTheme {
 }
 
 export interface IDisabledDates {
-    [date:string]: Moment.Moment;
+    [date:string]: moment.Moment;
 }
 
 export class DatePickerConfig {
@@ -43,7 +46,7 @@ export class DatePickerConfig {
         confirmLabel: 'Ok'
     };
     private theme: IColorTheme; 
-    private format : Moment.MomentInput;
+    private format : moment.MomentInput;
     private disabledDates: IDisabledDates = {};
 
     constructor() { 
@@ -61,9 +64,9 @@ export class DatePickerConfig {
      * to set list of dates which will be used as disabled
      * @param dates 
      */
-    setDisabledDates( dates: Array<Moment.MomentInput> ) {
+    setDisabledDates( dates: Array<moment.MomentInput> ) {
         dates.forEach(( date ) => {
-            let d = Moment(date);
+            let d = moment(date);
             this.disabledDates[ d.format('YYYY-MM-DD') ] = d;
         });
     }
@@ -228,7 +231,7 @@ export class DatePickerConfig {
         return this.format;
     }
 
-    set Format(val: Moment.MomentInput) {
+    set Format(val: moment.MomentInput) {
         this.format = val
     }
 }

@@ -1,7 +1,10 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { DatePickerConfig, ECalendarType, } from '../lib/lc-date-picker/lc-date-picker-config-helper';
-import { LCDatePickerComponent } from './../lib/lc-date-picker/lc-date-picker.component';
+import { DatePickerConfig, ECalendarType, LCDatePickerComponent } from '@libusoftcicom/lc-datepicker';
 import * as moment from 'moment';
+
+
+
+
 
 @Component({
   selector: 'lc-app-root',

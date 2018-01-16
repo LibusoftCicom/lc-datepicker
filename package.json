@@ -1,6 +1,6 @@
 {
   "name": "@libusoftcicom/lc-datepicker",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "LC DatePicker - Pure Angular date and time picker component.",
   "homepage": "https://github.com/LibusoftCicom/lc-datepicker",
   "bugs": "https://github.com/LibusoftCicom/lc-datepicker/issues",
@@ -15,45 +15,46 @@
     "angular 4",
     "angular 5"
   ],
+  "main": "./lib/lc-date-picker.module.ts",
+  "module": "./lib/lc-date-picker.module.ts",
+  "typings": "./lib/lc-date-picker.module.ts",
+  "es2015": "./lib/lc-date-picker.module.ts",
+  "metadata": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/LibusoftCicom/lc-datepicker.git"
   },
+  "bundleDependencies": [],
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --base-href / --open",
-    "build": "ng build --base-href /",
-    "test": "ng test --base-href /",
+    "start": "ng serve --open",
+    "build": "ng build",
+    "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "clean": "rm -rf dist",
-    "build:library": "nglb --rootDir src/lib --outDir lib-dist --tsconfig tsconfig-ngc.json",
-    "build:dist": "ng build --prod --aot --base-href /lc-datepicker/",
-    "build:publish": "npm run build:dist && npm run build:library"
+    "build:git:demo": "ng build --prod --aot --base-href /lc-datepicker/",
+    "build:library": "ng-packagr -p ng-package.json && npm run build:git:demo",
+    "build:publish:local": "npm publish lib-dist --access public --registry http://localhost:4873",
+    "build:publish:public": "npm publish lib-dist --access public"
   },
-  "main": "./lib-dist/lc-date-picker.module.js",
-  "module": "./lib-dist/lc-date-picker.module.js",
-  "types": "./lib-dist/lc-date-picker.module.d.ts",
   "dependencies": {
     "font-awesome": "4.7.0",
-    "moment": "^2.19.2"
+    "moment-es6": "1.0.0"
   },
   "devDependencies": {
-    "@angular/animations": "5.0.1",
-    "@angular/cli": "1.5.0",
-    "@angular/common": "5.0.1",
-    "@angular/compiler": "5.0.1",
-    "@angular/compiler-cli": "5.0.1",
-    "@angular/core": "5.0.1",
-    "@angular/forms": "5.0.1",
-    "@angular/http": "5.0.1",
-    "@angular/language-service": "5.0.1",
-    "@angular/platform-browser": "5.0.1",
-    "@angular/platform-browser-dynamic": "5.0.1",
-    "@angular/router": "5.0.1",
+    "@angular/cli": "1.6.3",
+    "@angular/common": "5.2.0",
+    "@angular/compiler": "5.2.0",
+    "@angular/compiler-cli": "5.2.0",
+    "@angular/core": "5.2.0",
+    "@angular/forms": "5.2.0",
+    "@angular/http": "5.2.0",
+    "@angular/platform-browser": "5.2.0",
+    "@angular/platform-browser-dynamic": "5.2.0",
+    "@angular/router": "5.2.0",
     "@types/jasmine": "2.8.0",
     "@types/node": "8.0.51",
-    "angular-library-builder": "1.6.3",
     "codelyzer": "4.0.1",
     "core-js": "2.5.1",
     "jasmine-core": "2.8.0",
@@ -68,7 +69,8 @@
     "protractor": "5.2.0",
     "ts-node": "3.3.0",
     "tslint": "5.8.0",
-    "typescript": "2.6.1",
-    "bootstrap": "4.0.0-alpha.6"
+    "typescript": "2.6.2",
+    "bootstrap": "4.0.0-alpha.6",
+    "ng-packagr": "1.6.0"
   }
 }

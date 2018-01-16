@@ -2,9 +2,12 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out-tsc/app",
-    "module": "commonjs",
-    "baseUrl": "",
-    "types": []
+    "module": "es2015",
+    "baseUrl": "./",
+    "types": [],
+    "paths": {
+      "@libusoftcicom/lc-datepicker": ["lib/lc-date-picker.module"]
+    }
   },
   "exclude": [
     "test.ts",
