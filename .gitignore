@@ -5,6 +5,9 @@
 /dist
 /lib-dist
 
+# modules install
+package-lock.json
+
 # dependencies
 /node_modules
 
