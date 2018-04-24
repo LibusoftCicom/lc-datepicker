@@ -62,7 +62,7 @@ describe('LCDayPickerComponent', () => {
     component.config.MinDate = minDate.toObject();
     component.config.MaxDate = maxDate.toObject();
     component.config.setDisabledDates([ moment().add(-5, 'day').format('YYYY-MM-DD'), moment().add(3, 'day').format('YYYY-MM-DD') ]);
-  
+
     component.formatMonthData();
 
     const flatDates = component.monthData.reduce(( source, second ) => [...source, ...second]);
@@ -98,45 +98,43 @@ describe('LCDayPickerComponent', () => {
     const monthArray = component.monthData.reduce(( source, second ) => source.concat(second));
     expect(monthArray[10].months).toBe( currentMonth == 11 ? 0 : currentMonth + 1);
   })
-  
-  // it('should switch to previous month on scroll up', () => {
-  //   const date = moment().month(3);
-  //   component.newDate = date;
-  //   let scrollEvent = new WheelEvent('test', {deltaY: 1})
-  //   component.monthScroll(scrollEvent);
-  //   const monthArray = component.createMonthArray();
-  //   expect(monthArray[0].months).toBe(2);
-  // })  
 
-  // it('should switch to next month on scroll down', () => {
-  //   const date = moment().month(3);
-  //   component.newDate = date;
-  //   let scrollEvent = new WheelEvent('test', {deltaY: -1})
-  //   component.monthScroll(scrollEvent);
-  //   const monthArray = component.createMonthArray();
-  //   expect(monthArray[0].months).toBe(4);
-  // })  
+  it('should switch to previous month on scroll up', () => {
+    const date = moment().month(3);
+    component.newDate = date;
+    let scrollEvent = new WheelEvent('test', {deltaY: 1})
+    component.monthScroll(scrollEvent);
+    const monthArray = component.createMonthArray();
+    expect(monthArray[0].months).toBe(2);
+  })
 
-  // it('should set new date on click', () => {
-  //   const date = moment().date(3);
-  //   const newDate = moment().date(5).month(6).year(2017).toObject();
-  //   component.newDate = date;
-  //   component.dayClick(null, newDate);
-  //   expect(component.newDate.date()).toBe(newDate.date);
-  //   expect(component.newDate.month()).toBe(newDate.months);
-  //   expect(component.newDate.year()).toBe(newDate.years);
-  // })
+  it('should switch to next month on scroll down', () => {
+    const date = moment().month(3);
+    component.newDate = date;
+    let scrollEvent = new WheelEvent('test', {deltaY: -1})
+    component.monthScroll(scrollEvent);
+    const monthArray = component.createMonthArray();
+    expect(monthArray[0].months).toBe(4);
+  })
 
-  // it('should update active date on click', () =>{
-  //   const date = moment().date(3).month(6).year(2017);
-  //   const newDate = moment().date(5).month(6).year(2017).toObject();
-  //   component.tempDate = date;
-  //   component.dayClick(null, newDate);
-  //   const monthArray = component.createMonthArray();
-  //   const activeDate = component.setActiveDate(monthArray).filter(item => item.active === true);
-  //   expect(activeDate.length).toBe(1);
-  //   expect(activeDate[0].date).toBe(newDate.date);
-  //   expect(activeDate[0].months).toBe(newDate.months);
-  //   expect(activeDate[0].years).toBe(newDate.years);
-  // })
+  it('should set new date on click', () => {
+    const date = moment().date(3);
+    const newDate = moment().date(5).month(6).year(2017).toObject();
+    component.newDate = date;
+    component.dayClick(null, newDate);
+    expect(component.newDate.date()).toBe(newDate.date);
+    expect(component.newDate.month()).toBe(newDate.months);
+    expect(component.newDate.year()).toBe(newDate.years);
+  })
+
+
+  it('should correctly set date when new date has less days than current date', () =>{
+    const date = moment().year(2018).month(3).date(30);
+    const newDate = moment().year(2018).month(2).date(31).toObject();
+    component.newDate = date;
+    component.dayClick(null, newDate);
+    expect(component.newDate.date()).toBe(newDate.date);
+    expect(component.newDate.month()).toBe(newDate.months);
+    expect(component.newDate.year()).toBe(newDate.years);
+  })
 });

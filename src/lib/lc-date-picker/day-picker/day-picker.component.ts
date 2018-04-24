@@ -233,9 +233,9 @@ export class LCDayPickerComponent implements OnInit, OnChanges {
         }
 
         const date = moment(this.newDate.toISOString());
-        date.date(item.date);
-        date.month(item.months);
         date.year(item.years);
+        date.month(item.months);
+        date.date(item.date);
         this.newDate = date;
         this.tempDate = date;
         this.selected.emit(date);

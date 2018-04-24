@@ -13,6 +13,7 @@ import * as moment from 'moment';
 })
 export class AppComponent {
   title = 'LC DatePicker';
+  public year = new Date().getFullYear();
   public CalendarOpened = false;
   public config = new DatePickerConfig();
   private availableLocalizations: String[];
@@ -20,8 +21,8 @@ export class AppComponent {
   public todayDateObject = moment(moment.now()).startOf('day');
   public randomDisabledDates = [];
 
-  public fromDateObject = moment(moment.now()).startOf('day').subtract(20, 'day').toObject();
-  public toDateObject = moment(moment.now()).startOf('day').add(20, 'day').toObject();
+  public fromDateObject = moment(moment.now()).startOf('day').subtract(40, 'day').toObject();
+  public toDateObject = moment(moment.now()).startOf('day').add(40, 'day').toObject();
 
 
   @ViewChild('calendar')
@@ -44,10 +45,10 @@ export class AppComponent {
     // define range of unavailable dates
     this.config.setDisabledDates( this.randomDisabledDates );
 
-    this.config.Labels = { 
+    this.config.Labels = {
       confirmLabel: 'Ok',
     }
-    
+
     this.config.PrimaryColor = '#5e666f';
     this.config.FontColor = '#5e666f';
   }
