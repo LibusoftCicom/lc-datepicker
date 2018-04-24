@@ -12,7 +12,7 @@ before_install:
   - sh -e /etc/init.d/xvfb start
 
 before_script:
-  - npm install -g @angular/cli
+  - npm install -g @angular/cli@1.6.3
 
 install:
   - npm install
