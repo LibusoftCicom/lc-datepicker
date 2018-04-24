@@ -43,7 +43,6 @@
     "moment-es6": "1.0.0"
   },
   "devDependencies": {
-    "@angular-devkit/core": "0.5.7",
     "@angular/cli": "1.6.3",
     "@angular/common": "5.2.0",
     "@angular/compiler": "5.2.0",
