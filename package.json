@@ -1,6 +1,6 @@
 {
   "name": "@libusoftcicom/lc-datepicker",
-  "version": "1.1.8",
+  "version": "1.1.10",
   "description": "LC DatePicker - Pure Angular date and time picker component.",
   "homepage": "https://github.com/LibusoftCicom/lc-datepicker",
   "bugs": "https://github.com/LibusoftCicom/lc-datepicker/issues",
@@ -35,8 +35,8 @@
     "clean": "rm -rf dist",
     "build:git:demo": "ng build --prod --aot --base-href /lc-datepicker/",
     "build:library": "ng-packagr -p ng-package.json && npm run build:git:demo",
-    "build:publish:local": "npm publish lib-dist --access public --registry http://localhost:4873",
-    "build:publish:public": "npm publish lib-dist --access public"
+    "build:publish:local": "npm publish lib-dist/ --access public --registry http://localhost:4873",
+    "build:publish:public": "npm publish lib-dist/ --access public"
   },
   "dependencies": {
     "font-awesome": "4.7.0",
