@@ -1,4 +1,4 @@
-![Logo of the project](src/assets/logo.png)
+![Logo of the project](https://raw.githubusercontent.com/LibusoftCicom/lc-datepicker/master/src/assets/logo.png)
 
 # LC DatePicker
 > Pure Angular date and time picker component.
