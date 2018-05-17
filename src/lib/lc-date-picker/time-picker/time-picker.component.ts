@@ -53,7 +53,7 @@ import moment from 'moment-es6';
     styleUrls: ['./time-picker.component.style.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LCTimePickerComponent implements OnInit, OnChanges {
+export class LCTimePickerComponent implements OnInit {
 
     public is24HourFormat: boolean;
 
@@ -66,12 +66,12 @@ export class LCTimePickerComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         this.setTimeFormat();
-            this.cd.detectChanges();
+        this.updateTime(false);
     }
 
     ngOnChanges(changes) {
         if (changes.newDate) {
-            this.cd.detectChanges();
+            this.updateTime(false);
         }
     }
 
@@ -82,29 +82,72 @@ export class LCTimePickerComponent implements OnInit, OnChanges {
     addHour() {
         let hour = this.newDate.hour();
         this.newDate.hour(++hour % 24);
-        this.selected.emit(this.newDate);
-        this.cd.detectChanges();
+        this.updateTime(false);
     }
 
     subtractHour() {
         let hour = this.newDate.hour();
         this.newDate.hour((--hour + 24) % 24);
-        this.selected.emit(this.newDate);
-        this.cd.detectChanges();
+        this.updateTime(true);
     }
 
     addMinute() {
         let minute = this.newDate.minutes();
         this.newDate.minute(++minute % 60);
-        this.selected.emit(this.newDate);
-        this.cd.detectChanges();
+        this.updateTime(false);
     }
 
     subtractMinute() {
         let minute = this.newDate.minute();
         this.newDate.minute((--minute + 60) % 60);
+        this.updateTime(true);
+    }
+
+    updateTime(reverse){
+
+        let updatedTime = false;
+
+        this.config.DisabledTimeRanges.forEach(timerange => {
+            let currentTime = moment({
+                h: this.newDate.hour(),
+                m: this.newDate.minutes()
+            });
+
+            let minimumTime = moment({
+                h: timerange.startTime.hour,
+                m: timerange.startTime.minute
+            })
+
+            let maximumTime = moment({
+                h: timerange.stopTime.hour,
+                m: timerange.stopTime.minute
+            })
+
+
+            if (currentTime.isBetween(minimumTime, maximumTime, 'minute', '[]')) {
+
+                if (reverse) {
+                    this.newDate.hour(minimumTime.hour())
+                    this.newDate.minutes(minimumTime.minutes())
+                    this.newDate.subtract(1, 'm');
+                }
+                else{
+                    this.newDate.hour(maximumTime.hour())
+                    this.newDate.minutes(maximumTime.minutes())
+                    this.newDate.add(1, 'm');
+                }
+                updatedTime = true;
+                return;
+            }
+        })
+
+        if(updatedTime){
+
+            this.updateTime(reverse);
+            return;
+        }
+
         this.selected.emit(this.newDate);
-        this.cd.detectChanges();
     }
 
     hourScroll(event) {
@@ -134,7 +177,6 @@ export class LCTimePickerComponent implements OnInit, OnChanges {
         this.stopPropagation(event);
         this.newDate.hour((this.newDate.hour() + 12) % 24);
         this.selected.emit(this.newDate);
-        this.cd.detectChanges();
     }
 
     private preventDefault(e: Event) {

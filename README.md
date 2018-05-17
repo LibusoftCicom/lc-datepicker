@@ -1,4 +1,4 @@
-![Logo of the project](./src/assets/logo.png)
+![Logo of the project](src/assets/logo.png)
 
 # LC DatePicker
 > Pure Angular date and time picker component.
@@ -20,7 +20,7 @@
 - LC DatePicker is an Angular component that generates a datepicker calendar on your input element
 - Compatible with Angular 2+ up to Angular v5.0.0
 - Only dependency is MomentJS and Font Awesome
-- Customizable date format and language 
+- Customizable date format and language
 - Can be configured as time, date-time, date, month or year picker
 
 
@@ -51,7 +51,7 @@ System.config({
 })
 ```
 
-Use the following snippet inside your app module: 
+Use the following snippet inside your app module:
 ```shell
 import {LcDatePickerModule} from '@libusoftcicom/lc-datepicker';
 
@@ -71,7 +71,7 @@ import {LcDatePickerModule} from '@libusoftcicom/lc-datepicker';
 export class AppModule {}
 ```
 
-Use the following snippet inside your component: 
+Use the following snippet inside your component:
 ```shell
 import {DatePickerConfig, ECalendarType} from '@libusoftcicom/lc-datepicker';
 
@@ -104,7 +104,7 @@ export class AppComponent {
 }
 ```
 
-Use the following snippet inside your template: 
+Use the following snippet inside your template:
 ```shell
 <lc-datepicker [(opened)]="CalendarOpened" [config]="config" [(date)]="setDate"></lc-datepicker>
 ```
@@ -123,11 +123,12 @@ Use the following snippet inside your template:
 * FontColor: String
 * Format: Moment.MomentInput
 * setDisabledDates( Array<Moment.MomentInput> )
+* addDisabledTimeRange( start<Moment.MomentInput>, stop<Moment.MomentInput> )</li>
 
 
 ## Developing
 
-### Built With: 
+### Built With:
 - Angular
 - MomentJS
 - Font Awesome

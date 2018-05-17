@@ -208,8 +208,7 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
 
     onResetDate() {
         this.newDate = this.isDateAvailable( moment(moment.now()) );
-        
-         // this.dateChange.emit(moment(moment.now()).toISOString());
+
         if (this.config.CalendarType > 1) {
             this.confirm();
         }

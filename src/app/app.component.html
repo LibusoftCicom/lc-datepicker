@@ -128,34 +128,6 @@
           </div>
           <hr>
 
-          <div class="form-group" id="allowed-disabled-dates">
-            <blockquote class="card-blockquote col-12">
-              <b>Define allowed/disabled dates:</b>
-            </blockquote>
-          </div>
-          <div class="form-group">
-              <p>To configure range of available dates in calendar you can use
-                config.MinDate and config.MaxDate, all dates out of that range are disabled
-              </p>
-              <p>
-                <code class="small-text">const config = new DatePickerConfig();
-config.MinDate = &#123; years: {{ fromDateObject.years }}, months: {{ fromDateObject.months }}, date: {{ fromDateObject.date }} &#125;;
-config.MaxDate = &#123; years: {{ toDateObject.years }}, months: {{ toDateObject.months }}, date: {{ toDateObject.date }} &#125;;</code>
-              </p>
-          </div>
-          <hr>
-          <div class="form-group">
-            <p>or to configure dates which are disabled you can use config.setDisabledDates( Array&lt;MomentInput&gt; )</p>
-            <p>
-              <code class="small-text">const config = new DatePickerConfig();
-config.setDisabledDates({{ randomDisabledDates | json }});</code>
-            </p>
-          </div>
-          <hr>
-          <div class="form-group">
-            <p>if <i class="fa fa-home"></i> is pressed and that day is in previously defined disabled list, calendar will pick next available date</p>
-          </div>
-
         </div>
       </div>
     </div>
@@ -173,6 +145,64 @@ config.setDisabledDates({{ randomDisabledDates | json }});</code>
       </div>
     </div>
   </div>
+
+
+    <div class="card">
+      <h3 class="card-header">Define allowed/disabled dates:</h3>
+      <div class="card-block">
+        <div class="form-group">
+          <p>To configure range of available dates in calendar you can use config.MinDate and config.MaxDate, all dates out of that
+            range are disabled
+          </p>
+          <p>
+            <code class="small-text">
+const config = new DatePickerConfig();
+config.MinDate = &#123; years: {{ fromDateObject.years }}, months: {{ fromDateObject.months }}, date: {{ fromDateObject.date }} &#125;;
+config.MaxDate = &#123; years: {{ toDateObject.years }}, months: {{ toDateObject.months }}, date: {{ toDateObject.date }} &#125;;</code>
+          </p>
+        </div>
+        <hr>
+        <div class="form-group">
+          <p>or to configure dates which are disabled you can use config.setDisabledDates( Array&lt;MomentInput&gt; )</p>
+          <p>
+            <code class="small-text">
+const config = new DatePickerConfig();
+config.setDisabledDates({{ randomDisabledDates | json }});</code>
+          </p>
+        </div>
+        <hr>
+        <div class="form-group">
+          <p>if
+            <i class="fa fa-home"></i> is pressed and that day is in previously defined disabled list, calendar will pick next available date</p>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <div class="card">
+      <h3 class="card-header">Define allowed/disabled time ranges:</h3>
+      <div class="card-block">
+        <div class="form-group">
+          <p>To configure disabled time ranges you can use config.addDisabledTimeRange, all times between that
+            ranges are disabled
+          </p>
+          <p>
+            <code class="small-text">
+const config = new DatePickerConfig();
+config.addDisabledTimeRange('00:00','07:59');
+config.addDisabledTimeRange('14:00', '16:59');
+config.addDisabledTimeRange('21:00', '23:59');</code>
+          </p>
+        </div>
+        <hr>
+        <hr>
+        <div class="form-group">
+          <p>if
+            <i class="fa fa-home"></i> is pressed and current time is in disabled time range, calendar will pick next available time</p>
+        </div>
+      </div>
+    </div>
+    <br>
 
   <div class="card">
     <h3 class="card-header">Description</h3>
@@ -261,11 +291,11 @@ export class AppComponent &#123;
     ...
   &#125;
 
-  public get setDate() &#123;
+  public get Date() &#123;
     return this.dateValue;
   &#125;
 
-  public set setDate(value: string) &#123;
+  public set Date(value: string) &#123;
     this.dateValue = value;
   &#125;
 
@@ -273,7 +303,7 @@ export class AppComponent &#123;
 </code></li>
           <li>
             <p>Use the following snippet inside your template:</p>
-            <code>&lt;lc-datepicker [(opened)]="calendarOpened" [config]="config" [(date)]="setDate"&gt;&lt;/lc-datepicker&gt;</code>
+            <code>&lt;lc-datepicker [(opened)]="calendarOpened" [config]="config" [(date)]="Date"&gt;&lt;/lc-datepicker&gt;</code>
           </li>
         </ol>
     </div>
@@ -298,6 +328,7 @@ export class AppComponent &#123;
           <li> FontColor: String</li>
           <li> Format: Moment.MomentInput</li>
           <li> setDisabledDates( Array&lt;Moment.MomentInput&gt; )</li>
+          <li> addDisabledTimeRange( start&lt;Moment.MomentInput&gt;, stop&lt;Moment.MomentInput&gt; )</li>
         </ul>
     </div>
   </div>

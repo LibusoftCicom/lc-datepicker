@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { DatePickerConfig, ECalendarType, LCDatePickerComponent } from '@libusoftcicom/lc-datepicker';
+import { DatePickerConfig, ECalendarType, LCDatePickerComponent, IDisabledTimeRanges } from '@libusoftcicom/lc-datepicker';
 import * as moment from 'moment';
 
 
@@ -20,6 +20,7 @@ export class AppComponent {
 
   public todayDateObject = moment(moment.now()).startOf('day');
   public randomDisabledDates = [];
+  public disabledTimeRanges = [];
 
   public fromDateObject = moment(moment.now()).startOf('day').subtract(40, 'day').toObject();
   public toDateObject = moment(moment.now()).startOf('day').add(40, 'day').toObject();
@@ -43,7 +44,9 @@ export class AppComponent {
     this.generateRandDates();
 
     // define range of unavailable dates
-    this.config.setDisabledDates( this.randomDisabledDates );
+    this.config.setDisabledDates(this.randomDisabledDates);
+    // define range of unavailable time
+    this.setDisabledTimeRanges();
 
     this.config.Labels = {
       confirmLabel: 'Ok',
@@ -53,13 +56,23 @@ export class AppComponent {
     this.config.FontColor = '#5e666f';
   }
 
-  private generateRandDates(){
+  private generateRandDates() {
     this.randomDisabledDates = Array(3).fill(null).map(() => {
       let rand = Math.random() * (15 - (-15)) + (-15);
-      return moment(moment.now()).startOf('day').add( rand, 'day' ).format('YYYY-MM-DD');
+      return moment(moment.now()).startOf('day').add(rand, 'day').format('YYYY-MM-DD');
     })
 
-    this.randomDisabledDates.push( moment(moment.now()).format('YYYY-MM-DD') )
+    this.randomDisabledDates.push(moment(moment.now()).format('YYYY-MM-DD'))
+  }
+
+  private setDisabledTimeRanges() {
+
+    this.config.addDisabledTimeRange('00:00','07:59');
+
+    this.config.addDisabledTimeRange('14:00', '16:59');
+
+    this.config.addDisabledTimeRange('21:00', '23:59');
+
   }
 
   public openCalendar() {
@@ -79,56 +92,56 @@ export class AppComponent {
   }
 
 
-  public updateLocalization(value){
+  public updateLocalization(value) {
     this.config.Localization = value;
   }
 
-  public get CalendarType(){
+  public get CalendarType() {
     return this.config.CalendarType
   }
 
-  public set CalendarType(value){
-    this.config.CalendarType = 1*value;
+  public set CalendarType(value) {
+    this.config.CalendarType = 1 * value;
   }
-  public get Localization(){
+  public get Localization() {
     return this.config.Localization;
   }
 
-  public set Localization(value){
+  public set Localization(value) {
     this.config.Localization = value;
   }
-  public get Format(){
+  public get Format() {
     return this.config.Format;
   }
 
-  public set Format(value){
+  public set Format(value) {
     this.config.Format = value;
     this.dateInput.nativeElement.value = '';
   }
 
 
-  public get ConfirmLabel(){
+  public get ConfirmLabel() {
     return this.config.ConfirmLabel;
   }
 
-  public set ConfirmLabel(value){
+  public set ConfirmLabel(value) {
     this.config.ConfirmLabel = value;
   }
 
 
-  public get PrimaryColor(){
+  public get PrimaryColor() {
     return this.config.PrimaryColor;
   }
 
-  public set PrimaryColor(value){
+  public set PrimaryColor(value) {
     this.config.PrimaryColor = value;
   }
 
-  public get FontColor(){
+  public get FontColor() {
     return this.config.ColorTheme.fontColor;
   }
 
-  public set FontColor(value){
+  public set FontColor(value) {
     this.config.ColorTheme.fontColor = value;
   }
 

@@ -1,8 +1,5 @@
 import moment from 'moment-es6';
 
-
-
-
 export enum ECalendarType {
     Time,
     DateTime,
@@ -14,9 +11,17 @@ export enum ECalendarType {
 export interface IDate {
     years?: number,
     months?: number,
-    date?: number,
-    hours?: number,
-    minutes?: number
+    date?: number
+}
+
+export interface ITime {
+    minute: number,
+    hour: number
+}
+
+export interface IDisabledTimeRanges {
+    startTime: ITime,
+    stopTime: ITime
 }
 
 interface IDateRange {
@@ -45,11 +50,13 @@ export class DatePickerConfig {
     private labels: ILabels = {
         confirmLabel: 'Ok'
     };
-    private theme: IColorTheme; 
+    private theme: IColorTheme;
     private format : moment.MomentInput;
     private disabledDates: IDisabledDates = {};
 
-    constructor() { 
+    private disabledTimeRanges: IDisabledTimeRanges[] = [ ];
+
+    constructor() {
         this.theme = {
             primaryColor: 'black',
             fontColor: 'black'
@@ -62,7 +69,7 @@ export class DatePickerConfig {
 
     /**
      * to set list of dates which will be used as disabled
-     * @param dates 
+     * @param dates
      */
     setDisabledDates( dates: Array<moment.MomentInput> ) {
         dates.forEach(( date ) => {
@@ -155,38 +162,6 @@ export class DatePickerConfig {
         this.maxDate.date = maxDay;
     }
 
-    get MinHour() {
-        return this.minDate && this.minDate.hours;
-    }
-
-    set MinHour(minHour: number) {
-        this.minDate.hours = minHour;
-    }
-
-    get MaxHour() {
-        return this.maxDate && this.maxDate.hours;
-    }
-
-    set MaxHour(maxHour: number) {
-        this.maxDate.hours = maxHour;
-    }
-
-    get MinMinutes() {
-        return this.minDate && this.minDate.minutes;
-    }
-
-    set MinMinutes(minMinutes: number) {
-        this.minDate.minutes = minMinutes;
-    }
-
-    get MaxMinutes() {
-        return this.maxDate && this.maxDate.minutes;
-    }
-
-    set MaxMinutes(maxMinutes: number) {
-        this.maxDate.minutes = maxMinutes;
-    }
-
     get Labels() {
         return this.labels;
     }
@@ -233,5 +208,33 @@ export class DatePickerConfig {
 
     set Format(val: moment.MomentInput) {
         this.format = val
+    }
+
+    get DisabledTimeRanges(){
+        return this.disabledTimeRanges
+    }
+
+    public addDisabledTimeRange(start: moment.MomentInput, stop: moment.MomentInput){
+        let min = moment(start, 'HH:mm');
+        let max = moment(stop, 'HH:mm');
+
+        if(!min.isValid() || !max.isValid()){
+            throw "Invalid start/stop time format";
+        }
+
+        if(min.diff(max) > 0){
+            throw "Stop time range must be after start";
+        }
+
+        this.disabledTimeRanges.push({
+            startTime: {
+                hour: min.hour(),
+                minute: min.minutes()
+            },
+            stopTime: {
+                hour: max.hours(),
+                minute: max.minutes()
+            }
+        })
     }
 }
