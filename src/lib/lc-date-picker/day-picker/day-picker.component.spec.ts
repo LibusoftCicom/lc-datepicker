@@ -102,19 +102,23 @@ describe('LCDayPickerComponent', () => {
   it('should switch to previous month on scroll up', () => {
     const date = moment().month(3);
     component.newDate = date;
+    const InitMonthArray = component.createMonthArray();
+    expect(InitMonthArray[0].months).toBe(4);
     let scrollEvent = new WheelEvent('test', {deltaY: 1})
     component.monthScroll(scrollEvent);
     const monthArray = component.createMonthArray();
-    expect(monthArray[0].months).toBe(2);
+    expect(monthArray[0].months).toBe(3);
   })
 
   it('should switch to next month on scroll down', () => {
     const date = moment().month(3);
     component.newDate = date;
+    const InitMonthArray = component.createMonthArray();
+    expect(InitMonthArray[0].months).toBe(4);
     let scrollEvent = new WheelEvent('test', {deltaY: -1})
     component.monthScroll(scrollEvent);
     const monthArray = component.createMonthArray();
-    expect(monthArray[0].months).toBe(4);
+    expect(monthArray[0].months).toBe(5);
   })
 
   it('should set new date on click', () => {
