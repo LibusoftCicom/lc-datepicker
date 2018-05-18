@@ -58,7 +58,7 @@ export class AppComponent {
 
   private generateRandDates() {
     this.randomDisabledDates = Array(3).fill(null).map(() => {
-      let rand = Math.random() * (15 - (-15)) + (-15);
+      const rand = Math.random() * (15 - (-15)) + (-15);
       return moment(moment.now()).startOf('day').add(rand, 'day').format('YYYY-MM-DD');
     })
 
@@ -67,7 +67,7 @@ export class AppComponent {
 
   private setDisabledTimeRanges() {
 
-    this.config.addDisabledTimeRange('00:00','07:59');
+    this.config.addDisabledTimeRange('00:00', '07:59');
 
     this.config.addDisabledTimeRange('14:00', '16:59');
 

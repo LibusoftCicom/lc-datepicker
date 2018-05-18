@@ -18,7 +18,7 @@
 # Description
 
 - LC DatePicker is an Angular component that generates a datepicker calendar on your input element
-- Compatible with Angular 2+ up to Angular v5.0.0
+- Compatible with Angular 2+ up to Angular v6.0.0
 - Only dependency is MomentJS and Font Awesome
 - Customizable date format and language
 - Can be configured as time, date-time, date, month or year picker
@@ -83,7 +83,7 @@ export class AppComponent {
 
   private dateValue: string = null;
   public config = new DatePickerConfig();
-  public calendarOpened: boolean = false;
+  public CalendarOpened: boolean = false;
 
   constructor() {
 
@@ -93,11 +93,11 @@ export class AppComponent {
     ...
   }
 
-  public get setDate() {
+  public get Date() {
     return this.dateValue;
   }
 
-  public set setDate(value: string) {
+  public set Date(value: string) {
     this.dateValue = value;
   }
 
@@ -106,7 +106,7 @@ export class AppComponent {
 
 Use the following snippet inside your template:
 ```shell
-<lc-datepicker [(opened)]="CalendarOpened" [config]="config" [(date)]="setDate"></lc-datepicker>
+<lc-datepicker [(opened)]="CalendarOpened" [config]="config" [(date)]="Date"></lc-datepicker>
 ```
 ## DatePicker config parameters
 
@@ -135,7 +135,7 @@ Use the following snippet inside your template:
 
 ### Setting up Dev
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.1.3.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.2.
 
 [Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
 
@@ -154,7 +154,7 @@ Open "http://localhost:4200" in browser
 
 ### Building
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.1.3.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.2.
 
 
 [Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.

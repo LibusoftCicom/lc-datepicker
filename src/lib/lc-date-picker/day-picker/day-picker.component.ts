@@ -55,7 +55,8 @@ export interface IDateObject {
             <td *ngFor="let item of shortDayName" class="dayName" [style.color]="config.FontColor"><span>{{item}}</span></td>
             </tr>
             <tr *ngFor="let row of monthData">
-            <td *ngFor="let item of row" (click)="dayClick($event, item)" [ngClass]="{'active': item?.active, 'disabled': item?.disabled, 'current': item?.current}">
+            <td *ngFor="let item of row" (click)="dayClick($event, item)"
+                [ngClass]="{'active': item?.active, 'disabled': item?.disabled, 'current': item?.current}">
                 <button *ngIf="item" [style.color]="config.FontColor">{{item?.date}}</button>
             </td>
             </tr>

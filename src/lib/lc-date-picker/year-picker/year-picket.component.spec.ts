@@ -6,11 +6,11 @@ import { LcDatePickerModule, DatePickerConfig, ECalendarType } from '../../lc-da
 
 import * as moment from 'moment';
 export enum CalendarType {
-    Time,
-    DateTime,
-    Date,
-    Month,
-    Year
+  Time,
+  DateTime,
+  Date,
+  Month,
+  Year
 }
 describe('LCYearPickerComponent', () => {
   let component: LCYearPickerComponent;
@@ -31,7 +31,7 @@ describe('LCYearPickerComponent', () => {
     component = fixture.componentInstance;
     element = fixture.debugElement.nativeElement;
     component.newDate = moment();
-    
+
     component.config = new DatePickerConfig();
     component.config.CalendarType = ECalendarType.Year;
     component.config.Localization = 'hr';
@@ -56,49 +56,53 @@ describe('LCYearPickerComponent', () => {
   })
 
   it('should set year on click', () => {
-      component.newDate = moment().year(2017);
-      const newDate = moment().year(2015);
-      expect(component.newDate.year()).not.toBe(newDate.year());
-      component.setYear(null, { year: newDate.year() });
-      expect(component.newDate.year()).toBe(newDate.year());
+    component.newDate = moment().year(2017);
+    const newDate = moment().year(2015);
+    expect(component.newDate.year()).not.toBe(newDate.year());
+    component.setYear(null, { year: newDate.year() });
+    expect(component.newDate.year()).toBe(newDate.year());
   })
 
   it('should switch to previous year group on click', () => {
     const date = moment().year(2017);
     component.newDate = date;
+    component.formatYears();
     const yearArray = component.yearsArrayFormated;
     component.prevYears();
     const prevYearArray = component.yearsArrayFormated;
-    // expect(prevYearArray[4][4]).toBe(yearArray[0][0] - 1)
+    expect(prevYearArray[4][4].year).toBe(yearArray[0][0].year - 1)
   })
 
   it('should switch to next year group on click', () => {
     const date = moment().year(2017);
     component.newDate = date;
+    component.formatYears();
     const yearArray = component.yearsArrayFormated;
     component.nextYears();
     const nextYearArray = component.yearsArrayFormated;
-    //expect(nextYearArray[0][0]).toBe(yearArray[4][4] + 1)
+    expect(nextYearArray[0][0].year).toBe(yearArray[4][4].year + 1)
   })
 
-  // it('should switch to previous year group on scroll up', () => {
-  //     const date = moment().year(2017);
-  //     component.newDate = date;
-  //     const yearArray = component.yearsArray;
-  //     const scrollEvent = new WheelEvent('test', {deltaY: 1});
-  //     component.yearScroll(scrollEvent);
-  //     const newYearArray = component.yearsArray;
-  //     expect(newYearArray[4][4]).toBe(yearArray[0][0] - 1)
-  // })
- 
-  // it('should switch to next year group on scroll up', () => {
-  //     const date = moment().year(2017);
-  //     component.newDate = date;
-  //     const yearArray = component.yearsArray;
-  //     const scrollEvent = new WheelEvent('test', {deltaY: -1});
-  //     component.yearScroll(scrollEvent);
-  //     const newYearArray = component.yearsArray;
-  //     expect(newYearArray[0][0]).toBe(yearArray[4][4] + 1)
-  // })
+  it('should switch to previous year group on scroll up', () => {
+    const date = moment().year(2017);
+    component.newDate = date;
+    component.formatYears();
+    const yearArray = component.yearsArrayFormated;
+    const scrollEvent = new WheelEvent('test', { deltaY: 1 });
+    component.yearScroll(scrollEvent);
+    const newYearArray = component.yearsArrayFormated;
+    expect(newYearArray[4][4].year).toBe(yearArray[0][0].year - 1)
+  })
+
+  it('should switch to next year group on scroll up', () => {
+    const date = moment().year(2017);
+    component.newDate = date;
+    component.formatYears();
+    const yearArray = component.yearsArrayFormated;
+    const scrollEvent = new WheelEvent('test', { deltaY: -1 });
+    component.yearScroll(scrollEvent);
+    const newYearArray = component.yearsArrayFormated;
+    expect(newYearArray[0][0].year).toBe(yearArray[4][4].year + 1)
+  })
 
 });

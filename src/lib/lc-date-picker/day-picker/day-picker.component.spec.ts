@@ -47,7 +47,9 @@ describe('LCDayPickerComponent', () => {
     const date = moment().date(5);
     component.newDate = date;
     component.formatMonthData();
-    const activeDate = component.monthData.reduce(( source, second ) => source.concat(second)).filter(item => item != null ? item.active === true : false );
+    const activeDate = component.monthData
+      .reduce(( source, second ) => source.concat(second))
+      .filter(item => item != null ? item.active === true : false );
 
     expect(activeDate.length).toBe(1);
     expect(activeDate[0].date).toBe(date.toObject().date);
