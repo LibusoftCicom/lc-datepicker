@@ -22,8 +22,8 @@ export class AppComponent {
   public randomDisabledDates = [];
   public disabledTimeRanges = [];
 
-  public fromDateObject = moment(moment.now()).startOf('day').subtract(40, 'day').toObject();
-  public toDateObject = moment(moment.now()).startOf('day').add(40, 'day').toObject();
+  public fromDateObject = moment(moment.now()).startOf('day').subtract(40, 'day').subtract(30, 'years').toObject();
+  public toDateObject = moment(moment.now()).startOf('day').add(40, 'day').add(30, 'years').toObject();
 
 
   @ViewChild('calendar')
