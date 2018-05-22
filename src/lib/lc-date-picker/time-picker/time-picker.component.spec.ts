@@ -43,86 +43,86 @@ describe('LCTimePickerComponent', () => {
   });
 
   it('should check 12h format', () => {
-      const date = moment().locale('en');
-      component.newDate = date;
-      component.setTimeFormat();
-      expect(component.is24HourFormat).toBeFalsy();
+    const date = moment().locale('en');
+    component.newDate = date;
+    component.setTimeFormat();
+    expect(component.is24HourFormat).toBeFalsy();
   })
-  
+
   it('should check 24h format', () => {
-      const date = moment().locale('hr');
-      component.newDate = date;
-      component.setTimeFormat();
-      expect(component.is24HourFormat).toBeTruthy();
+    const date = moment().locale('hr');
+    component.newDate = date;
+    component.setTimeFormat();
+    expect(component.is24HourFormat).toBeTruthy();
   })
 
   it('should add hour on click', () => {
-      const date = moment().hour(5);
-      component.newDate = date;
-      component.addHour();
-      expect(component.newDate.hour()).toBe(6);
+    const date = moment().hour(5);
+    component.newDate = date;
+    component.addHour();
+    expect(component.newDate.hour()).toBe(6);
   })
-  
-  it('should subtract hour on click', () => {
-      const date = moment().hour(5);
-      component.newDate = date;
-      component.subtractHour();
-      expect(component.newDate.hour()).toBe(4);
-  })
-  
-  it('should add minute on click', () => {
-      const date = moment().minute(15);
-      component.newDate = date;
-      component.addMinute();
-      expect(component.newDate.minute()).toBe(16);
-  })
-  
-  it('should subtract minute on click', () => {
-      const date = moment().minute(15);
-      component.newDate = date;
-      component.subtractMinute();
-      expect(component.newDate.minute()).toBe(14);
-  })
-  
-//   it('should add hour on scroll up', () => {
-//       const date = moment().hour(5);
-//       component.newDate = date;
-//       let scrollEvent = new WheelEvent('test', {deltaY: -1})
-//       component.hourScroll(scrollEvent);
-//       expect(component.newDate.hour()).toBe(6);
-//   })
-  
-//   it('should subtract hour on scroll down', () => {
-//       const date = moment().hour(5);
-//       component.newDate = date;
-//       let scrollEvent = new WheelEvent('test', {deltaY: 1})
-//       component.hourScroll(scrollEvent);
-//       expect(component.newDate.hour()).toBe(4);
-//   })
 
-//   it('should add minute on scroll up', () => {
-//       const date = moment().minute(15);
-//       component.newDate = date;
-//       let scrollEvent = new WheelEvent('test', {deltaY: -1})
-//       component.minuteScroll(scrollEvent);
-//       expect(component.newDate.minute()).toBe(16);
-//   })
-  
-//   it('should subtract minute on scroll down', () => {
-//       const date = moment().minute(15);
-//       component.newDate = date;
-//       let scrollEvent = new WheelEvent('test', {deltaY: 1})
-//       component.minuteScroll(scrollEvent);
-//       expect(component.newDate.minute()).toBe(14);
-//   })
-  
-//   it('should toggle meridiem on click', () => {
-//       const date = moment().locale('en').hour(5);
-//       component.newDate = date;
-//       component.toggleMeridiem();
-//       expect(component.newDate.hour()).toBe(17);
-//       component.toggleMeridiem();
-//       expect(component.newDate.hour()).toBe(5);
-//   })
+  it('should subtract hour on click', () => {
+    const date = moment().hour(5);
+    component.newDate = date;
+    component.subtractHour();
+    expect(component.newDate.hour()).toBe(4);
+  })
+
+  it('should add minute on click', () => {
+    const date = moment().minute(15);
+    component.newDate = date;
+    component.addMinute();
+    expect(component.newDate.minute()).toBe(16);
+  })
+
+  it('should subtract minute on click', () => {
+    const date = moment().minute(15);
+    component.newDate = date;
+    component.subtractMinute();
+    expect(component.newDate.minute()).toBe(14);
+  })
+
+  it('should add hour on scroll up', () => {
+    const date = moment().hour(5);
+    component.newDate = date;
+    let scrollEvent = new WheelEvent('test', { deltaY: -1 })
+    component.hourScroll(scrollEvent);
+    expect(component.newDate.hour()).toBe(6);
+  })
+
+  it('should subtract hour on scroll down', () => {
+    const date = moment().hour(5);
+    component.newDate = date;
+    let scrollEvent = new WheelEvent('test', { deltaY: 1 })
+    component.hourScroll(scrollEvent);
+    expect(component.newDate.hour()).toBe(4);
+  })
+
+  it('should add minute on scroll up', () => {
+    const date = moment().minute(15);
+    component.newDate = date;
+    let scrollEvent = new WheelEvent('test', { deltaY: -1 })
+    component.minuteScroll(scrollEvent);
+    expect(component.newDate.minute()).toBe(16);
+  })
+
+  it('should subtract minute on scroll down', () => {
+    const date = moment().minute(15);
+    component.newDate = date;
+    let scrollEvent = new WheelEvent('test', { deltaY: 1 })
+    component.minuteScroll(scrollEvent);
+    expect(component.newDate.minute()).toBe(14);
+  })
+
+  it('should toggle meridiem on click', () => {
+    const date = moment().locale('en').hour(5);
+    component.newDate = date;
+    component.toggleMeridiem(new Event(''));
+    expect(component.newDate.hour()).toBe(17);
+    component.toggleMeridiem(new Event(''));
+    expect(component.newDate.hour()).toBe(5);
+  })
 
 });

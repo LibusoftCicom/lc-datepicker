@@ -104,9 +104,16 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
         this.locale = this.config.Localization || 'hr';
         moment.locale(this.locale);
         this.originalDate = !this.date || !moment(this.date, <string>format).isValid() ? moment().locale(this.locale) : moment(this.date, <string>format).locale(this.locale);
+        this.originalDate = this.isDateAvailable(this.originalDate)
         this.newDate = !this.date || !moment(this.date, <string>format).isValid() ? moment().locale(this.locale) : moment(this.date, <string>format).locale(this.locale);
+        this.newDate = this.isDateAvailable(this.newDate)
         this.setPanel(this.config.CalendarType);
 
+        if (moment(this.config.MaxDate).diff(moment(this.config.MinDate), 'days') < 1) {
+            this.config.MinDate = this.config.DefaultMinDate;
+            this.config.MaxDate = this.config.DefaultMaxDate;
+            throw 'Invalid min/max date. Max date should be at least 1 day after min date';
+        }
     }
 
     ngOnChanges(changes) {
@@ -232,7 +239,7 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
             let minDate = moment( this.config.MinDate );
 
             if( date.isBefore( minDate ) ){
-                return this.isDateAvailable( date.add(1, 'day') );
+                return this.isDateAvailable( minDate );
             }
         }
 
@@ -240,7 +247,7 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
             let maxDate = moment( this.config.MaxDate );
 
             if( date.isAfter( maxDate ) ){
-                return this.isDateAvailable( date.subtract(1, 'day') );
+                return this.isDateAvailable( maxDate );
             }
         }
 

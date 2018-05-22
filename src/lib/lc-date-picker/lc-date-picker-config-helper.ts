@@ -45,8 +45,18 @@ export interface IDisabledDates {
 export class DatePickerConfig {
     private calendarType: ECalendarType = ECalendarType.Date;
     private localization: string = 'en';
-    private minDate: IDate = null;
-    private maxDate: IDate = null;
+    private defaultMinDate: IDate = {
+        date: 1,
+        months: 0,
+        years: 1900
+    };
+    private defaultMaxDate: IDate = {
+        date: 31,
+        months: 11,
+        years: 2099
+    };
+    private minDate: IDate = this.defaultMinDate;
+    private maxDate: IDate = this.defaultMaxDate;
     private labels: ILabels = {
         confirmLabel: 'Ok'
     };
@@ -98,7 +108,17 @@ export class DatePickerConfig {
         return this.minDate;
     }
 
+    get DefaultMinDate() {
+        return this.defaultMinDate;
+    }
+
     set MinDate(date: IDate) {
+        let d = moment(date);
+
+        if (!d.isValid() ) {
+            throw "Invalid MinDate format";
+        }
+
         this.minDate = date;
     }
 
@@ -106,7 +126,16 @@ export class DatePickerConfig {
         return this.maxDate;
     }
 
+    get DefaultMaxDate() {
+        return this.defaultMaxDate;
+    }
+
     set MaxDate(date: IDate) {
+        let d = moment(date);
+
+        if (!d.isValid()) {
+            throw "Invalid MaxDate format";
+        }
         this.maxDate = date;
     }
 
