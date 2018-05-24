@@ -9,10 +9,12 @@ import {
     HostBinding,
     ElementRef,
     OnInit,
-    OnChanges
+    OnChanges,
+    OnDestroy
 } from '@angular/core';
-import { DatePickerConfig, ECalendarType } from './lc-date-picker-config-helper';
+import { DatePickerConfig, ECalendarType, ECalendarNavigation } from './lc-date-picker-config-helper';
 import moment from 'moment-es6';
+import { Subscription } from 'rxjs';
 
 
 export enum panels {
@@ -74,7 +76,7 @@ export enum panels {
     styleUrls: ['./lc-date-picker.component.style.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LCDatePickerComponent implements OnInit, OnChanges {
+export class LCDatePickerComponent implements OnInit, OnChanges, OnDestroy {
 
     public originalDate: moment.Moment;
     public newDate: moment.Moment;
@@ -84,11 +86,16 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
 
     @HostBinding('style.margin-top') componentMargin;
 
+    @HostBinding('attr.tabindex')
+    public tabIndex: number = 0;
+
     @Input() opened: boolean;
     @Output() openedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Input() config: DatePickerConfig;
     @Input() date: moment.Moment;
     @Output() dateChange: EventEmitter<string> = new EventEmitter<string>();
+
+    private subscriptions: Array<Subscription> = [];
 
     constructor(private cd: ChangeDetectorRef,
         private _elementRef: ElementRef) {
@@ -96,6 +103,7 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
     }
 
     ngOnInit() {
+        this.config.setHostElement(this._elementRef.nativeElement);
         this.initCalendar();
     }
 
@@ -114,6 +122,11 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
             this.config.MaxDate = this.config.DefaultMaxDate;
             throw 'Invalid min/max date. Max date should be at least 1 day after min date';
         }
+
+        this.subscriptions.push(this.config.navigationChanges.subscribe((dir) => this.navigation(dir)));
+        this.subscriptions.push(this.config.panelChanges.subscribe((type) => this.setPanel(type)));
+
+        this._elementRef.nativeElement.focus();
     }
 
     ngOnChanges(changes) {
@@ -132,6 +145,15 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
             this.initCalendar();
             this.cd.markForCheck();
         }
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+        this.subscriptions.length = 0;
+    }
+
+    private navigation(dir: ECalendarNavigation): void {
+        if(dir === ECalendarNavigation.Close) this.close();
     }
 
     setPanel(panel: ECalendarType) {
@@ -168,6 +190,7 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
         if (this.config.CalendarType === ECalendarType.Time) {
             this.cd.markForCheck();
         }
+        this.config.focus();
     }
 
     onDaySelected(date: moment.Moment) {
@@ -178,6 +201,7 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
         if (this.config.CalendarType === ECalendarType.Date) {
             this.confirm();
         }
+        this.config.focus();
     }
 
     onMonthSelected(date: moment.Moment) {
@@ -192,6 +216,7 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
         else {
             this.confirm();
         }
+        this.config.focus();
     }
 
     onYearSelected(date: moment.Moment) {
@@ -206,6 +231,7 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
         else {
             this.confirm();
         }
+        this.config.focus();
     }
 
     onSwitchPannel(panel: panels) {
@@ -258,11 +284,13 @@ export class LCDatePickerComponent implements OnInit, OnChanges {
         this.openedChange.emit(false);
         this.dateChange.emit( this.config.Format ? moment(this.newDate.toISOString()).format(<string>this.config.Format ) : this.newDate.toISOString());
         this.opened = false;
+        this.cd.detectChanges();
     }
 
     close() {
         this.openedChange.emit(false);
         this.opened = false;
+        this.cd.detectChanges();
     }
 
     calendarSize(type: ECalendarType) {

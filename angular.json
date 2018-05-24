@@ -16,6 +16,8 @@
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
+            "baseHref": "/lc-datepicker/",
+            "aot": true,
             "assets": [
               "src/assets",
               "src/favicon.ico"
@@ -50,7 +52,9 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "lc-date-picker:build"
+            "browserTarget": "lc-date-picker:build",
+            "open": true,
+            "aot": true
           },
           "configurations": {
             "production": {

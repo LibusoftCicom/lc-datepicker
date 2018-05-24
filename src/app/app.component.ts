@@ -1,7 +1,6 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { DatePickerConfig, ECalendarType, LCDatePickerComponent, IDisabledTimeRanges } from '@libusoftcicom/lc-datepicker';
 import * as moment from 'moment';
-
 
 
 
@@ -15,7 +14,7 @@ export class AppComponent {
   title = 'LC DatePicker';
   public year = new Date().getFullYear();
   public CalendarOpened = false;
-  public config = new DatePickerConfig();
+  public config: DatePickerConfig = new DatePickerConfig();
   private availableLocalizations: String[];
 
   public todayDateObject = moment(moment.now()).startOf('day');
@@ -32,7 +31,7 @@ export class AppComponent {
   @ViewChild('dateInput')
   dateInput: ElementRef;
 
-  constructor() {
+  constructor(private renderer: Renderer2) {
 
     const today = this.todayDateObject.toObject();
 
@@ -54,6 +53,8 @@ export class AppComponent {
 
     this.config.PrimaryColor = '#5e666f';
     this.config.FontColor = '#5e666f';
+
+    this.registerKeyNavigation();
   }
 
   private generateRandDates() {
@@ -143,6 +144,76 @@ export class AppComponent {
 
   public set FontColor(value) {
     this.config.ColorTheme.fontColor = value;
+  }
+
+  /**
+   * demo implementation
+   * keyboard navigation
+   */
+  private registerKeyNavigation(): void {
+
+    this.renderer.listen('document', 'keydown', (event: KeyboardEvent) => {
+      if(this.config.isFocused()){
+        event.preventDefault();
+
+        if(event.keyCode == 39 && event.shiftKey){
+          this.changePanelType(1);
+        }
+
+        if(event.keyCode == 37 && event.shiftKey){
+          this.changePanelType(-1);
+        }
+
+        if(event.keyCode == 38) {
+          this.config.navigateUp();
+        }
+        if(event.keyCode == 40) {
+          this.config.navigateDown();
+        }
+
+        if(event.keyCode == 39 && !event.shiftKey) {
+          this.config.navigateRight();
+        }
+
+        if(event.keyCode == 37 && !event.shiftKey) {
+          this.config.navigateLeft();
+        }
+
+        if(event.keyCode == 13) {
+          this.config.confirm();
+        }
+
+        if(event.keyCode == 27) {
+          this.config.close();
+        }
+
+        if(event.keyCode == 34) {
+          this.config.nextPage();
+
+        }
+        if(event.keyCode == 33) {
+          this.config.previousPage();
+        }
+      }
+    })
+  }
+
+  /**
+   * just for demo
+   */
+  private changePanelType(jump: number){
+    let calendarKeys = Object.keys(ECalendarType).filter((val) => isNaN(parseInt(val)));
+    let currentIndex = calendarKeys.findIndex((type) => this.config.CalendarType== ECalendarType[type]);
+    
+    if(currentIndex+(jump) < calendarKeys.length && currentIndex+(jump) >= 0){
+      this.config.CalendarType = ECalendarType[calendarKeys[currentIndex+(jump)]];
+    }
+    else if(currentIndex+(jump) >= calendarKeys.length ) {
+      this.config.CalendarType = ECalendarType[calendarKeys[0]];
+    }
+    else {
+      this.config.CalendarType = ECalendarType[calendarKeys[calendarKeys.length-1]];
+    }
   }
 
 }

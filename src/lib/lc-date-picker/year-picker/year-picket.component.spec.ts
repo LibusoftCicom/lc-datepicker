@@ -59,7 +59,7 @@ describe('LCYearPickerComponent', () => {
     component.newDate = moment().year(2017);
     const newDate = moment().year(2015);
     expect(component.newDate.year()).not.toBe(newDate.year());
-    component.setYear(null, { year: newDate.year() });
+    component.setYear({ year: newDate.year() });
     expect(component.newDate.year()).toBe(newDate.year());
   })
 

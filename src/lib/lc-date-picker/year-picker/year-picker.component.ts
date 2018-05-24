@@ -1,7 +1,7 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnInit, OnChanges } from '@angular/core';
-import { DatePickerConfig } from './../lc-date-picker-config-helper';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnInit, OnChanges, OnDestroy } from '@angular/core';
+import { DatePickerConfig, ECalendarNavigation } from './../lc-date-picker-config-helper';
 import moment from 'moment-es6';
-
+import { Subscription } from 'rxjs';
 
 export interface IYearobject {
     year?: number;
@@ -30,7 +30,7 @@ export interface IYearobject {
     </thead>
     <tbody align="center">
         <tr *ngFor="let row of yearsArrayFormated">
-        <td *ngFor="let item of row" (click)="setYear($event, item)" [ngClass]="{'active': item?.active, 'current': item?.current, 'disabled': item?.disabled}">
+        <td *ngFor="let item of row" (click)="setYear(item, $event)" [ngClass]="{'active': item?.active, 'current': item?.current, 'disabled': item?.disabled}">
             <button [style.color]="config.FontColor">{{item?.year}}</button>
         </td>
         </tr>
@@ -40,9 +40,9 @@ export interface IYearobject {
     styleUrls: ['./year-picker.component.style.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LCYearPickerComponent implements OnInit, OnChanges {
+export class LCYearPickerComponent implements OnInit, OnChanges, OnDestroy {
 
-    public tempDate: number;
+    public tempYear: number;
     public initYear: number;
     public yearsArray: IYearobject[] = [];
     public yearsArrayFormated: IYearobject[][];
@@ -52,35 +52,76 @@ export class LCYearPickerComponent implements OnInit, OnChanges {
     @Output() selected: EventEmitter<moment.Moment> = new EventEmitter<moment.Moment>();
     @Output() reset: EventEmitter<void> = new EventEmitter<void>();
 
+    private navigationSubscription: Subscription;
+    private selectedItem: IYearobject = null;
+
     constructor(private cd: ChangeDetectorRef) { }
 
     ngOnInit() {
-        this.tempDate = moment(this.newDate.toISOString()).year();
+        this.navigationSubscription = this.config.navigationChanges.subscribe((dir) => this.navigate(dir));
+        this.initCalendar();
+    }
+
+    ngOnChanges(changes) {
+        if (changes.newDate) {
+            this.initCalendar();
+            this.cd.detectChanges();
+        }
+    }
+
+    ngOnDestroy() {
+        this.navigationSubscription.unsubscribe();
+        this.cd.detach();
+    }
+
+    private initCalendar() {
+        this.tempYear = moment(this.newDate.toISOString()).year();
         this.initYear = moment(this.newDate.toISOString()).year();
         this.checkInitYear();
         this.formatYears();
     }
 
-    ngOnChanges(changes) {
-        if (changes.newDate) {
-            this.ngOnInit();
-            this.cd.detectChanges();
+    private navigate(dir:ECalendarNavigation): void {
+        switch(dir) {
+            case ECalendarNavigation.Confirm:
+                return this.setYear(this.selectedItem);
+            case ECalendarNavigation.Left:
+                this.selectYear(-1);
+                break;
+            case ECalendarNavigation.Right:
+                this.selectYear(1);
+                break;
+            case ECalendarNavigation.Up:
+                this.selectYear(-5);
+                break;
+            case ECalendarNavigation.Down:
+                this.selectYear(5);
+                break;
+            case ECalendarNavigation.PageUp:
+                this.prevYears();
+                break;
+            case ECalendarNavigation.PageDown:
+                this.nextYears();
+                break;
         }
+
+        this.formatYears();
+        this.cd.detectChanges();
     }
 
     checkInitYear() {
-        let year = this.tempDate;
+        let year = this.tempYear;
         if (this.config.MinDate && this.config.MinDate.years) {
             year = Math.max(year, this.config.MinYear);
         }
         if (this.config.MaxDate && this.config.MaxDate.years) {
             year = Math.min(year, this.config.MaxYear);
         }
-        this.tempDate = this.initYear = year;
+        this.tempYear = this.initYear = year;
     }
 
     formatYears() {
-        const selectedYear = this.tempDate;
+        const selectedYear = this.tempYear;
         const currentYear = moment(moment.now()).year();
 
         let minYear = Math.max(this.config.MinYear, selectedYear - 12);
@@ -99,6 +140,7 @@ export class LCYearPickerComponent implements OnInit, OnChanges {
 
             if (this.yearsArray[i % minYear].year == selectedYear) {
                 this.yearsArray[i % minYear].active = true;
+                this.selectedItem = this.yearsArray[i % minYear];
             }
         }
 
@@ -115,34 +157,48 @@ export class LCYearPickerComponent implements OnInit, OnChanges {
     }
 
     prevYears() {
-        this.tempDate -= 25;
+        this.tempYear -= 25;
 
-        if (this.tempDate < this.config.MinYear){
-            this.tempDate = this.config.MinYear
+        if (this.tempYear < this.config.MinYear){
+            this.tempYear = this.config.MinYear
         }
 
         this.formatYears();
         this.cd.detectChanges();
+        this.config.focus();
     }
 
 
     nextYears() {
-        this.tempDate += 25;
+        this.tempYear += 25;
 
-        if (this.tempDate > this.config.MaxYear) {
-            this.tempDate = this.config.MaxYear
+        if (this.tempYear > this.config.MaxYear) {
+            this.tempYear = this.config.MaxYear
         }
         this.formatYears();
         this.cd.detectChanges();
+        this.config.focus();
     }
 
-    setYear(event, item?: IYearobject) {
+    selectYear(jump: number) {
+        this.tempYear = this.tempYear+(jump);
+
+        if (this.tempYear < this.config.MinYear){
+            this.tempYear = this.config.MinYear
+        }
+        if (this.tempYear > this.config.MaxYear) {
+            this.tempYear = this.config.MaxYear
+        }
+    }
+
+    setYear(item: IYearobject, event?) {
         if (!item || item.disabled) {
             return;
         }
         this.newDate.year(item.year);
         this.initYear = item.year;
         this.selected.emit(this.newDate);
+        this.config.focus();
     }
 
     yearScroll(event) {

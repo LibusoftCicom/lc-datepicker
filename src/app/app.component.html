@@ -155,8 +155,7 @@
             range are disabled. Default available range: 01.01.1900 - 31.12.2099
           </p>
           <p>
-            <code class="small-text">
-const config = new DatePickerConfig();
+<code class="small-text">const config = new DatePickerConfig();
 config.MinDate = &#123; years: {{ fromDateObject.years }}, months: {{ fromDateObject.months }}, date: {{ fromDateObject.date }} &#125;;
 config.MaxDate = &#123; years: {{ toDateObject.years }}, months: {{ toDateObject.months }}, date: {{ toDateObject.date }} &#125;;</code>
           </p>
@@ -165,8 +164,7 @@ config.MaxDate = &#123; years: {{ toDateObject.years }}, months: {{ toDateObject
         <div class="form-group">
           <p>or to configure dates which are disabled you can use config.setDisabledDates( Array&lt;MomentInput&gt; )</p>
           <p>
-            <code class="small-text">
-const config = new DatePickerConfig();
+<code class="small-text">const config = new DatePickerConfig();
 config.setDisabledDates({{ randomDisabledDates | json }});</code>
           </p>
         </div>
@@ -187,14 +185,12 @@ config.setDisabledDates({{ randomDisabledDates | json }});</code>
             ranges are disabled
           </p>
           <p>
-            <code class="small-text">
-const config = new DatePickerConfig();
+<code class="small-text">const config = new DatePickerConfig();
 config.addDisabledTimeRange('00:00','07:59');
 config.addDisabledTimeRange('14:00', '16:59');
 config.addDisabledTimeRange('21:00', '23:59');</code>
           </p>
         </div>
-        <hr>
         <hr>
         <div class="form-group">
           <p>if
@@ -203,6 +199,46 @@ config.addDisabledTimeRange('21:00', '23:59');</code>
       </div>
     </div>
     <br>
+
+  <div class="card">
+    <h3 class="card-header">Navigation</h3>
+    <div class="card-block">
+      <div class="form-group">
+        <p>It is possible to navigate through grid of each component, so each developer
+          can implement keyboard or any other navigation using <b>DatePickerConfig</b> methods. 
+          Beside that now it is possible to dynamically change panel layout with already built in method `CalendarType`</p>
+        <p>
+<code class="small-text">const config = new DatePickerConfig();
+config.navigateUp();
+config.navigateDown();
+config.navigateRight();
+config.navigateLeft();
+config.nextPage();
+config.previousPage();
+config.confirm();
+config.close();
+</code>
+        </p>
+        <p>
+          <strong>Example used in demo:</strong><br>
+<code>this.renderer.listen('document', 'keydown', (event: KeyboardEvent) => &#123;<br>
+            &nbsp;if(this.config.isFocused())&#123;<br>
+            &nbsp;&nbsp;event.preventDefault();<br>
+            &nbsp;&nbsp;if(event.keyCode == 38) &#123; this.config.navigateUp(); &#125;<br>
+            &nbsp;&nbsp;if(event.keyCode == 40) &#123; this.config.navigateDown(); &#125;<br>
+            &nbsp;&nbsp;if(event.keyCode == 39) &#123; this.config.navigateRight(); &#125;<br>
+            &nbsp;&nbsp;if(event.keyCode == 37) &#123; this.config.navigateLeft(); &#125;<br>
+            &nbsp;&nbsp;if(event.keyCode == 13) &#123; this.config.confirm(); &#125;<br>
+            &nbsp;&nbsp;if(event.keyCode == 27) &#123; this.config.close(); &#125;<br>
+            &nbsp;&nbsp;if(event.keyCode == 34) &#123; this.config.nextPage(); &#125;<br>
+            &nbsp;&nbsp;if(event.keyCode == 33) &#123; this.config.previousPage(); &#125;<br>
+              &#125;
+          </code>
+        </p>
+      </div>
+    </div>
+  </div>
+  <br>
 
   <div class="card">
     <h3 class="card-header">Description</h3>
@@ -242,63 +278,61 @@ config.addDisabledTimeRange('21:00', '23:59');</code>
           <li><code>npm install @libusoftcicom/lc-datepicker</code></li>
           <li>
             <p>skip this if SystemJS is not used as module loader</p>
-<code>System.config(&#123;
-    paths: &#123;
-      'npm:': 'node_modules/'
-    &#125;,
-    map: &#123;
-      '@libusoftcicom/lc-datepicker' : 'npm:@libusoftcicom/lc-datepicker/bundles/lc-datepicker.umd'
+<code>System.config(&#123;<br>
+    paths: &#123;<br>
+      'npm:': 'node_modules/'<br>
+    &#125;,<br>
+    map: &#123;<br>
+      '@libusoftcicom/lc-datepicker' : 'npm:@libusoftcicom/lc-datepicker/bundles/lc-datepicker.umd'<br>
     &#125;
 &#125;)</code>
           </li>
           <li>
 <code>import &#123;LcDatePickerModule&#125; from '@libusoftcicom/lc-datepicker';
+<br>
 
-
-@NgModule(&#123;
-  declarations: [
-    ...
-  ],
-  imports: [
-    ...
-    ,LcDatePickerModule
-  ],
-  providers: [
-    ...
-  ],
+@NgModule(&#123;<br>
+  declarations: [<br>
+    ...<br>
+  ],<br>
+  imports: [<br>
+    ...<br>
+    ,LcDatePickerModule<br>
+  ],<br>
+  providers: [<br>
+    ...<br>
+  ],<br>
   bootstrap: [...]
 &#125;)
 export class AppModule &#123;&#125;</code>
         </li>
           <li>
 <code>import &#123;DatePickerConfig, ECalendarType&#125; from '@libusoftcicom/lc-datepicker';
+<br>
 
-
-@Component(&#123;
-  ...
+@Component(&#123;<br>
+  ...<br>
 &#125;)
-export class AppComponent &#123;
+export class AppComponent &#123;<br>
 
-  private dateValue: string = null;
-  public config = new DatePickerConfig();
-  public calendarOpened: boolean = false;
-
-  constructor() &#123;
-
-    // configuration is optional
-    this.config.CalendarType = ECalendarType.Date;
-    this.config.Localization = 'en';
-    ...
+  private dateValue: string = null;<br>
+  public config = new DatePickerConfig();<br>
+  public calendarOpened: boolean = false;<br>
+  <br>
+  constructor() &#123;<br>
+    &nbsp;// configuration is optional<br>
+    &nbsp;this.config.CalendarType = ECalendarType.Date;<br>
+    &nbsp;this.config.Localization = 'en';<br>
+    &nbsp;...<br>
+  &#125;<br>
+  <br>
+  public get Date() &#123;<br>
+    &nbsp;return this.dateValue;<br>
+  &#125;<br>
+  <br>
+  public set Date(value: string) &#123;<br>
+    &nbsp;this.dateValue = value;<br>
   &#125;
-
-  public get Date() &#123;
-    return this.dateValue;
-  &#125;
-
-  public set Date(value: string) &#123;
-    this.dateValue = value;
-  &#125;
-
 &#125;
 </code></li>
           <li>

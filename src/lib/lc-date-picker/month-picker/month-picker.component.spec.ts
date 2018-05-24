@@ -55,7 +55,7 @@ describe('LCMonthPickerComponent', () => {
   it('should set month on click', () => {
       const date = moment().month(1);
       const newMonth = component.shortMonthName[1][2];
-      component.setMonth(null , newMonth);
+      component.setMonth(newMonth);
       expect(component.newDate.format('MMM')).toBe(newMonth.key);
   })
 

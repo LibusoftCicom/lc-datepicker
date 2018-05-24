@@ -9,7 +9,6 @@ import { LCDatePickerComponent } from './lc-date-picker/lc-date-picker.component
 import { DatePickerConfig } from './lc-date-picker/lc-date-picker-config-helper';
 
 
-
 @NgModule({
   imports: [
     CommonModule

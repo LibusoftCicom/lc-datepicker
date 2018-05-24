@@ -1,8 +1,12 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnInit, OnChanges } from '@angular/core';
-import { DatePickerConfig } from './../lc-date-picker-config-helper';
+import { 
+    Component, Input, Output, 
+    EventEmitter, ChangeDetectorRef, 
+    ChangeDetectionStrategy, OnInit, 
+    OnChanges, OnDestroy, ViewChildren, QueryList, ElementRef
+} from '@angular/core';
+import { DatePickerConfig, ECalendarNavigation } from './../lc-date-picker-config-helper';
 import moment from 'moment-es6';
-
-
+import { Subscription } from 'rxjs';
 
 export enum Panels {
     Time,
@@ -55,18 +59,17 @@ export interface IDateObject {
             <td *ngFor="let item of shortDayName" class="dayName" [style.color]="config.FontColor"><span>{{item}}</span></td>
             </tr>
             <tr *ngFor="let row of monthData">
-            <td *ngFor="let item of row" (click)="dayClick($event, item)"
-                [ngClass]="{'active': item?.active, 'disabled': item?.disabled, 'current': item?.current}">
-                <button *ngIf="item" [style.color]="config.FontColor">{{item?.date}}</button>
-            </td>
+                <td *ngFor="let item of row" (click)="dayClick(item, $event)"
+                    [ngClass]="{'active': item?.active, 'disabled': item?.disabled, 'current': item?.current}">
+                    <button *ngIf="item" [style.color]="config.FontColor">{{item?.date}}</button>
+                </td>
             </tr>
         </tbody>
         </table>
     `,
-    styleUrls: ['./day-picker.component.style.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    styleUrls: ['./day-picker.component.style.css']
 })
-export class LCDayPickerComponent implements OnInit, OnChanges {
+export class LCDayPickerComponent implements OnInit, OnChanges, OnDestroy {
     public tempDate: moment.Moment;
     public monthData: Array<Array<IDateObject>>;
     public shortDayName;
@@ -83,12 +86,17 @@ export class LCDayPickerComponent implements OnInit, OnChanges {
     @Output() switchPannel: EventEmitter<Panels> = new EventEmitter<Panels>();
     @Output() reset: EventEmitter<void> = new EventEmitter<void>();
 
-    constructor(private cd: ChangeDetectorRef) { }
+    private navigationSubscription: Subscription;
+    private selectedItem: IDateObject = null;
+
+    constructor(private cd: ChangeDetectorRef) {
+    }
 
     ngOnInit() {
         this.shortDayName = moment.weekdaysShort(true);
         this.tempDate = moment(this.newDate.toISOString());
         this.formatMonthData();
+        this.navigationSubscription = this.config.navigationChanges.subscribe((dir) => this.navigate(dir));
         this.cd.detectChanges();
     }
 
@@ -98,6 +106,44 @@ export class LCDayPickerComponent implements OnInit, OnChanges {
             this.tempDate = moment(changes.newDate.currentValue.toISOString());
             this.formatMonthData();
             this.cd.detectChanges();
+        }
+    }
+
+    ngOnDestroy() {
+        this.navigationSubscription.unsubscribe();
+        this.cd.detach();
+    }
+
+    private navigate(dir:ECalendarNavigation): void {
+        if(dir == ECalendarNavigation.PageDown) {
+            this.prevMonth();
+        }
+        else if(dir == ECalendarNavigation.PageUp) {
+            this.nextMonth();
+        }
+        else if(dir == ECalendarNavigation.Confirm) {
+            this.dayClick(this.selectedItem);
+        }
+        else {
+            if(dir != ECalendarNavigation.Close) {
+                this.newDate =
+                this.tempDate = this.getNewDate(dir);
+                this.formatMonthData();
+                this.cd.detectChanges();
+            }
+        }
+    }
+
+    private getNewDate(dir: ECalendarNavigation) {
+        switch(dir){
+            case ECalendarNavigation.Left:
+                return moment(this.tempDate.toISOString()).subtract(1, 'd');
+            case ECalendarNavigation.Right:
+                return moment(this.tempDate.toISOString()).add(1, 'd');
+            case ECalendarNavigation.Up:
+                return moment(this.tempDate).subtract(7, 'd');
+            case ECalendarNavigation.Down:
+                return moment(this.tempDate).add(7, 'd');
         }
     }
 
@@ -134,10 +180,6 @@ export class LCDayPickerComponent implements OnInit, OnChanges {
         return Array.from(Array(daysinMonth).keys()).map((val, index) => {
             let date: IDateObject = { ...monthObj, date: monthObj.date + index };
 
-            if (date.date === selectedDate.date) {
-                date = { ...date, active: true };
-            }
-
             // mark current date
             if (this.isCurrentDate(date)) {
                 date = { ...date, current: true };
@@ -146,6 +188,11 @@ export class LCDayPickerComponent implements OnInit, OnChanges {
             // if date isn't in allowed range
             if( this.isDateDisabled( date ) ){
                 date = { ...date, disabled: true };
+            }
+
+            if (date.date === selectedDate.date) {
+                date = { ...date, active: true };
+                this.selectedItem = date;
             }
 
             return date;
@@ -219,6 +266,7 @@ export class LCDayPickerComponent implements OnInit, OnChanges {
         this.tempDate = nDate;
         this.formatMonthData();
         this.cd.detectChanges();
+        this.config.focus();
     }
 
     prevMonth(event?) {
@@ -226,17 +274,18 @@ export class LCDayPickerComponent implements OnInit, OnChanges {
         this.tempDate = nDate;
         this.formatMonthData();
         this.cd.detectChanges();
+        this.config.focus();
     }
 
-    dayClick(event: Event, item: any) {
+    dayClick(item: any, event?: Event) {
         if (!item || item.disabled) {
             return;
         }
 
         const date = moment(this.newDate.toISOString());
-        date.year(item.years);
-        date.month(item.months);
-        date.date(item.date);
+        date.year(item.years)
+            .month(item.months)
+            .date(item.date);
         this.newDate = date;
         this.tempDate = date;
         this.selected.emit(date);

@@ -1,4 +1,5 @@
 import moment from 'moment-es6';
+import { Subject, Observable } from 'rxjs';
 
 export enum ECalendarType {
     Time,
@@ -42,6 +43,17 @@ export interface IDisabledDates {
     [date:string]: moment.Moment;
 }
 
+export enum ECalendarNavigation {
+    Up,
+    Right,
+    Down,
+    Left,
+    PageUp,
+    PageDown,
+    Confirm,
+    Close
+}
+
 export class DatePickerConfig {
     private calendarType: ECalendarType = ECalendarType.Date;
     private localization: string = 'en';
@@ -64,7 +76,11 @@ export class DatePickerConfig {
     private format : moment.MomentInput;
     private disabledDates: IDisabledDates = {};
 
-    private disabledTimeRanges: IDisabledTimeRanges[] = [ ];
+    private disabledTimeRanges: IDisabledTimeRanges[] = [];
+
+    private readonly navigationChanged: Subject<ECalendarNavigation> = new Subject();
+    public readonly panelChanges: Subject<ECalendarType> = new Subject();
+    private hostElement: HTMLElement = null;
 
     constructor() {
         this.theme = {
@@ -94,6 +110,7 @@ export class DatePickerConfig {
 
     set CalendarType(type: ECalendarType) {
         this.calendarType = type;
+        this.panelChanges.next(this.calendarType);
     }
 
     get Localization() {
@@ -265,5 +282,56 @@ export class DatePickerConfig {
                 minute: max.minutes()
             }
         })
+    }
+
+    public get navigationChanges(): Observable<ECalendarNavigation> {
+        return this.navigationChanged.asObservable();
+    }
+
+    public navigateRight(): void {
+        this.navigationChanged.next(ECalendarNavigation.Right);
+    }
+
+    public navigateLeft(): void {
+        this.navigationChanged.next(ECalendarNavigation.Left);
+    }
+
+    public navigateUp(): void {
+        this.navigationChanged.next(ECalendarNavigation.Up);
+    }
+
+    public navigateDown(): void {
+        this.navigationChanged.next(ECalendarNavigation.Down);
+    }
+
+    public nextPage(): void {
+        this.navigationChanged.next(ECalendarNavigation.PageUp);
+    }
+
+    public previousPage(): void {
+        this.navigationChanged.next(ECalendarNavigation.PageDown);
+    }
+
+    public confirm(): void {
+        this.navigationChanged.next(ECalendarNavigation.Confirm);
+    }
+
+    public close(): void {
+        this.navigationChanged.next(ECalendarNavigation.Close);
+    }
+
+    /** @internal */
+    public setHostElement(hostElement: HTMLElement): void {
+        if(!this.hostElement){
+            this.hostElement = hostElement;
+        }
+    }
+
+    public isFocused(): boolean {
+        return document.activeElement == this.hostElement;
+    }
+
+    public focus(): void {
+        this.hostElement && this.hostElement.focus();
     }
 }

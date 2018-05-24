@@ -127,7 +127,7 @@ describe('LCDayPickerComponent', () => {
     const date = moment().date(3);
     const newDate = moment().date(5).month(6).year(2017).toObject();
     component.newDate = date;
-    component.dayClick(null, newDate);
+    component.dayClick(newDate);
     expect(component.newDate.date()).toBe(newDate.date);
     expect(component.newDate.month()).toBe(newDate.months);
     expect(component.newDate.year()).toBe(newDate.years);
@@ -138,7 +138,7 @@ describe('LCDayPickerComponent', () => {
     const date = moment().year(2018).month(3).date(30);
     const newDate = moment().year(2018).month(2).date(31).toObject();
     component.newDate = date;
-    component.dayClick(null, newDate);
+    component.dayClick(newDate);
     expect(component.newDate.date()).toBe(newDate.date);
     expect(component.newDate.month()).toBe(newDate.months);
     expect(component.newDate.year()).toBe(newDate.years);

@@ -1,7 +1,7 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnInit, OnChanges } from '@angular/core';
-import { DatePickerConfig } from './../lc-date-picker-config-helper';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnInit, OnChanges, OnDestroy } from '@angular/core';
+import { DatePickerConfig, ECalendarNavigation } from './../lc-date-picker-config-helper';
 import moment from 'moment-es6';
-
+import { Subscription } from 'rxjs';
 
 
 export enum Panels {
@@ -37,7 +37,7 @@ export interface IMonthObject {
         <tbody align="center">
             <tr *ngFor="let row of shortMonthName">
             <td *ngFor="let item of row" [ngClass]="{'active': item?.active, 'current': item?.current, 'disabled': item?.disabled }">
-                <button (click)="setMonth($event, item)" [style.color]="config.FontColor">{{item.key}}</button>
+                <button (click)="setMonth(item, $event)" [style.color]="config.FontColor">{{item.key}}</button>
             </td>
             </tr>
         </tbody>
@@ -46,7 +46,7 @@ export interface IMonthObject {
     styleUrls: ['./month-picker.component.style.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LCMonthPickerComponent implements OnInit, OnChanges {
+export class LCMonthPickerComponent implements OnInit, OnChanges, OnDestroy {
 
     public tempDate: moment.Moment;
     public shortMonthName: Array<Array<IMonthObject>> = [];
@@ -58,6 +58,9 @@ export class LCMonthPickerComponent implements OnInit, OnChanges {
     @Output() switchPannel: EventEmitter<Panels> = new EventEmitter<Panels>();
     @Output() reset: EventEmitter<void> = new EventEmitter<void>();
 
+    private navigationSubscription: Subscription;
+    private selectedItem: IMonthObject = null;
+
     constructor(private cd: ChangeDetectorRef) { }
 
     switchPannels(event: Event, panel: Panels) {
@@ -65,16 +68,29 @@ export class LCMonthPickerComponent implements OnInit, OnChanges {
     }
 
     ngOnInit() {
+        this.navigationSubscription = this.config.navigationChanges.subscribe((dir) => this.navigate(dir));
+        this.initCalendar();
+    }
+
+    ngOnChanges(changes) {
+        if (changes.newDate) {
+            this.initCalendar();
+            this.cd.detectChanges();
+        }
+    }
+
+    ngOnDestroy() {
+        this.cd.detach();
+        this.navigationSubscription.unsubscribe();
+    }
+
+    private initCalendar() {
         const selectedDate = this.newDate.toObject();
         const currentDate = moment(moment.now()).toObject();
         const monthNames = this.newDate.locale(this.config.Localization).localeData().monthsShort();
 
         let months = monthNames.map(( key, index ) => {
             let month: IMonthObject = { key, index };
-
-            if( month.index == selectedDate.months ){
-                month = {...month, active: true };
-            }
 
             if( month.index == currentDate.months && selectedDate.years == currentDate.years ){
                 month = {...month, current: true };
@@ -85,18 +101,38 @@ export class LCMonthPickerComponent implements OnInit, OnChanges {
                 month = {...month, disabled: true };
             }
 
+            if( month.index == selectedDate.months ){
+                month = {...month, active: true };
+                this.selectedItem = month;
+            }
+
             return month;
         })
 
         this.shortMonthName = this.formatMonths(months);
     }
 
-    ngOnChanges(changes) {
-        if (changes.newDate) {
-            this.ngOnInit();
-            this.cd.detectChanges();
+    private navigate(dir:ECalendarNavigation): void {
+        if(dir == ECalendarNavigation.Confirm) {
+            return this.setMonth(this.selectedItem);
         }
+        else if(dir == ECalendarNavigation.Left) {
+            this.newDate.month(this.selectedItem.index-1);
+        }
+        else if(dir == ECalendarNavigation.Right) {
+            this.newDate.month(this.selectedItem.index+1);
+        }
+        else if(dir == ECalendarNavigation.Up) {
+            this.newDate.month(this.selectedItem.index-3);
+        }
+        else if(dir == ECalendarNavigation.Down) {
+            this.newDate.month(this.selectedItem.index+3);
+        }
+        
+        this.initCalendar();
+        this.cd.detectChanges();
     }
+
 
     formatMonths(months: IMonthObject[]) {
         return months.reduce((rows, month, index) => (index % 3 === 0
@@ -104,12 +140,13 @@ export class LCMonthPickerComponent implements OnInit, OnChanges {
             : rows[rows.length - 1].push(month)) && rows, []);
     }
 
-    setMonth(event, item?: IMonthObject) {
+    setMonth(item?: IMonthObject, event?) {
         if (!item || item.disabled) {
             return;
         }
         this.newDate.month(item.key);
         this.selected.emit(this.newDate);
+        this.config.focus();
     }
 
     resetDate(event) {
