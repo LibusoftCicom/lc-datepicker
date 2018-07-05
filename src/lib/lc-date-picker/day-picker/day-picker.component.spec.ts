@@ -68,7 +68,7 @@ describe('LCDayPickerComponent', () => {
     component.formatMonthData();
 
     const flatDates = component.monthData.reduce(( source, second ) => [...source, ...second]);
-    const activeDateIndex = flatDates.findIndex((date) => date != null ? date.active == true : false );
+    const activeDateIndex = flatDates.findIndex((date) => date != null ? date.active === true : false );
 
     if(flatDates[activeDateIndex+3] ){
       expect( flatDates[activeDateIndex+3].disabled ).toBe( true );
@@ -91,37 +91,40 @@ describe('LCDayPickerComponent', () => {
     const currentMonth = component.newDate.month();
     component.prevMonth();
     const monthArray = component.monthData.reduce(( source, second ) => source.concat(second));
-    expect(monthArray[10].months).toBe(currentMonth == 0 ? 11 : currentMonth - 1);
-  })
+    expect(monthArray[10].months).toBe(currentMonth === 0 ? 11 : currentMonth - 1);
+  });
 
   it('should switch to next month on click', () => {
     const currentMonth = component.newDate.month();
     component.nextMonth();
     const monthArray = component.monthData.reduce(( source, second ) => source.concat(second));
-    expect(monthArray[10].months).toBe( currentMonth == 11 ? 0 : currentMonth + 1);
-  })
+    expect(monthArray[10].months).toBe( currentMonth === 11 ? 0 : currentMonth + 1);
+  });
 
   it('should switch to previous month on scroll up', () => {
-    const date = moment().month(3);
+    const date = moment().month(4);
     component.newDate = date;
+    component.ngOnInit();
     const InitMonthArray = component.createMonthArray();
     expect(InitMonthArray[0].months).toBe(4);
-    let scrollEvent = new WheelEvent('test', {deltaY: 1})
+    const scrollEvent = new WheelEvent('test', {deltaY: 1});
     component.monthScroll(scrollEvent);
     const monthArray = component.createMonthArray();
     expect(monthArray[0].months).toBe(3);
-  })
+  });
 
   it('should switch to next month on scroll down', () => {
-    const date = moment().month(3);
+    const date = moment().month(4);
     component.newDate = date;
+    component.ngOnInit();
     const InitMonthArray = component.createMonthArray();
     expect(InitMonthArray[0].months).toBe(4);
-    let scrollEvent = new WheelEvent('test', {deltaY: -1})
+
+    const scrollEvent = new WheelEvent('test', {deltaY: -1});
     component.monthScroll(scrollEvent);
     const monthArray = component.createMonthArray();
     expect(monthArray[0].months).toBe(5);
-  })
+  });
 
   it('should set new date on click', () => {
     const date = moment().date(3);
@@ -131,7 +134,7 @@ describe('LCDayPickerComponent', () => {
     expect(component.newDate.date()).toBe(newDate.date);
     expect(component.newDate.month()).toBe(newDate.months);
     expect(component.newDate.year()).toBe(newDate.years);
-  })
+  });
 
 
   it('should correctly set date when new date has less days than current date', () =>{
@@ -142,5 +145,5 @@ describe('LCDayPickerComponent', () => {
     expect(component.newDate.date()).toBe(newDate.date);
     expect(component.newDate.month()).toBe(newDate.months);
     expect(component.newDate.year()).toBe(newDate.years);
-  })
+  });
 });

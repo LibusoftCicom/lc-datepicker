@@ -197,11 +197,11 @@ export class LCDatePickerComponent implements OnInit, OnChanges, OnDestroy {
         this.newDate = date;
         if (this.config.CalendarType > 1) {
             this.dateChange.emit(this.newDate.toISOString());
+            this.config.focus();
         }
         if (this.config.CalendarType === ECalendarType.Date) {
             this.confirm();
         }
-        this.config.focus();
     }
 
     onMonthSelected(date: moment.Moment) {
@@ -212,11 +212,11 @@ export class LCDatePickerComponent implements OnInit, OnChanges, OnDestroy {
         if (this.config.CalendarType !== ECalendarType.MonthYear) {
             this.onSwitchPannel(panels.Day);
             this.cd.markForCheck();
+            this.config.focus();
         }
         else {
             this.confirm();
         }
-        this.config.focus();
     }
 
     onYearSelected(date: moment.Moment) {
@@ -227,11 +227,11 @@ export class LCDatePickerComponent implements OnInit, OnChanges, OnDestroy {
         if (this.config.CalendarType !== ECalendarType.Year) {
             this.onSwitchPannel(panels.Month);
             this.cd.markForCheck();
+            this.config.focus();
         }
         else {
             this.confirm();
         }
-        this.config.focus();
     }
 
     onSwitchPannel(panel: panels) {
