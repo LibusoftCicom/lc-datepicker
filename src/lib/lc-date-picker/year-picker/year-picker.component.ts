@@ -125,7 +125,7 @@ export class LCYearPickerComponent implements OnInit, OnChanges, OnDestroy {
         const currentYear = moment(moment.now()).year();
 
         let minYear = Math.max(this.config.MinYear, selectedYear - 12);
-        let maxYear = Math.min(this.config.MaxYear + 1, minYear + 25);
+        const maxYear = Math.min(this.config.MaxYear + 1, minYear + 25);
 
         if(maxYear - minYear < 25){
             minYear = Math.max(this.config.MinYear, maxYear - 25)
@@ -144,9 +144,9 @@ export class LCYearPickerComponent implements OnInit, OnChanges, OnDestroy {
             }
         }
 
-        let yearsArrayFormated = this.yearsArray.filter(year => year !== null)
+        const yearsArrayFormated = this.yearsArray.filter(year => year !== null)
 
-        let rows = [];
+        const rows = [];
         for (let z = 0; z < 25; z++) {
             z % 5 === 0
                 ? rows.push([yearsArrayFormated[z]])
@@ -160,12 +160,9 @@ export class LCYearPickerComponent implements OnInit, OnChanges, OnDestroy {
         this.tempYear -= 25;
 
         if (this.tempYear < this.config.MinYear){
-            this.tempYear = this.config.MinYear
+            this.tempYear = this.config.MinYear;
         }
-
-        this.formatYears();
-        this.cd.detectChanges();
-        this.config.focus();
+        this.prepareLayout();
     }
 
 
@@ -173,8 +170,12 @@ export class LCYearPickerComponent implements OnInit, OnChanges, OnDestroy {
         this.tempYear += 25;
 
         if (this.tempYear > this.config.MaxYear) {
-            this.tempYear = this.config.MaxYear
+            this.tempYear = this.config.MaxYear;
         }
+        this.prepareLayout();
+    }
+
+    private prepareLayout() {
         this.formatYears();
         this.cd.detectChanges();
         this.config.focus();
@@ -198,7 +199,6 @@ export class LCYearPickerComponent implements OnInit, OnChanges, OnDestroy {
         this.newDate.year(item.year);
         this.initYear = item.year;
         this.selected.emit(this.newDate);
-        this.config.focus();
     }
 
     yearScroll(event) {

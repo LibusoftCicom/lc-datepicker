@@ -146,7 +146,6 @@ export class LCMonthPickerComponent implements OnInit, OnChanges, OnDestroy {
         }
         this.newDate.month(item.key);
         this.selected.emit(this.newDate);
-        this.config.focus();
     }
 
     resetDate(event) {

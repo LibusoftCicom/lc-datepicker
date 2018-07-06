@@ -184,9 +184,6 @@ export class LCDatePickerComponent implements OnInit, OnChanges, OnDestroy {
 
     onTimeSelected(date: moment.Moment) {
         this.newDate = date;
-        // if(this.config.type !== 1){
-        //     this.dateChange.emit(this.newDate.toISOString());
-        // }
         if (this.config.CalendarType === ECalendarType.Time) {
             this.cd.markForCheck();
         }
@@ -211,10 +208,7 @@ export class LCDatePickerComponent implements OnInit, OnChanges, OnDestroy {
         }
         if (this.config.CalendarType !== ECalendarType.MonthYear) {
             this.onSwitchPannel(panels.Day);
-            this.cd.markForCheck();
-            this.config.focus();
-        }
-        else {
+        } else {
             this.confirm();
         }
     }
@@ -226,17 +220,16 @@ export class LCDatePickerComponent implements OnInit, OnChanges, OnDestroy {
         }
         if (this.config.CalendarType !== ECalendarType.Year) {
             this.onSwitchPannel(panels.Month);
-            this.cd.markForCheck();
-            this.config.focus();
-        }
-        else {
+        } else {
             this.confirm();
         }
     }
 
     onSwitchPannel(panel: panels) {
+        this.cd.markForCheck();
         this.activePanel = panel;
         this.cd.detectChanges();
+        this.config.focus();
     }
 
     onResetDate() {
@@ -282,8 +275,8 @@ export class LCDatePickerComponent implements OnInit, OnChanges, OnDestroy {
 
     confirm() {
         this.openedChange.emit(false);
-        this.dateChange.emit( this.config.Format ? moment(this.newDate.toISOString()).format(<string>this.config.Format ) : this.newDate.toISOString());
         this.opened = false;
+        this.dateChange.emit( this.config.Format ? moment(this.newDate.toISOString()).format(<string>this.config.Format ) : this.newDate.toISOString());
         this.cd.detectChanges();
     }
 

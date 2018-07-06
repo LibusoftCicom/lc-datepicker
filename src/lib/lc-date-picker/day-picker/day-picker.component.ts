@@ -204,9 +204,9 @@ export class LCDayPickerComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     private isDateDisabled( date: IDateObject ): boolean {
-        let momentDate = moment(date);
+        const momentDate = moment(date);
 
-        let disabled = this.config.DisabledDates[ momentDate.format('YYYY-MM-DD') ];
+        const disabled = this.config.DisabledDates[ momentDate.format('YYYY-MM-DD') ];
         if( disabled != null ){
             return disabled.isSame(momentDate);
         }
@@ -264,14 +264,16 @@ export class LCDayPickerComponent implements OnInit, OnChanges, OnDestroy {
     nextMonth(event?) {
         const nDate = moment(this.tempDate).add(1, 'months');
         this.tempDate = nDate;
-        this.formatMonthData();
-        this.cd.detectChanges();
-        this.config.focus();
+        this.prepareLayout();
     }
 
     prevMonth(event?) {
         const nDate = moment(this.tempDate).subtract(1, 'months');
         this.tempDate = nDate;
+        this.prepareLayout();
+    }
+
+    private prepareLayout(): void {
         this.formatMonthData();
         this.cd.detectChanges();
         this.config.focus();

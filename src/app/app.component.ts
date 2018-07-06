@@ -1,6 +1,7 @@
-import { Component, ViewChild, ElementRef, Renderer2 } from '@angular/core';
+import { Component, ViewChild, ElementRef, Renderer2, OnInit, OnDestroy } from '@angular/core';
 import { DatePickerConfig, ECalendarType, LCDatePickerComponent, IDisabledTimeRanges } from '@libusoftcicom/lc-datepicker';
 import * as moment from 'moment';
+import { Subscription } from 'rxjs';
 
 
 
@@ -10,7 +11,7 @@ import * as moment from 'moment';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'LC DatePicker';
   public year = new Date().getFullYear();
   public CalendarOpened = false;
@@ -24,6 +25,7 @@ export class AppComponent {
   public fromDateObject = moment(moment.now()).startOf('day').subtract(40, 'day').subtract(30, 'years').toObject();
   public toDateObject = moment(moment.now()).startOf('day').add(40, 'day').add(30, 'years').toObject();
 
+  private subscription: Subscription;
 
   @ViewChild('calendar')
   calendar: LCDatePickerComponent;
@@ -55,6 +57,19 @@ export class AppComponent {
     this.config.FontColor = '#5e666f';
 
     this.registerKeyNavigation();
+  }
+
+  public ngOnInit(): void {
+    this.subscription = this.calendar.openedChange.subscribe(val => {
+      if (!val) {
+        this.dateInput.nativeElement.click();
+        this.dateInput.nativeElement.select();
+      }
+    });
+  }
+
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   private generateRandDates() {
