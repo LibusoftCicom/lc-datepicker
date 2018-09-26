@@ -34,7 +34,7 @@ import moment from 'moment-es6';
             <tr>
                 <td class="timeDigit" (wheel)="hourScroll($event)">{{is24HourFormat ? newDate.format('HH') : newDate.format('hh')}}</td>
                 <td class="timeDigit" (wheel)="minuteScroll($event)">{{newDate.format('mm')}}</td>
-                <td class="timeDigit" #periods (wheel)="toggleMeridiem($event)" *ngIf="!is24HourFormat">{{newDate.format('A')}}</td>
+                <td class="timeDigit" (wheel)="toggleMeridiem($event)" *ngIf="!is24HourFormat">{{newDate.format('A')}}</td>
             </tr>
             <tr>
             <td class="selectbtn" (click)="subtractHour()" (wheel)="hourScroll($event)" [style.color]="config.FontColor">
@@ -62,11 +62,7 @@ export class LCTimePickerComponent implements OnInit {
     @Output() selected: EventEmitter<moment.Moment> = new EventEmitter<moment.Moment>();
     @Output() reset: EventEmitter<void> = new EventEmitter<void>();
 
-    constructor(
-        private cd: ChangeDetectorRef,
-        private renderer: Renderer2,
-        private elementRef: ElementRef
-        ) {}
+    constructor(private cd: ChangeDetectorRef) {}
 
     ngOnInit() {
         this.setTimeFormat();
@@ -181,7 +177,6 @@ export class LCTimePickerComponent implements OnInit {
         this.stopPropagation(event);
         this.newDate.hour((this.newDate.hour() + 12) % 24);
         this.selected.emit(this.newDate);
-        this.forcePeriodsRedraw();
     }
 
     private preventDefault(e: Event) {
@@ -200,11 +195,5 @@ export class LCTimePickerComponent implements OnInit {
 
     resetDate(event) {
         this.reset.emit();
-    }
-
-    private forcePeriodsRedraw() {
-        this.renderer.setStyle(this.elementRef.nativeElement, 'display', 'none');
-        const h = this.elementRef.nativeElement.offsetHeight;
-        this.renderer.setStyle(this.elementRef.nativeElement, 'display', 'block');
     }
 }

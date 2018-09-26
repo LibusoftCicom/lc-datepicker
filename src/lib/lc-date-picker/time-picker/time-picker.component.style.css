@@ -115,4 +115,5 @@ td.active {
 .timeDigit {
   width: 75px;
   font-size: larger;
+  line-height: 1;
 }
