@@ -94,6 +94,7 @@ td.active {
   font-size: x-large;
   text-align: right;
   width: 30px;
+  line-height: 1;
 }
 
 .divider{
