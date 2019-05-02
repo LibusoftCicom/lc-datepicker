@@ -12,6 +12,7 @@
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version, currently*/
   outline: none;
+  line-height: 0;
 }
 
 :host.displayDown {
@@ -23,7 +24,6 @@
 }
 
 button {
-  width: 100%;
   height: 100%;
   background: transparent;
   box-sizing: border-box;
@@ -49,12 +49,12 @@ td:hover {
 }
 
 .calendar {
-  box-shadow: rgba(0, 0, 0, 0.156863) 0px 1px 5px 0px, rgba(0, 0, 0, 0.26) -2px -1px 5px 0px;
+  box-shadow: rgba(0, 0, 0, 0.156863) 0px 1px 1px 0, rgba(0, 0, 0, 0.26) 0 -1px 1px 0;
   box-sizing: border-box;
-  display: block;
+  display: inline-block;
   font-size: 12px;
   line-height: 14px;
-  margin: 5px;
+  margin: 0;
   width: 220px;
 }
 
@@ -89,7 +89,8 @@ table {
   border-right: 1px solid #efefef;
 }
 
-.confirmDate {
+.dateRangeLabel .confirmDate {
+  box-shadow: rgba(0, 0, 0, 0.156863) 0px 1px 1px 0, rgba(0, 0, 0, 0.26) 0 -1px 1px 0;
   width: 220px;
   height: 20px;
   background: #5e666f;
@@ -102,6 +103,10 @@ table {
   color: white;
 }
 
+.dateRangeLabel {
+  text-align: center;
+  color: white;
+}
 thead tr {
   height: 25px;
   background: #efefef;

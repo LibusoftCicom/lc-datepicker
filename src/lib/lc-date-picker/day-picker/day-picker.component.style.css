@@ -1,5 +1,5 @@
 button {
-  width: 29px;
+  width: 28px;
   height: 100%;
   background: transparent;
   box-sizing: border-box;
@@ -11,9 +11,9 @@ button {
   outline: none;
 }
 
-td{
-    outline: 1px solid transparent;    
-    width: 32px;
+td {
+  outline: 1px solid transparent;
+  width: 32px;
 }
 
 td:hover {
@@ -21,7 +21,7 @@ td:hover {
   cursor: default;
 }
 
-td.dayName, 
+td.dayName,
 td.dayName:hover {
   background: white;
   outline: none;
@@ -42,7 +42,7 @@ table {
   border-collapse: collapse;
   border: none;
   box-sizing: border-box;
-  background: white;    
+  background: white;
   text-transform: capitalize;
 }
 
@@ -79,16 +79,16 @@ table {
 }
 
 thead tr {
-  height: 25px;        
+  height: 25px;
   /*background: #5e666f;*/
   color: aliceblue;
 }
 
-thead tr button{  
+thead tr button {
   color: aliceblue;
 }
 
-tr.days {    
+tr.days {
   height: 25px;
   /*color: #5e666f;*/
   border-bottom: 1px solid #d8d8d8;
@@ -99,12 +99,12 @@ tr.days td {
   border: none;
 }
 
-td.active {    
+td.active {
   outline: 1px solid #5e666f;
 }
 
 td.disabled {
-  background: rgba(234,234,234,0.05);
+  background: rgba(234, 234, 234, 0.05);
 }
 
 td.current {
@@ -120,32 +120,32 @@ td:not(.disabled):hover {
   outline: 1px solid #5e666f;
 }
 
-.selectbtn{
-    cursor: pointer;
-    color: #e0e0e0;
-    float: left;
-    width: 28px;
-    text-align: center;
+.selectbtn {
+  cursor: pointer;
+  color: #e0e0e0;
+  float: left;
+  width: 28px;
+  text-align: center;
 }
 
-.pullRight{
+.pullRight {
   float: right;
 }
 
-.monthlabel{
+.monthlabel {
   width: 80px;
 }
 
-.yearlabel{
+.yearlabel {
   width: 50px;
 }
-.selectbtn:hover{
-    color: #fbfbfb;
+.selectbtn:hover {
+  color: #fbfbfb;
 }
 
-.rotateUp{
-    transform: rotate(-90deg);
+.rotateUp {
+  transform: rotate(-90deg);
 }
-.rotateDown{
-    transform: rotate(90deg);
+.rotateDown {
+  transform: rotate(90deg);
 }

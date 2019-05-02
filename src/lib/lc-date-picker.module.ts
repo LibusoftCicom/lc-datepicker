@@ -7,27 +7,22 @@ import { LCMonthPickerComponent } from './lc-date-picker/month-picker/month-pick
 import { LCYearPickerComponent } from './lc-date-picker/year-picker/year-picker.component';
 import { LCDatePickerComponent } from './lc-date-picker/lc-date-picker.component';
 import { DatePickerConfig } from './lc-date-picker/lc-date-picker-config-helper';
-
+import { LCDateRangePickerComponent } from './lc-date-picker/lc-date-range-picker.component';
 
 @NgModule({
-  imports: [
-    CommonModule
-  ],
+  imports: [CommonModule],
   declarations: [
     LCDatePickerComponent,
     LCTimePickerComponent,
     LCTimePickerCompactComponent,
     LCDayPickerComponent,
     LCMonthPickerComponent,
-    LCYearPickerComponent
+    LCYearPickerComponent,
+    LCDateRangePickerComponent
   ],
-  exports: [
-    LCDatePickerComponent,
-  ]
+  exports: [LCDatePickerComponent, LCDateRangePickerComponent]
 })
-export class LcDatePickerModule { }
-
-
+export class LcDatePickerModule {}
 
 export * from './lc-date-picker/lc-date-picker-config-helper';
 export * from './lc-date-picker/lc-date-picker.component';

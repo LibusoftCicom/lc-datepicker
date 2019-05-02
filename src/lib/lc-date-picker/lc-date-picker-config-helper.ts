@@ -6,7 +6,8 @@ export enum ECalendarType {
   DateTime,
   Date,
   MonthYear,
-  Year
+  Year,
+  DateRange
 }
 
 export interface IDate {
@@ -57,6 +58,8 @@ export enum ECalendarNavigation {
 export class DatePickerConfig {
   private calendarType: ECalendarType = ECalendarType.Date;
   private localization: string = 'en';
+  private fromLabel: string = 'From';
+  private toLabel: string = 'To';
   private defaultMinDate: IDate = {
     date: 1,
     months: 0,
@@ -258,6 +261,22 @@ export class DatePickerConfig {
 
   get DisabledTimeRanges() {
     return this.disabledTimeRanges;
+  }
+
+  get FromLabel() {
+    return this.fromLabel;
+  }
+
+  set FromLabel(val: string) {
+    this.fromLabel = val;
+  }
+
+  get ToLabel() {
+    return this.toLabel;
+  }
+
+  set ToLabel(val: string) {
+    this.toLabel = val;
   }
 
   public clearDisabledTimeRange() {
