@@ -1,19 +1,16 @@
 ![Logo of the project](https://raw.githubusercontent.com/LibusoftCicom/lc-datepicker/master/src/assets/logo.png)
 
 # LC DatePicker
+
 > Pure Angular date and time picker component.
-
-
 
 [![npm version](https://badge.fury.io/js/%40libusoftcicom%2Flc-datepicker.svg)](https://www.npmjs.com/package/@libusoftcicom/lc-datepicker)
 
 [![Build Status](https://travis-ci.org/LibusoftCicom/lc-datepicker.svg?branch=master)](https://travis-ci.org/LibusoftCicom/lc-datepicker)
 
-
 # Demo
 
 [Click here for preview](https://libusoftcicom.github.io/lc-datepicker/)
-
 
 # Description
 
@@ -22,7 +19,6 @@
 - Only dependencies are RxJS, MomentJS and Font Awesome
 - Customizable date format and language
 - Can be configured as time, date-time, date, month or year picker
-
 
 # Tested with
 
@@ -34,12 +30,12 @@
 
 ## Installing / Getting started
 
-
 ```shell
 npm install @libusoftcicom/lc-datepicker
 ```
 
 skip this if SystemJS is not used as module loader:
+
 ```shell
 System.config({
   paths: {
@@ -52,6 +48,7 @@ System.config({
 ```
 
 Use the following snippet inside your app module:
+
 ```shell
 import {LcDatePickerModule} from '@libusoftcicom/lc-datepicker';
 
@@ -72,6 +69,7 @@ export class AppModule {}
 ```
 
 Use the following snippet inside your component:
+
 ```shell
 import {DatePickerConfig, ECalendarType} from '@libusoftcicom/lc-datepicker';
 
@@ -104,31 +102,39 @@ export class AppComponent {
 }
 ```
 
-Use the following snippet inside your template:
+Use the following snippet inside your template for date-picker:
+
 ```shell
 <lc-datepicker [(opened)]="CalendarOpened" [config]="config" [(date)]="Date"></lc-datepicker>
 ```
+
+Use the following snippet inside your template for date-range-picker:
+
+```shell
+<lc-date-range-picker [(opened)]="CalendarOpened" [config]="config" [(date)]="Date"></lc-date-range-picker>
+```
+
 ## DatePicker config parameters
 
-* CalendarType: ECalendarType
-* Localization: String
-* MaxYear: Number
-* MinYear: Number
-* MaxMonth: Number
-* MinMonth: Number
-* MaxDay: Number
-* MinDay: Number
-* ConfirmLabel: String
-* PrimaryColor: String
-* FontColor: String
-* Format: Moment.MomentInput
-* setDisabledDates( Array<Moment.MomentInput> )
-* addDisabledTimeRange( start<Moment.MomentInput>, stop<Moment.MomentInput> )</li>
-
+- CalendarType: ECalendarType
+- Localization: String
+- MaxYear: Number
+- MinYear: Number
+- MaxMonth: Number
+- MinMonth: Number
+- MaxDay: Number
+- MinDay: Number
+- ConfirmLabel: String
+- PrimaryColor: String
+- FontColor: String
+- Format: Moment.MomentInput
+- setDisabledDates( Array<Moment.MomentInput> )
+- addDisabledTimeRange( start<Moment.MomentInput>, stop<Moment.MomentInput> )</li>
 
 ## Developing
 
 ### Built With:
+
 - Angular
 - MomentJS
 - Font Awesome
@@ -149,13 +155,12 @@ cd lc-datepicker/
 npm install
 npm run start
 ```
-Open "http://localhost:4200" in browser
 
+Open "http://localhost:4200" in browser
 
 ### Building
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.2.
-
 
 [Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
 
@@ -178,13 +183,11 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.2.
 
-
 [Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
 
 ```shell
 npm install -g @angular/cli
 ```
-
 
 ```shell
 git clone https://github.com/LibusoftCicom/lc-datepicker.git
@@ -198,8 +201,6 @@ npm run test
 ### Want to help?
 
 Want to file a bug, contribute some code, or improve documentation? Excellent! Read up on our [contributing guide](https://github.com/LibusoftCicom/lc-datepicker/blob/master/CONTRIBUTING.md) and [code of conduct](https://github.com/LibusoftCicom/lc-datepicker/blob/master/CODE_OF_CONDUCT.md) and then check out one of our [issues](https://github.com/LibusoftCicom/lc-datepicker/issues).
-
-
 
 ## Licensing
 

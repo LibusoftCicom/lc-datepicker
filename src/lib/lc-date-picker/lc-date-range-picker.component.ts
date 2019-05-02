@@ -14,14 +14,8 @@ import {
 import { DatePickerConfig, ECalendarType, ECalendarNavigation } from './lc-date-picker-config-helper';
 import moment from 'moment-es6';
 import { Subscription } from 'rxjs';
+import { panels } from '../lc-date-picker.module';
 
-export enum panels {
-  Time,
-  Day,
-  Month,
-  Year,
-  DateRange
-}
 export enum DateType {
   From,
   To
@@ -221,10 +215,6 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
         this.activePanelFrom = panels.Time;
         break;
       }
-      case ECalendarType.DateRange: {
-        this.activePanelFrom = panels.DateRange;
-        break;
-      }
     }
     this.cd.detectChanges();
   }
@@ -248,10 +238,6 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
       }
       case ECalendarType.Time: {
         this.activePanelTo = panels.Time;
-        break;
-      }
-      case ECalendarType.DateRange: {
-        this.activePanelTo = panels.DateRange;
         break;
       }
     }

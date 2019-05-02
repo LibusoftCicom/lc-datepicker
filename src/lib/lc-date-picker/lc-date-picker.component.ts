@@ -19,8 +19,7 @@ export enum panels {
   Time,
   Day,
   Month,
-  Year,
-  DateRange
+  Year
 }
 
 @Component({
@@ -182,10 +181,6 @@ export class LCDatePickerComponent implements OnInit, OnChanges, OnDestroy {
       }
       case ECalendarType.Time: {
         this.activePanel = panels.Time;
-        break;
-      }
-      case ECalendarType.DateRange: {
-        this.activePanel = panels.DateRange;
         break;
       }
     }
