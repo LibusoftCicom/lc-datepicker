@@ -14,7 +14,7 @@ import {
 import { DatePickerConfig, ECalendarType, ECalendarNavigation } from './lc-date-picker-config-helper';
 import moment from 'moment-es6';
 import { Subscription } from 'rxjs';
-import { panels } from '../lc-date-picker.module';
+import { panels } from './lc-date-picker.component';
 
 export enum DateType {
   From,
@@ -130,7 +130,15 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
 
   initCalendar() {
     let format = this.config.Format || '';
-    let [dateFromString, dateTotring] = this.date.split('/');
+    const dateArray = this.date.split('/');
+    let dateFromString, dateTotring;
+    if (dateArray && dateArray.length === 2) {
+      [dateFromString, dateTotring] = this.date.split('/');
+    } else {
+      dateFromString = '';
+      dateTotring = '';
+    }
+
     this.locale = this.config.Localization || 'hr';
     moment.locale(this.locale);
 
