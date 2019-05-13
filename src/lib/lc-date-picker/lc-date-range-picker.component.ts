@@ -389,7 +389,7 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   private calendarSize(type: ECalendarType) {
-    let height = 0;
+    let height = 15; // OK button
     if (this.config.CalendarType <= 1) {
       height += 20;
     }
