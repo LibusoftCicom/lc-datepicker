@@ -137,6 +137,30 @@
 
           <div class="form-group ">
             <blockquote class="card-blockquote col-12">
+              <b>From label:</b>
+              <br />
+              Label on date range picker. Default: From
+            </blockquote>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="FromLabel" />
+          </div>
+          <hr />
+
+          <div class="form-group ">
+            <blockquote class="card-blockquote col-12">
+              <b>To label:</b>
+              <br />
+              Label on date range picker. Default: To
+            </blockquote>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="ToLabel" />
+          </div>
+          <hr />
+
+          <div class="form-group ">
+            <blockquote class="card-blockquote col-12">
               <b>Color theme:</b>
             </blockquote>
           </div>
@@ -364,10 +388,15 @@
           </code>
         </li>
         <li>
-          <p>Use the following snippet inside your template:</p>
+          <p>Use the following snippet inside your template for date picker:</p>
           <code
             >&lt;lc-datepicker [(opened)]="calendarOpened" [config]="config"
             [(date)]="Date"&gt;&lt;/lc-datepicker&gt;</code
+          >
+          <p>Use the following snippet inside your template for date range picker:</p>
+          <code
+            >&lt;lc-date-range-picker [(opened)]="calendarOpened" [config]="config"
+            [(date)]="Date"&gt;&lt;/lc-date-range-picker&gt;</code
           >
         </li>
       </ol>

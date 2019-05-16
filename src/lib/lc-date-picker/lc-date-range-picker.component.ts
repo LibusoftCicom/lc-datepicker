@@ -138,7 +138,9 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
       dateFromString = '';
       dateTotring = '';
     }
-
+    if (this.config.CalendarType === ECalendarType.DateTime || this.config.CalendarType === ECalendarType.Time) {
+      this.config.CalendarType = ECalendarType.Date;
+    }
     this.locale = this.config.Localization || 'hr';
     moment.locale(this.locale);
 
@@ -282,10 +284,10 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
   public onMonthSelected(type: DateType, date: moment.Moment) {
     switch (type) {
       case DateType.From:
-        this.newDateFrom.month(date.month());
+        this.newDateFrom = this.newDateFrom.month(date.month());
         break;
       case DateType.To:
-        this.newDateTo.month(date.month());
+        this.newDateTo = this.newDateTo.month(date.month());
         break;
     }
     if (this.config.CalendarType > 1 && this.config.CalendarType === ECalendarType.MonthYear) {
@@ -293,8 +295,6 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
     }
     if (this.config.CalendarType !== ECalendarType.MonthYear) {
       this.onSwitchPannel(type, panels.Day);
-    } else {
-      this.confirm();
     }
   }
 
@@ -312,8 +312,6 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
     }
     if (this.config.CalendarType !== ECalendarType.Year) {
       this.onSwitchPannel(type, panels.Month);
-    } else {
-      this.confirm();
     }
   }
 

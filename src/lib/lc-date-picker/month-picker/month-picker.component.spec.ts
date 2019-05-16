@@ -6,7 +6,6 @@ import { LcDatePickerModule, DatePickerConfig, ECalendarType } from '../../lc-da
 
 import * as moment from 'moment';
 
-
 describe('LCMonthPickerComponent', () => {
   let component: LCMonthPickerComponent;
   let element: HTMLElement;
@@ -14,11 +13,8 @@ describe('LCMonthPickerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        LCMonthPickerComponent
-      ]
-    })
-      .compileComponents();
+      declarations: [LCMonthPickerComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -43,7 +39,7 @@ describe('LCMonthPickerComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should format months array', () =>{
+  it('should format months array', () => {
     const monthNames = component.shortMonthName;
     expect(monthNames.length).toBe(4);
     expect(monthNames[0].length).toBe(3);
@@ -53,10 +49,9 @@ describe('LCMonthPickerComponent', () => {
   });
 
   it('should set month on click', () => {
-      const date = moment().month(1);
-      const newMonth = component.shortMonthName[1][2];
-      component.setMonth(newMonth);
-      expect(component.newDate.format('MMM')).toBe(newMonth.key);
-  })
-
+    const date = moment().month(1);
+    const newMonth = component.shortMonthName[1][2];
+    component.setMonth(newMonth);
+    expect(component.newDate.format('MMM')).toBe(newMonth.key);
+  });
 });

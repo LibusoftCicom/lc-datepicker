@@ -13,6 +13,7 @@
   user-select: none; /* Non-prefixed version, currently*/
   outline: none;
   line-height: 0;
+  width: 440px;
 }
 
 :host.displayDown {
@@ -96,6 +97,10 @@ table {
   background: #5e666f;
 }
 
+.confirmDate {
+  width: 441px;
+}
+
 .confirmDate button {
   width: 100%;
   height: 100%;
@@ -105,7 +110,8 @@ table {
 
 .dateRangeLabel {
   text-align: center;
-  color: white;
+  color: #e0e0e0;
+  font-weight: bold;
 }
 thead tr {
   height: 25px;

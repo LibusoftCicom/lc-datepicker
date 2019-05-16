@@ -186,6 +186,21 @@ export class AppComponent implements OnInit, OnDestroy {
     this.config.ConfirmLabel = value;
   }
 
+  public get FromLabel() {
+    return this.config.FromLabel;
+  }
+
+  public set FromLabel(value) {
+    this.config.FromLabel = value;
+  }
+  public get ToLabel() {
+    return this.config.ToLabel;
+  }
+
+  public set ToLabel(value) {
+    this.config.ToLabel = value;
+  }
+
   public get PrimaryColor() {
     return this.config.PrimaryColor;
   }
