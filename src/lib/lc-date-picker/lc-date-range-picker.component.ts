@@ -109,7 +109,7 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
   @HostBinding('style.margin-top') componentMargin;
 
   @HostBinding('attr.tabindex')
-  public tabIndex: number = 0;
+  public tabIndex = 0;
 
   @Input() opened: boolean;
   @Input() config: DatePickerConfig;
@@ -129,7 +129,7 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   initCalendar() {
-    let format = this.config.Format || '';
+    const format = this.config.Format || '';
     const dateArray = this.date.split('/');
     let dateFromString, dateTotring;
     if (dateArray && dateArray.length === 2) {
@@ -144,14 +144,14 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
     this.locale = this.config.Localization || 'hr';
     moment.locale(this.locale);
 
-    this.originalDateFrom = this.initDate(dateFromString, <string>format);
-    this.originalDateTo = this.initDate(dateTotring, <string>format);
+    this.originalDateFrom = dateFromString ? this.initDate(dateFromString, <string>format) : null;
+    this.originalDateTo = dateTotring ? this.initDate(dateTotring, <string>format) : null;
 
     this.originalDateFrom = this.isDateAvailable(this.originalDateFrom);
     this.originalDateTo = this.isDateAvailable(this.originalDateTo);
 
-    this.newDateFrom = this.initDate(dateFromString, <string>format);
-    this.newDateTo = this.initDate(dateTotring, <string>format);
+    this.newDateFrom = dateFromString ? this.initDate(dateFromString, <string>format) : null;
+    this.newDateTo = dateTotring ? this.initDate(dateTotring, <string>format) : null;
 
     this.newDateFrom = this.isDateAvailable(this.newDateFrom);
     this.newDateTo = this.isDateAvailable(this.newDateTo);
@@ -162,7 +162,7 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
     if (moment(this.config.MaxDate).diff(moment(this.config.MinDate), 'days') < 1) {
       this.config.MinDate = this.config.DefaultMinDate;
       this.config.MaxDate = this.config.DefaultMaxDate;
-      throw 'Invalid min/max date. Max date should be at least 1 day after min date';
+      throw Error('Invalid min/max date. Max date should be at least 1 day after min date');
     }
 
     this.subscriptions.push(this.config.navigationChanges.subscribe(dir => this.navigation(dir)));
@@ -200,7 +200,12 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   private navigation(dir: ECalendarNavigation): void {
-    if (dir === ECalendarNavigation.Close) this.close();
+    if (dir === ECalendarNavigation.Close) {
+      this.close();
+    }
+    if (dir === ECalendarNavigation.Confirm) {
+      this.confirm();
+    }
   }
 
   private setPanel(panel: ECalendarType) {
@@ -258,10 +263,13 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
     this.dateChange.emit(
       this.config.Format
         ? [
-            moment(this.newDateFrom.toISOString()).format(<string>this.config.Format),
-            moment(this.newDateTo.toISOString()).format(<string>this.config.Format)
+            this.newDateFrom ? moment(this.newDateFrom.toISOString()).format(<string>this.config.Format) : '',
+            this.newDateTo ? moment(this.newDateTo.toISOString()).format(<string>this.config.Format) : ''
           ].join('/')
-        : [this.newDateFrom.toISOString(), this.newDateTo.toISOString()].join('/')
+        : [
+            this.newDateFrom ? this.newDateFrom.toISOString() : '',
+            this.newDateTo ? this.newDateTo.toISOString() : ''
+          ].join('/')
     );
   }
 
@@ -342,9 +350,12 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   private isDateAvailable(date: moment.Moment): moment.Moment {
+    if (!date) {
+      return null;
+    }
     if (this.config.MinDate && this.config.MaxDate) {
-      let minDate = moment(this.config.MinDate);
-      let maxDate = moment(this.config.MaxDate);
+      const minDate = moment(this.config.MinDate);
+      const maxDate = moment(this.config.MaxDate);
       if (minDate.isSame(maxDate)) {
         return null;
       }
@@ -355,7 +366,7 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
     }
 
     if (this.config.MinDate) {
-      let minDate = moment(this.config.MinDate);
+      const minDate = moment(this.config.MinDate);
 
       if (date.isBefore(minDate)) {
         return this.isDateAvailable(minDate);
@@ -363,7 +374,7 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
     }
 
     if (this.config.MaxDate) {
-      let maxDate = moment(this.config.MaxDate);
+      const maxDate = moment(this.config.MaxDate);
 
       if (date.isAfter(maxDate)) {
         return this.isDateAvailable(maxDate);
