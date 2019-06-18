@@ -119,7 +119,11 @@ export class LCDayPickerComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(changes) {
     // ignore initial detection
     if (changes.newDate && !changes.newDate.firstChange) {
-      this.tempDate = moment(changes.newDate.currentValue.toISOString());
+      if (changes.newDate.currentValue) {
+        this.tempDate = moment(changes.newDate.currentValue.toISOString());
+      } else {
+        this.newDate = null;
+      }
       this.formatMonthData();
       this.cd.detectChanges();
     }

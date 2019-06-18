@@ -276,10 +276,18 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
   public onDaySelected(type: DateType, date: moment.Moment) {
     switch (type) {
       case DateType.From:
-        this.newDateFrom = date;
+        if (this.newDateFrom && this.newDateFrom.toISOString() === date.toISOString()) {
+          this.newDateFrom = null;
+        } else {
+          this.newDateFrom = date;
+        }
         break;
       case DateType.To:
-        this.newDateTo = date;
+        if (this.newDateTo && this.newDateTo.toISOString() === date.toISOString()) {
+          this.newDateTo = null;
+        } else {
+          this.newDateTo = date;
+        }
         break;
     }
 
