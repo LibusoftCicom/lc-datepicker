@@ -38,16 +38,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription;
 
-  @ViewChild('calendar')
+  @ViewChild('calendar', { static: true })
   calendar: LCDatePickerComponent;
 
-  @ViewChild('calendarRange')
+  @ViewChild('calendarRange', { static: true })
   calendarRange: LCDatePickerComponent;
 
-  @ViewChild('dateInput')
+  @ViewChild('dateInput', { static: true })
   dateInput: ElementRef;
 
-  @ViewChild('dateRangeInput')
+  @ViewChild('dateRangeInput', { static: true })
   dateRangeInput: ElementRef;
 
   constructor(private renderer: Renderer2) {
