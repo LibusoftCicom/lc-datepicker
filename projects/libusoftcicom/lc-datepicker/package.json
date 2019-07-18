@@ -1,0 +1,30 @@
+{
+  "name": "@libusoftcicom/lc-datepicker",
+  "version": "1.5.0",
+  "description": "LC DatePicker - Pure Angular date and time picker component.",
+  "homepage": "https://github.com/LibusoftCicom/lc-datepicker",
+  "bugs": "https://github.com/LibusoftCicom/lc-datepicker/issues",
+  "license": "MIT",
+  "keywords": [
+    "datepicker",
+    "timepicker",
+    "datetimepicker",
+    "calendar",
+    "angular",
+    "angular 2",
+    "angular 4",
+    "angular 5",
+    "angular 6"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LibusoftCicom/lc-datepicker.git"
+  },
+  "peerDependencies": {
+    "@angular/common": "^8.1.2",
+    "@angular/core": "^8.1.2",
+    "font-awesome": "4.7.0",
+    "moment-es6": "1.0.0",
+    "rxjs": "6.5.2"
+  }  
+}

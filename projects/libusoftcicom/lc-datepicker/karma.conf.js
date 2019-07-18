@@ -15,8 +15,21 @@ module.exports = function (config) {
     client: {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
+    customLaunchers: {
+      ChromeNoSandboxHeadless: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox',
+          // See https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md
+          '--headless',
+          '--disable-gpu',
+          // Without a remote debugging port, Google Chrome exits immediately.
+          // ' --remote-debugging-port=9222',
+        ],
+      }
+    },
     coverageIstanbulReporter: {
-      dir: require('path').join(__dirname, './coverage/lc-date-picker'),
+      dir: require('path').join(__dirname, '../../../coverage/libusoftcicom/lc-datepicker'),
       reports: ['html', 'lcovonly', 'text-summary'],
       fixWebpackSourcePaths: true
     },
@@ -25,8 +38,8 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chrome'],
-    singleRun: false,
+    browsers: ['ChromeNoSandboxHeadless'],
+    singleRun: true,
     restartOnFileChange: true
   });
 };

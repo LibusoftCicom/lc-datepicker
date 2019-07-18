@@ -1,0 +1,36 @@
+<table class="timePicker">
+    <tbody align="center">
+        <tr>
+        <td rowspan="2" class="clockCell">
+            <i class="fa fa-clock-o fa-2x" aria-hidden="true" [style.color]="config.FontColor"></i>
+        </td>
+        <td rowspan="2" class="timeLabel" (wheel)="hourScroll($event)" [style.color]="config.FontColor">
+            {{is24HourFormat ? newDate.format('HH') : newDate.format('hh')}}
+        </td>
+        <td class="selectbtn" (click)="addHour()" (wheel)="hourScroll($event)" [style.color]="config.FontColor">
+            <i class="fa fa-caret-up fa-2x" aria-hidden="true"></i>
+        </td>
+        <td rowspan="2" class="divider" [style.color]="config.FontColor">:</td>
+        <td rowspan="2" class="timeLabel" (wheel)="minuteScroll($event)" [style.color]="config.FontColor">{{newDate.format('mm')}}</td>
+        <td class="selectbtn" (click)="addMinute()" (wheel)="minuteScroll($event)" >
+            <i class="fa fa-caret-up fa-2x" aria-hidden="true" [style.color]="config.FontColor"> </i>
+        </td>
+        <td rowspan="2" class="timeLabel" (wheel)="toggleMeridiem()" *ngIf="!is24HourFormat" [style.color]="config.FontColor">{{newDate.format('A')}}</td>
+        <td class="selectbtn" (click)="toggleMeridiem()" (wheel)="toggleMeridiem()" *ngIf="!is24HourFormat" [style.color]="config.FontColor">
+            <i class="fa fa-caret-up fa-2x" aria-hidden="true" [style.color]="config.FontColor"></i>
+        </td>
+        <td rowspan="2" ></td>
+        </tr>
+        <tr>
+        <td class="selectbtn" (click)="subtractHour()" (wheel)="hourScroll($event)" [style.color]="config.FontColor">
+            <i class="fa fa-caret-down fa-2x" aria-hidden="true"></i>
+        </td>
+        <td class="selectbtn" (click)="subtractMinute()" (wheel)="minuteScroll($event)" [style.color]="config.FontColor">
+            <i class="fa fa-caret-down fa-2x" aria-hidden="true"></i>
+        </td>
+        <td class="selectbtn" (click)="toggleMeridiem()" (wheel)="toggleMeridiem()" *ngIf="!is24HourFormat" [style.color]="config.FontColor">
+            <i class="fa fa-caret-down fa-2x" aria-hidden="true"></i>
+        </td>
+        </tr>
+    </tbody>
+</table>
