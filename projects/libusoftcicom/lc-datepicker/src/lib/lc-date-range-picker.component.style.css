@@ -3,7 +3,7 @@
   color: black;
   background: transparent;
   font-family: open_sans-n4, open_sans, Helvetica, Arial, sans-serif;
-  font-size: 12px;
+  font-size: 0;
   z-index: 101;
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
@@ -98,6 +98,7 @@ table {
 }
 
 .confirmDate {
+  font-size: 12px;
   width: 441px;
 }
 

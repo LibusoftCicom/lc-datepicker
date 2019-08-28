@@ -2,9 +2,6 @@
   "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
   "dest": "../../../dist/lib",
   "lib": {
-    "entryFile": "src/public-api.ts",
-    "externals": {
-      "moment": "moment"
-    }
+    "entryFile": "src/public-api.ts"
   }
 }
