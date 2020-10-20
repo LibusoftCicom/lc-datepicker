@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnInit, OnChanges, OnDestroy } from '@angular/core';
 import { DatePickerConfig, ECalendarNavigation } from './../lc-date-picker-config-helper';
-import moment from 'moment-es6';
+import moment from 'moment';
 import { Subscription } from 'rxjs';
 
 export interface IYearobject {
