@@ -158,7 +158,7 @@ td.active {
   right: 0;
 }
 
-:host >>> .fa-lg {
+:host ::ng-deep .fa-lg {
   font-size: 1.5em;
   line-height: 0em;
 }
