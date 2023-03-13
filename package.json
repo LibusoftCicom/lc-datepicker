@@ -12,7 +12,7 @@
     "clean": "rm -rf dist",
     "build:git:demo": "ng build --configuration production",
     "build:library": "ng test lc-datepicker-library && ng build lc-datepicker-library --configuration production && npm run copy:files && npm run build:git:demo",
-    "build:publish:public": "npm publish dist/lib/ --access public --tag=latest"
+    "build:publish:public": "npm publish dist/lib/ --access public --tag=support-14.0.0"
   },
   "private": true,
   "dependencies": {
