@@ -15,7 +15,7 @@
 # Description
 
 - LC DatePicker is an Angular component that generates a datepicker calendar on your input element
-- Compatible with Angular 2+ up to Angular v8.0.0
+- Compatible with Angular up to v15.0.0
 - Only dependencies are RxJS, MomentJS and Font Awesome
 - Customizable date format and language
 - Can be configured as time, date-time, date, month or year picker
@@ -26,25 +26,11 @@
 - Chrome (latest)
 - Chromium (latest)
 - Edge
-- IE11
 
 ## Installing / Getting started
 
 ```shell
 npm install @libusoftcicom/lc-datepicker
-```
-
-skip this if SystemJS is not used as module loader:
-
-```shell
-System.config({
-  paths: {
-    'npm:': 'node_modules/'
-  },
-  map: {
-    '@libusoftcicom/lc-datepicker' : 'npm:@libusoftcicom/lc-datepicker/bundles/lc-datepicker.umd'
-  }
-})
 ```
 
 Use the following snippet inside your app module:
@@ -141,7 +127,7 @@ Use the following snippet inside your template for date-range-picker:
 
 ### Setting up Dev
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.1.3.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.2.
 
 [Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
 
@@ -160,7 +146,7 @@ Open "http://localhost:4200" in browser
 
 ### Building
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.1.3.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.2.
 
 [Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
 
@@ -181,7 +167,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Tests
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.1.3.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.2.
 
 [Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
 

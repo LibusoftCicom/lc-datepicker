@@ -10,9 +10,14 @@
     "module": "esnext",
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "es2015",
-    "typeRoots": ["node_modules/@types"],
-    "lib": ["es2018", "dom"],
+    "target": "ES2022",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ],
     "paths": {
       "@libusoftcicom/lc-datepicker": [
         "projects/libusoftcicom/lc-datepicker/src/public-api.ts"
@@ -20,7 +25,8 @@
       "@libusoftcicom/lc-datepicker/*": [
         "projects/libusoftcicom/lc-datepicker/src/lib/*"
       ]
-    }
+    },
+    "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
