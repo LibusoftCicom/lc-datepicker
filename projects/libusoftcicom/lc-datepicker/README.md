@@ -1,6 +1,6 @@
 # LcDatepicker
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.2.
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.1.
 
 ## Code scaffolding
 
