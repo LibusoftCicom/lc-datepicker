@@ -30,7 +30,7 @@
     "postcss": "6.0.14",
     "font-awesome": "4.7.0",
     "bootstrap": "4.0.0-alpha.6",
-    "moment": "2.29.1"
+    "moment": "2.29.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~13.3.8",
