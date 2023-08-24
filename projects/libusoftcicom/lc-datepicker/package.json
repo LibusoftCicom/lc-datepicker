@@ -1,6 +1,6 @@
 {
   "name": "@libusoftcicom/lc-datepicker",
-  "version": "14.0.2",
+  "version": "14.0.3",
   "description": "LC DatePicker - Pure Angular date and time picker component.",
   "homepage": "https://github.com/LibusoftCicom/lc-datepicker",
   "bugs": "https://github.com/LibusoftCicom/lc-datepicker/issues",
@@ -20,8 +20,8 @@
   "peerDependencies": {
     "@angular/common": "^14.0.0",
     "@angular/core": "^14.0.0",
-    "font-awesome": "4.7.0",
-    "moment": "2.29.1",
+    "font-awesome": "^4.7.0",
+    "moment": "^2.29.0",
     "rxjs": "^7.0.0"
   }
 }
