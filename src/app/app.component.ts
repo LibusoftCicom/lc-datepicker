@@ -112,8 +112,6 @@ export class AppComponent implements OnInit, OnDestroy {
           .add(rand, 'day')
           .format('YYYY-MM-DD');
       });
-
-    this.randomDisabledDates.push(moment(moment.now()).format('YYYY-MM-DD'));
   }
 
   private setDisabledTimeRanges() {

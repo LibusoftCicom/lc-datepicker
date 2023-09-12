@@ -143,14 +143,14 @@ export class LCDateRangePickerComponent implements OnInit, OnChanges, OnDestroy 
     this.locale = this.config.Localization || 'hr';
     moment.locale(this.locale);
 
-    this.originalDateFrom = dateFromString ? this.initDate(dateFromString, <string>format) : null;
-    this.originalDateTo = dateTotring ? this.initDate(dateTotring, <string>format) : null;
+    this.originalDateFrom = dateFromString ? this.initDate(dateFromString, <string>format) : moment().locale(this.locale);
+    this.originalDateTo = dateTotring ? this.initDate(dateTotring, <string>format) : moment().add(1, 'days').locale(this.locale);
 
     this.originalDateFrom = this.isDateAvailable(this.originalDateFrom);
     this.originalDateTo = this.isDateAvailable(this.originalDateTo);
 
-    this.newDateFrom = dateFromString ? this.initDate(dateFromString, <string>format) : null;
-    this.newDateTo = dateTotring ? this.initDate(dateTotring, <string>format) : null;
+    this.newDateFrom = dateFromString ? this.initDate(dateFromString, <string>format) : moment().locale(this.locale);
+    this.newDateTo = dateTotring ? this.initDate(dateTotring, <string>format) : moment().add(1, 'days').locale(this.locale);
 
     this.newDateFrom = this.isDateAvailable(this.newDateFrom);
     this.newDateTo = this.isDateAvailable(this.newDateTo);
