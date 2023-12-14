@@ -11,7 +11,7 @@ button {
   outline: none;
 }
 
- td {
+td {
   padding: 1px;
 }
 
@@ -64,8 +64,11 @@ table {
 
 thead tr {
   height: 25px;
-  /*background: #5e666f*/;
   color: aliceblue;
+}
+
+tbody td {
+  text-align: center;
 }
 
 tr.days {
@@ -97,6 +100,10 @@ td.active {
 
 .pullRight{
   float: right;
+}
+
+.pullLeft{
+  float: left;
 }
 
 .rotateUp {

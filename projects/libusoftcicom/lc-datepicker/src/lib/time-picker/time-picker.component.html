@@ -1,0 +1,18 @@
+<table #timePicker aria-describedby="a control for choosing time">
+    <thead>
+    <tr>
+        <th #header>
+            <div class="resetBtn"> &nbsp; </div>
+            <div #reset class="resetBtn"> <i class="fa fa-home" aria-hidden="true"></i> </div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="pullRight"><lc-time-spinner [value]="formattedHour" [config]="config" (incremented)="addHour()" (decremented)="subtractHour()" (scrolled)="hourScroll($event)"></lc-time-spinner></td>
+        <td class="divider">:</td>
+        <td class="pullLeft"><lc-time-spinner [value]="formattedMinute" [config]="config" (incremented)="addMinute()" (decremented)="subtractMinute()" (scrolled)="minuteScroll($event)"></lc-time-spinner></td>
+        <td><lc-time-spinner *ngIf="!is24HourFormat" [value]="formattedAMPM" [config]="config" (incremented)="toggleMeridiem()" (decremented)="toggleMeridiem()" (scrolled)="scrollMeridiem($event)"></lc-time-spinner></td>
+    </tr>
+    </tbody>
+</table>

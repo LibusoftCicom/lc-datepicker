@@ -1,0 +1,21 @@
+<table #monthPicker class="monthsCal" aria-describedby="a control for choosing the month">
+  <thead>
+  <tr>
+    <th colspan="4">
+      <div class="selectbtn">&nbsp;</div>
+      <div #reset class="selectbtn"><i class="fa fa-home" aria-hidden="true"></i></div>
+      <div class="selectbtn monthlabel">&nbsp;</div>
+      <div #yearPanel class="selectbtn yearlabel">
+        {{ formattedYear }}
+      </div>
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let row of calendarData; let i = index">
+    <td #items *ngFor="let item of row; let j = index">
+      <lc-month-picker-button [item]="item" [row]="i" [column]="j" [config]="config" (selected)="selectItem($event)"></lc-month-picker-button>
+    </td>
+  </tr>
+  </tbody>
+</table>

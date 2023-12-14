@@ -1,448 +1,502 @@
 <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top">
-  <button
-    class="navbar-toggler navbar-toggler-right"
-    type="button"
-    data-toggle="collapse"
-    data-target="#navbarsExampleDefault"
-    aria-controls="navbarsExampleDefault"
-    aria-expanded="false"
-    aria-label="Toggle navigation"
-  >
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <a href="http://www.spi.hr" target="_blank"><img src="./assets/logo.png"/></a>
-  <a class="navbar-brand" href="#">LC DatePicker</a>
+    <button
+            class="navbar-toggler navbar-toggler-right"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarsExampleDefault"
+            aria-controls="navbarsExampleDefault"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+    >
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a href="http://www.spi.hr" target="_blank"><img src="./assets/logo.png" alt="Libusoft Cicom logo"/></a>
+    <a class="navbar-brand" href="#" *ngIf="CalendarOpened">LC DatePicker</a>
 </nav>
 
 <!-- Main jumbotron for a primary marketing message or call to action -->
 <div class="jumbotron">
-  <div class="container">
-    <h1 class="display-3">LC DatePicker</h1>
-    <p>Angular date time picker component</p>
-    <a
-      href="https://github.com/LibusoftCicom/lc-datepicker"
-      class="btn btn-primary btn-lg active"
-      role="button"
-      aria-pressed="true"
-      >GitHub</a
-    >
-  </div>
+    <div class="container">
+        <h1 class="display-3">LC DatePicker</h1>
+        <p>Angular date time picker component</p>
+        <a
+                href="https://github.com/LibusoftCicom/lc-datepicker"
+                class="btn btn-primary btn-lg active"
+                role="button"
+                aria-pressed="true"
+        >GitHub</a
+        >
+    </div>
 </div>
 
 <div class="container">
-  <!-- Example row of columns -->
-  <div class="row">
-    <div class="col-lg-3">
-      <div class="card">
-        <div class="card-header">
-          DatePicker
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <h3 class="card-header">Description</h3>
+                <div class="card-block">
+                    <p class="card-text">A pure Angular date and time picker component.</p>
+                    <div>
+                        <ul>
+                            <li>LC DatePicker is an Angular component that generates a datepicker calendar on your input element</li>
+                            <li>Compatible with Angular 2+ up to Angular v16.0.0</li>
+                            <li>Only dependencies are RxJS and Font Awesome</li>
+                            <li>Customizable language</li>
+                            <li>Can be configured as time, date-time, date, month or year picker</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <br />
         </div>
-        <div class="card-block">
-          <blockquote class="card-blockquote"></blockquote>
-          <div class="input-group">
-            <input type="text" class="form-control" #dateInput />
-            <span class="input-group-btn">
-              <button class="btn btn-secondary" type="button" (click)="openCalendar()">
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <h3 class="card-header">Getting Started</h3>
+                <div class="card-block">
+                    <p class="card-text"></p>
+                    <ol>
+                        <li>Fork and clone this repo</li>
+                        <li>npm install</li>
+                        <li>Open a terminal and type "npm run start"</li>
+                        <li>Open "http://localhost:4200" in the browser</li>
+                    </ol>
+                </div>
+            </div>
+            <br />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card" id="installation">
+                <h3 class="card-header">Installation</h3>
+                <div class="card-block">
+                    <p>To install this component to an external project, follow the procedure:</p>
+                    <p class="card-text"></p>
+                    <ol>
+                        <li><code>npm install &#64;libusoftcicom/lc-datepicker</code></li>
+                        <li>
+                            <p>Skip this if SystemJS is not used as module loader</p>
+                            <code
+                            >System.config(&#123;<br />
+                                paths: &#123;<br />
+                                'npm:': 'node_modules/'<br />
+                                &#125;,<br />
+                                map: &#123;<br />
+                                '&#64;libusoftcicom/lc-datepicker' : 'npm:&#64;libusoftcicom/lc-datepicker/bundles/lc-datepicker.umd'<br />
+                                &#125; &#125;)</code
+                            >
+                        </li>
+                        <li>
+                            <code>
+                                import &#123;LcDatePickerModule&#125; from '&#64;libusoftcicom/lc-datepicker';
+                                <br />
+
+                                &#64;NgModule(&#123;<br />
+                                declarations: [<br />
+                                ...<br />
+                                ],<br />
+                                imports: [<br />
+                                ...<br />
+                                LcDatePickerModule.withImplementation(&#123;adapter: LuxonDateAdapterService&#125;)<br />
+                                // or LcDatePickerModule.withImplementation(&#123;adapter: MomentDateAdapterService&#125;)<br />
+                                // It is also possible to extend LCDatePickerAdapter and implement the adapter using a different library.<br />
+                                ],<br />
+                                providers: [<br />
+                                ...<br />
+                                ],<br />
+                                bootstrap: [...] &#125;)<br />
+                                export class AppModule &#123;&#125;
+                            </code>
+                        </li>
+                        <li>
+                            <code>
+                                import &#123;DatePickerConfig, ECalendarType&#125; from '&#64;libusoftcicom/lc-datepicker';
+                                <br />
+
+                                &#64;Component(&#123;<br />
+                                ...<br />
+                                &#125;)<br />
+                                export class AppComponent &#123;<br />
+
+                                &nbsp;public config = new DatePickerConfig();<br />
+                                &nbsp;public inputDate: DateTime;<br />
+                                &nbsp;public CalendarOpened = false;<br />
+                                &nbsp;public CalendarRangeOpened = false;<br />
+                                <br />
+                                &nbsp;constructor(<br />
+                                &nbsp;&nbsp;private readonly dateAdapter: LCDatePickerAdapter,<br />
+                                &nbsp;&nbsp;...<br />
+                                &nbsp;) &#123;<br />
+                                &nbsp;&nbsp;// configuration is optional<br />
+                                &nbsp;&nbsp;this.config.setCalendarType(ECalendarType.Date);<br />
+                                &nbsp;&nbsp;this.config.setLocalization('en');<br />
+                                &nbsp;&nbsp;this.inputDate = this.dateAdapter.now(this.config.getTimezone());<br />
+                                &nbsp;&nbsp;...<br />
+                                &nbsp;&#125;<br />
+                                <br />
+                                &nbsp;public setCalendarDate(dateTime: DateTime): void &#123;<br />
+                                &nbsp;&nbsp;this.dateInput.nativeElement.value = this.dateAdapter.toISOString(dateTime);<br />
+                                &nbsp;&#125;<br />
+
+
+                                &nbsp;public toggleCalendarOpen(): void &#123;<br />
+                                &nbsp;&nbsp;this.CalendarOpened = !this.CalendarOpened;<br />
+                                &nbsp;&nbsp;...<br />
+                                &nbsp;&#125;<br />
+                                &#125;
+                            </code>
+                        </li>
+                        <li>
+                            <p>Use the following snippet inside your template for date picker:</p>
+                            <code>
+                                &lt;lc-datepicker<br/>
+                                &nbsp;&nbsp;[value]="inputDate"<br/>
+                                &nbsp;&nbsp;[config]="config"<br/>
+                                &nbsp;&nbsp;*ngIf="CalendarOpened"<br/>
+                                &nbsp;&nbsp;(openedChange)="toggleCalendarOpen()"<br/>
+                                &nbsp;&nbsp;(dateChange)="setCalendarDate($event)"&gt;<br/>
+                                &lt;/lc-datepicker&gt;
+                            </code>
+                            <p>Use the following snippet inside your template for date range picker:</p>
+                            <code>
+                                &lt;lc-date-range-picker<br />
+                                &nbsp;&nbsp;[valueFrom]="inputRangeDateFrom"<br />
+                                &nbsp;&nbsp;[valueTo]="inputRangeDateTo"<br />
+                                &nbsp;&nbsp;[config]="config"<br />
+                                &nbsp;&nbsp;*ngIf="CalendarRangeOpened"<br />
+                                &nbsp;&nbsp;(openedChange)="toggleCalendarRangeOpen()"<br />
+                                &nbsp;&nbsp;(dateChange)="setCalendarDateRange($event)"&gt;<br />
+                                &lt;/lc-date-range-picker&gt;
+                            </code>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <br />
+        </div>
+    </div>
+    <!-- Example row of columns -->
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    DatePicker
+                </div>
+                <div class="card-block">
+                    <blockquote class="card-blockquote"></blockquote>
+                    <div class="input-group">
+                        <input type="text" class="form-control" #dateInput />
+                        <span class="input-group-btn">
+              <button class="btn btn-secondary" type="button" (click)="toggleCalendarOpen()">
                 <i class="fa fa-calendar" aria-hidden="true"></i>
               </button>
             </span>
-          </div>
-          <lc-datepicker #calendar [(opened)]="CalendarOpened" [config]="config" [(date)]="setDate"></lc-datepicker>
-        </div>
-        <div class="card-block">
-          <blockquote class="card-blockquote"></blockquote>
-          <div class="input-group">
-            <input type="text" class="form-control" #dateRangeInput />
-            <span class="input-group-btn">
-              <button class="btn btn-secondary" type="button" (click)="openCalendarRange()">
+                    </div>
+                    <lc-datepicker
+                            [value]="inputDate"
+                            [config]="config"
+                            *ngIf="CalendarOpened"
+                            (openedChange)="toggleCalendarOpen()"
+                            (dateChange)="setCalendarDate($event)">
+                    </lc-datepicker>
+                </div>
+                <div class="card-block">
+                    <blockquote class="card-blockquote"></blockquote>
+                    <div class="input-group">
+                        <input type="text" class="form-control" #dateRangeInput />
+                        <span class="input-group-btn">
+              <button class="btn btn-secondary" type="button" (click)="toggleCalendarRangeOpen()">
                 <i class="fa fa-calendar" aria-hidden="true"></i>
               </button>
             </span>
-          </div>
-          <lc-date-range-picker
-            #calendarRange
-            [(opened)]="CalendarRangeOpened"
-            [config]="config"
-            [(date)]="setDateRange"
-          ></lc-date-range-picker>
+                    </div>
+                    <lc-date-range-picker
+                            [valueFrom]="inputRangeDateFrom"
+                            [valueTo]="inputRangeDateTo"
+                            [config]="config"
+                            *ngIf="CalendarRangeOpened"
+                            (openedChange)="toggleCalendarRangeOpen()"
+                            (dateChange)="setCalendarDateRange($event)">
+                    </lc-date-range-picker>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    Config Options
+                </div>
+                <div class="card-block">
+                    <div class="form-group">
+                        <blockquote class="card-blockquote col-12">
+                            <b>Localization:</b>
+                            <br />
+                            ISO 639-1 language code. Default: en
+                        </blockquote>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control col-sm-12" id="inlineFormCustomSelect" [(ngModel)]="Localization">
+                            <option selected value="en">English</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="it">Italian</option>
+                            <option value="ja">Japanese</option>
+                            <option value="pt">Portuguese</option>
+                            <option value="ru">Russian</option>
+                            <option value="hr">Croatian</option>
+                        </select>
+                    </div>
+                    <hr />
+
+                    <div class="form-group">
+                        <blockquote class="card-blockquote col-12">
+                            <b>Calendar type:</b>
+                        </blockquote>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control col-sm-12" id="inlineFormCustomSelect" [(ngModel)]="CalendarType">
+                            <option [attr.value]="0">Time picker</option>
+                            <option [attr.value]="1">DateTime picker</option>
+                            <option selected [attr.value]="2">Date picker</option>
+                            <option [attr.value]="3">Month picker</option>
+                            <option [attr.value]="4">Year picker</option>
+                        </select>
+                    </div>
+                    <hr />
+
+                    <div class="form-group ">
+                        <blockquote class="card-blockquote col-12">
+                            <b>Confirm label:</b>
+                            <br />
+                            Label on the Confirm button. Default: OK
+                        </blockquote>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="ConfirmLabel" />
+                    </div>
+                    <hr />
+
+                    <div class="form-group ">
+                        <blockquote class="card-blockquote col-12">
+                            <b>From label:</b>
+                            <br />
+                            Label of the From part of the date range picker. Default: From
+                        </blockquote>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="FromLabel" />
+                    </div>
+                    <hr />
+
+                    <div class="form-group ">
+                        <blockquote class="card-blockquote col-12">
+                            <b>To label:</b>
+                            <br />
+                            Label of the To part of the date range picker. Default: To
+                        </blockquote>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="ToLabel" />
+                    </div>
+                    <hr />
+
+                    <div class="form-group ">
+                        <blockquote class="card-blockquote col-12">
+                            <b>Color theme:</b>
+                        </blockquote>
+                    </div>
+                    <div class="form-group row">
+                        <label for="primaryColorInput" class="col-4 col-form-label">Primary color:</label>
+                        <input id="primaryColorInput" type="text" class="form-control col-sm-8 col-lg-8" [(ngModel)]="PrimaryColor" />
+                    </div>
+                    <div class="form-group row">
+                        <label for="fontColorInput" class="col-4 col-form-label">Font color:</label>
+                        <input id="fontColorInput" type="text" class="form-control col-sm-8 col-lg-8" [(ngModel)]="FontColor" />
+                    </div>
+                    <hr />
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    Methods
+                </div>
+                <div class="card-block">
+                    <blockquote class="card-blockquote"></blockquote>
+                    <button type="button" class="btn btn-secondary btn-block" (click)="toggleCalendarOpen()">Toggle</button>
+                    <button type="button" class="btn btn-secondary btn-block" (click)="clearCalendar()">Clear</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-lg-6">
-      <div class="card">
-        <div class="card-header">
-          Config Options
-        </div>
+
+    <div class="card mt-4">
+        <h3 class="card-header">Define allowed/disabled dates:</h3>
         <div class="card-block">
-          <div class="form-group">
-            <blockquote class="card-blockquote col-12">
-              <b>Localization:</b>
-              <br />
-              ISO 639-1 language code from moment locales. Default: en
-            </blockquote>
-          </div>
-          <div class="form-group">
-            <select class="form-control col-sm-12" id="inlineFormCustomSelect" [(ngModel)]="Localization">
-              <option selected value="en">English</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
-              <option value="it">Italian</option>
-              <option value="ja">Japanese</option>
-              <option value="pt">Portuguese</option>
-              <option value="ru">Russian</option>
-              <option value="hr">Croatian</option>
-            </select>
-          </div>
-          <hr />
-
-          <div class="form-group">
-            <blockquote class="card-blockquote col-12">
-              <b>Calendar type:</b>
-            </blockquote>
-          </div>
-          <div class="form-group">
-            <select class="form-control col-sm-12" id="inlineFormCustomSelect" [(ngModel)]="CalendarType">
-              <option [attr.value]="0">Time picker</option>
-              <option [attr.value]="1">DateTime picker</option>
-              <option selected [attr.value]="2">Date picker</option>
-              <option [attr.value]="3">Month picker</option>
-              <option [attr.value]="4">Year picker</option>
-            </select>
-          </div>
-          <hr />
-
-          <div class="form-group ">
-            <blockquote class="card-blockquote col-12">
-              <b>Output format:</b>
-              <br />
-              Accepts any string format supported by Moment JS. Default: ISO string
-            </blockquote>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="Format" />
-          </div>
-          <hr />
-
-          <div class="form-group ">
-            <blockquote class="card-blockquote col-12">
-              <b>Confirm label:</b>
-              <br />
-              Label on confirm button. Default: OK
-            </blockquote>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="ConfirmLabel" />
-          </div>
-          <hr />
-
-          <div class="form-group ">
-            <blockquote class="card-blockquote col-12">
-              <b>From label:</b>
-              <br />
-              Label on date range picker. Default: From
-            </blockquote>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="FromLabel" />
-          </div>
-          <hr />
-
-          <div class="form-group ">
-            <blockquote class="card-blockquote col-12">
-              <b>To label:</b>
-              <br />
-              Label on date range picker. Default: To
-            </blockquote>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="ToLabel" />
-          </div>
-          <hr />
-
-          <div class="form-group ">
-            <blockquote class="card-blockquote col-12">
-              <b>Color theme:</b>
-            </blockquote>
-          </div>
-          <div class="form-group row">
-            <label for="lgFormGroupInput" class="col-4 col-form-label">Primary color:</label>
-            <input type="text" class="form-control col-sm-8 col-lg-8" [(ngModel)]="PrimaryColor" />
-          </div>
-          <div class="form-group row">
-            <label for="lgFormGroupInput" class="col-4 col-form-label">Font color:</label>
-            <input type="text" class="form-control col-sm-8 col-lg-8" [(ngModel)]="FontColor" />
-          </div>
-          <hr />
+            <div class="form-group">
+                <p>
+                    Use config.setMinDate() and config.setMaxDate() to limit available dates. Dates out of that range are disabled.
+                    Default available range: 1900-01-01 - 2099-12-31.
+                </p>
+                <p>
+                    <code class="small-text">
+                        constructor(<br />
+                        &nbsp;...<br />
+                        &nbsp;private readonly dateAdapter: LCDatePickerAdapter,<br />
+                        ) &#123;<br />
+                        &nbsp;...<br />
+                        &nbsp;const config = new DatePickerConfig();<br />
+                        &nbsp;config.setMinDate(this.dateAdapter.subtract(this.dateAdapter.today(this.config.getTimezone()), 40, 'day'));<br />
+                        &nbsp;config.setMinDate(this.dateAdapter.add(this.dateAdapter.today(this.config.getTimezone()), 40, 'day'));<br />
+                        &#125;
+                    </code>
+                </p>
+            </div>
+            <hr />
+            <div class="form-group">
+                <p>or to configure dates which are disabled use config.setDisabledDates(DateTime[])</p>
+                <p>
+                    <code class="small-text">
+                        constructor(<br />
+                        &nbsp;...<br />
+                        &nbsp;private readonly dateAdapter: LCDatePickerAdapter,<br />
+                        ) &#123;<br />
+                        &nbsp;...<br />
+                        &nbsp;const config = new DatePickerConfig();<br />
+                        &nbsp;const date1 = this.dateAdapter.add(this.dateAdapter.today(this.config.getTimezone()), 5, 'days');<br />
+                        &nbsp;const date2 = this.dateAdapter.subtract(this.dateAdapter.today(this.config.getTimezone()), 2, 'days');<br />
+                        &nbsp;config.setDisabledDates([date1, date2]);<br />
+                        &#125;
+                    </code>
+                </p>
+            </div>
+            <hr />
+            <div class="form-group">
+                <p>
+                    If <i class="fa fa-home"></i> is pressed and that date is in the list of disabled dates,
+                    the calendar will pick the next available date.
+                </p>
+            </div>
         </div>
-      </div>
     </div>
-    <div class="col-lg-3">
-      <div class="card">
-        <div class="card-header">
-          Methods
-        </div>
+    <br />
+
+    <div class="card">
+        <h3 class="card-header">Define allowed/disabled time ranges:</h3>
         <div class="card-block">
-          <blockquote class="card-blockquote"></blockquote>
-          <button type="button" class="btn btn-secondary btn-block" (click)="openCalendar()">Toggle</button>
-          <button type="button" class="btn btn-secondary btn-block" (click)="clearCalendar()">Clear</button>
+            <div class="form-group">
+                <p>
+                    To configure disabled time ranges use config.addDisabledTimeRange, everything in that range is disabled.
+                </p>
+                <p>
+                    <code class="small-text">
+                        constructor(<br />
+                        &nbsp;...<br />
+                        &nbsp;private readonly dateAdapter: LCDatePickerAdapter,<br />
+                        ) &#123;<br />
+                        &nbsp;...<br />
+                        &nbsp;const config = new DatePickerConfig();<br />
+                        &nbsp;this.config.addDisabledTimeRange(&#123;startTime: &#123;hour: 0, minute: 0&#125;, stopTime: &#123;hour: 7, minute: 59&#125;&#125;);<br />
+                        &nbsp;this.config.addDisabledTimeRange(&#123;startTime: &#123;hour: 14, minute: 0&#125;, stopTime: &#123;hour: 16, minute: 59&#125;&#125;);<br />
+                        &#125;
+                    </code>
+                </p>
+            </div>
+            <hr />
+            <div class="form-group">
+                <p>
+                    If <i class="fa fa-home"></i> is pressed and the current time is in the disabled time range, the calendar will pick the next available time.
+                </p>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+    <br />
 
-  <div class="card">
-    <h3 class="card-header">Define allowed/disabled dates:</h3>
-    <div class="card-block">
-      <div class="form-group">
-        <p>
-          To configure range of available dates in calendar you can use config.MinDate and config.MaxDate, all dates out
-          of that range are disabled. Default available range: 01.01.1900 - 31.12.2099
-        </p>
-        <p>
-          <code class="small-text"
-            >const config = new DatePickerConfig(); config.MinDate = &#123; years: {{ fromDateObject.years }}, months:
-            {{ fromDateObject.months }}, date: {{ fromDateObject.date }} &#125;; config.MaxDate = &#123; years:
-            {{ toDateObject.years }}, months: {{ toDateObject.months }}, date: {{ toDateObject.date }} &#125;;</code
-          >
-        </p>
-      </div>
-      <hr />
-      <div class="form-group">
-        <p>or to configure dates which are disabled you can use config.setDisabledDates( Array&lt;MomentInput&gt; )</p>
-        <p>
-          <code class="small-text"
-            >const config = new DatePickerConfig(); config.setDisabledDates({{ randomDisabledDates | json }});</code
-          >
-        </p>
-      </div>
-      <hr />
-      <div class="form-group">
-        <p>
-          if <i class="fa fa-home"></i> is pressed and that day is in previously defined disabled list, calendar will
-          pick next available date
-        </p>
-      </div>
+    <div class="card">
+        <h3 class="card-header">Navigation</h3>
+        <div class="card-block">
+            <div class="form-group">
+                <p>
+                    It is possible to navigate through grid of each component, so each developer can implement keyboard or any
+                    other navigation using <b>DatePickerConfig</b> methods. Beside that now it is possible to dynamically change
+                    panel layout with already built in method `CalendarType`
+                </p>
+                <p>
+                    <code class="small-text">
+                        ...<br />
+                        const config = new DatePickerConfig();<br/>
+                        config.navigateUp();<br />
+                        config.navigateDown();<br />
+                        config.navigateRight();<br />
+                        config.navigateLeft();<br />
+                        config.nextPage();<br />
+                        config.previousPage();<br />
+                        config.confirm();<br />
+                        config.close();<br />
+                    </code>
+                </p>
+                <p>
+                    <strong>Example:</strong><br />
+                    <code>
+                        this.renderer.listen('document', 'keydown', (event: KeyboardEvent) => &#123;<br />
+                        &nbsp;if (!this.config.isFocused()) &#123;return;&#125;<br />
+                        &nbsp;event.preventDefault();<br />
+                        &nbsp;if (event.key === "ArrowUp") &#123;this.config.navigateUp();&#125;<br />
+                        &nbsp;if (event.key === "ArrowDown") &#123;this.config.navigateDown();&#125;<br />
+                        &nbsp;if (event.key === "ArrowRight") &#123;this.config.navigateRight();&#125;<br />
+                        &nbsp;if (event.key === "ArrowLeft") &#123;this.config.navigateLeft();&#125;<br />
+                        &nbsp;if (event.key === "Enter") &#123;this.config.confirm();&#125;<br />
+                        &nbsp;if (event.key === "Escape") &#123;this.config.close();&#125;<br />
+                        &nbsp;if (event.key === "PageDown") &#123;this.config.nextPage();&#125;<br />
+                        &nbsp;if (event.key === "PageUp") &#123;this.config.previousPage();&#125;<br />
+                        &#125;);
+                    </code>
+                </p>
+            </div>
+        </div>
     </div>
-  </div>
-  <br />
+    <br />
 
-  <div class="card">
-    <h3 class="card-header">Define allowed/disabled time ranges:</h3>
-    <div class="card-block">
-      <div class="form-group">
-        <p>
-          To configure disabled time ranges you can use config.addDisabledTimeRange, all times between that ranges are
-          disabled
-        </p>
-        <p>
-          <code class="small-text"
-            >const config = new DatePickerConfig(); config.addDisabledTimeRange('00:00','07:59');
-            config.addDisabledTimeRange('14:00', '16:59'); config.addDisabledTimeRange('21:00', '23:59');</code
-          >
-        </p>
-      </div>
-      <hr />
-      <div class="form-group">
-        <p>
-          if <i class="fa fa-home"></i> is pressed and current time is in disabled time range, calendar will pick next
-          available time
-        </p>
-      </div>
+    <div class="card">
+        <h3 class="card-header">DatePicker config parameters</h3>
+        <div class="card-block">
+            <p class="card-text"></p>
+            <ul>
+                <li>confirmLabel: string</li>
+                <li>primaryColor: string</li>
+                <li>fontColor: string</li>
+                <li>setCalendarType(ECalendarType)</li>
+                <li>setLocalization(string)</li>
+                <li>setActivePanel(Panel)</li>
+                <li>setTimeFormat(boolean)</li>
+                <li>setTimezone(string)</li>
+                <li>setMinDate(DateTime)</li>
+                <li>setMaxDate(DateTime)</li>
+                <li>setDisabledDates(DateTime[])</li>
+                <li>addDisabledTimeRange(ITime)</li>
+            </ul>
+        </div>
     </div>
-  </div>
-  <br />
+    <br />
 
-  <div class="card">
-    <h3 class="card-header">Navigation</h3>
-    <div class="card-block">
-      <div class="form-group">
-        <p>
-          It is possible to navigate through grid of each component, so each developer can implement keyboard or any
-          other navigation using <b>DatePickerConfig</b> methods. Beside that now it is possible to dynamically change
-          panel layout with already built in method `CalendarType`
-        </p>
-        <p>
-          <code class="small-text"
-            >const config = new DatePickerConfig(); config.navigateUp(); config.navigateDown(); config.navigateRight();
-            config.navigateLeft(); config.nextPage(); config.previousPage(); config.confirm(); config.close();
-          </code>
-        </p>
-        <p>
-          <strong>Example used in demo:</strong><br />
-          <code
-            >this.renderer.listen('document', 'keydown', (event: KeyboardEvent) => &#123;<br />
-            &nbsp;if(this.config.isFocused())&#123;<br />
-            &nbsp;&nbsp;event.preventDefault();<br />
-            &nbsp;&nbsp;if(event.keyCode == 38) &#123; this.config.navigateUp(); &#125;<br />
-            &nbsp;&nbsp;if(event.keyCode == 40) &#123; this.config.navigateDown(); &#125;<br />
-            &nbsp;&nbsp;if(event.keyCode == 39) &#123; this.config.navigateRight(); &#125;<br />
-            &nbsp;&nbsp;if(event.keyCode == 37) &#123; this.config.navigateLeft(); &#125;<br />
-            &nbsp;&nbsp;if(event.keyCode == 13) &#123; this.config.confirm(); &#125;<br />
-            &nbsp;&nbsp;if(event.keyCode == 27) &#123; this.config.close(); &#125;<br />
-            &nbsp;&nbsp;if(event.keyCode == 34) &#123; this.config.nextPage(); &#125;<br />
-            &nbsp;&nbsp;if(event.keyCode == 33) &#123; this.config.previousPage(); &#125;<br />
-            &#125;
-          </code>
-        </p>
-      </div>
+    <div class="card">
+        <h3 class="card-header">Contributing</h3>
+        <div class="card-block">
+            <p class="card-text">
+                Want to file a bug, contribute some code, or improve documentation? Excellent! Read up on our
+                <a href="https://github.com/LibusoftCicom/lc-datepicker/blob/master/CONTRIBUTING.md">contributing guide</a> and
+                <a href="https://github.com/LibusoftCicom/lc-datepicker/blob/master/CODE_OF_CONDUCT.md">code of conduct</a> and
+                then check out one of our <a href="https://github.com/LibusoftCicom/lc-datepicker/issues">issues</a>.
+            </p>
+        </div>
     </div>
-  </div>
-  <br />
 
-  <div class="card">
-    <h3 class="card-header">Description</h3>
-    <div class="card-block">
-      <p class="card-text">Pure Angular date and time picker component.</p>
-      <div>
-        <ul>
-          <li>LC DatePicker is an Angular component that generates a datepicker calendar on your input element</li>
-          <li>Compatible with Angular 2+ up to Angular v6.0.0</li>
-          <li>Only dependencies are RxJS, MomentJS and Font Awesome</li>
-          <li>Customizable date format and language</li>
-          <li>Can be configured as time, date-time, date, month or year picker</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <br />
-
-  <div class="card">
-    <h3 class="card-header">Getting Started</h3>
-    <div class="card-block">
-      <p class="card-text"></p>
-      <ol>
-        <li>Fork and clone this repo</li>
-        <li>npm install</li>
-        <li>Open a terminal and type "npm run start"</li>
-        <li>Open "http://localhost:4200" to browser</li>
-      </ol>
-    </div>
-  </div>
-  <br />
-
-  <div class="card" id="installation">
-    <h3 class="card-header">Installation</h3>
-    <div class="card-block">
-      <p>To install this component to an external project, follow the procedure:</p>
-      <p class="card-text"></p>
-      <ol>
-        <li><code>npm install @libusoftcicom/lc-datepicker</code></li>
-        <li>
-          <p>skip this if SystemJS is not used as module loader</p>
-          <code
-            >System.config(&#123;<br />
-            paths: &#123;<br />
-            'npm:': 'node_modules/'<br />
-            &#125;,<br />
-            map: &#123;<br />
-            '@libusoftcicom/lc-datepicker' : 'npm:@libusoftcicom/lc-datepicker/bundles/lc-datepicker.umd'<br />
-            &#125; &#125;)</code
-          >
-        </li>
-        <li>
-          <code
-            >import &#123;LcDatePickerModule&#125; from '@libusoftcicom/lc-datepicker';
-            <br />
-
-            @NgModule(&#123;<br />
-            declarations: [<br />
-            ...<br />
-            ],<br />
-            imports: [<br />
-            ...<br />
-            ,LcDatePickerModule<br />
-            ],<br />
-            providers: [<br />
-            ...<br />
-            ],<br />
-            bootstrap: [...] &#125;) export class AppModule &#123;&#125;</code
-          >
-        </li>
-        <li>
-          <code
-            >import &#123;DatePickerConfig, ECalendarType&#125; from '@libusoftcicom/lc-datepicker';
-            <br />
-
-            @Component(&#123;<br />
-            ...<br />
-            &#125;) export class AppComponent &#123;<br />
-
-            private dateValue: string = null;<br />
-            public config = new DatePickerConfig();<br />
-            public calendarOpened: boolean = false;<br />
-            <br />
-            constructor() &#123;<br />
-            &nbsp;// configuration is optional<br />
-            &nbsp;this.config.CalendarType = ECalendarType.Date;<br />
-            &nbsp;this.config.Localization = 'en';<br />
-            &nbsp;...<br />
-            &#125;<br />
-            <br />
-            public get Date() &#123;<br />
-            &nbsp;return this.dateValue;<br />
-            &#125;<br />
-            <br />
-            public set Date(value: string) &#123;<br />
-            &nbsp;this.dateValue = value;<br />
-            &#125; &#125;
-          </code>
-        </li>
-        <li>
-          <p>Use the following snippet inside your template for date picker:</p>
-          <code
-            >&lt;lc-datepicker [(opened)]="calendarOpened" [config]="config"
-            [(date)]="Date"&gt;&lt;/lc-datepicker&gt;</code
-          >
-          <p>Use the following snippet inside your template for date range picker:</p>
-          <code
-            >&lt;lc-date-range-picker [(opened)]="calendarOpened" [config]="config"
-            [(date)]="Date"&gt;&lt;/lc-date-range-picker&gt;</code
-          >
-        </li>
-      </ol>
-    </div>
-  </div>
-  <br />
-
-  <div class="card">
-    <h3 class="card-header">DatePicker config parameters</h3>
-    <div class="card-block">
-      <p class="card-text"></p>
-      <ul>
-        <li>CalendarType: ECalendarType</li>
-        <li>Localization: String</li>
-        <li>MaxYear: Number</li>
-        <li>MinYear: Number</li>
-        <li>MaxMonth: Number</li>
-        <li>MinMonth: Number</li>
-        <li>MaxDay: Number</li>
-        <li>MinDay: Number</li>
-        <li>ConfirmLabel: String</li>
-        <li>PrimaryColor: String</li>
-        <li>FontColor: String</li>
-        <li>Format: Moment.MomentInput</li>
-        <li>setDisabledDates( Array&lt;Moment.MomentInput&gt; )</li>
-        <li>addDisabledTimeRange( start&lt;Moment.MomentInput&gt;, stop&lt;Moment.MomentInput&gt; )</li>
-      </ul>
-    </div>
-  </div>
-  <br />
-
-  <div class="card">
-    <h3 class="card-header">Contributing</h3>
-    <div class="card-block">
-      <p class="card-text">
-        Want to file a bug, contribute some code, or improve documentation? Excellent! Read up on our
-        <a href="https://github.com/LibusoftCicom/lc-datepicker/blob/master/CONTRIBUTING.md">contributing guide</a> and
-        <a href="https://github.com/LibusoftCicom/lc-datepicker/blob/master/CODE_OF_CONDUCT.md">code of conduct</a> and
-        then check out one of our <a href="https://github.com/LibusoftCicom/lc-datepicker/issues">issues</a>.
-      </p>
-    </div>
-  </div>
-
-  <hr />
-  <footer>
-    <p>&copy; Libusoft Cicom {{ year }}</p>
-  </footer>
+    <hr />
+    <footer>
+        <p>&copy; Libusoft Cicom {{ year }}</p>
+    </footer>
 </div>
 <!-- /container -->

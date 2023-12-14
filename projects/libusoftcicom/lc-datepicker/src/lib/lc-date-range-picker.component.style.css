@@ -99,7 +99,7 @@ table {
 
 .confirmDate {
   font-size: 12px;
-  width: 441px;
+  width: auto;
 }
 
 .confirmDate button {

@@ -1,0 +1,35 @@
+<table #dayPicker class="dayPicker" aria-describedby="a control for choosing the date">
+  <thead>
+  <tr>
+    <th colspan="7">
+      <div class="selectbtn">
+        <button type="button" #previousMonthButton><i class="fa fa-caret-left fa-lg" aria-hidden="true"></i></button>
+      </div>
+      <div #reset class="selectbtn">
+        <i class="fa fa-home" aria-hidden="true"></i>
+      </div>
+      <div #monthPanel class="selectbtn monthlabel">
+        {{ formattedMonth }}
+      </div>
+      <div #yearPanel class="selectbtn yearlabel">
+        {{ formattedYear }}
+      </div>
+      <div class="selectbtn pullRight">
+        <button type="button" #nextMonthButton><i class="fa fa-caret-right fa-lg" aria-hidden="true"></i></button>
+      </div>
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr class="days">
+      <td #daysOfWeek *ngFor="let item of shortDaysOfWeek" class="dayName">
+        <span>{{ item }}</span>
+      </td>
+    </tr>
+    <tr *ngFor="let row of calendarData; let i = index">
+      <td *ngFor="let item of row; let j = index">
+        <lc-day-picker-button [item]="item" [row]="i" [column]="j" [config]="config" (selected)="selectItem($event)" *ngIf="item"></lc-day-picker-button>
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -6,164 +6,180 @@ import {
   ChangeDetectorRef,
   ChangeDetectionStrategy,
   OnInit,
-  OnChanges,
-  OnDestroy
+  OnDestroy, ViewChild, ElementRef, AfterViewInit, NgZone, Renderer2,
 } from '@angular/core';
-import { DatePickerConfig, ECalendarNavigation } from './../lc-date-picker-config-helper';
-import moment from 'moment';
-import { Subscription } from 'rxjs';
-
-export enum Panels {
-  Time,
-  Day,
-  Month,
-  Year
-}
-
-export interface IMonthObject {
-  key: string;
-  index: number;
-  active?: boolean;
-  disabled?: boolean;
-  current?: boolean;
-}
+import { DatePickerConfig } from './../lc-date-picker-config-helper';
+import {fromEvent, Subscription} from 'rxjs';
+import {ICalendarItem, Panel} from '../base-date-picker.class';
+import {DateTime} from '../date-time.class';
+import {MonthPicker} from './month-picker.class';
+import {ECalendarNavigation} from '../enums';
 
 @Component({
   selector: 'lc-month-picker',
-  template: `
-    <table class="monthsCal">
-      <thead align="center" [style.background]="config.PrimaryColor">
-        <tr>
-          <th colspan="4">
-            <div class="selectbtn">&nbsp;</div>
-            <div class="selectbtn" (click)="resetDate($event)"><i class="fa fa-home" aria-hidden="true"></i></div>
-            <div class="selectbtn monthlabel">&nbsp;</div>
-            <div class="selectbtn yearlabel" (click)="switchPannels($event, panels.Year)">{{ newDate.year() }}</div>
-          </th>
-        </tr>
-      </thead>
-      <tbody align="center">
-        <tr *ngFor="let row of shortMonthName">
-          <td
-            *ngFor="let item of row"
-            [ngClass]="{ active: item?.active, current: item?.current, disabled: item?.disabled }"
-          >
-            <button (click)="setMonth(item, $event)" [style.color]="config.FontColor">{{ item.key }}</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  `,
+  templateUrl: 'month-picker.component.html',
   styleUrls: ['./month-picker.component.style.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [MonthPicker],
 })
-export class LCMonthPickerComponent implements OnInit, OnChanges, OnDestroy {
-  public tempDate: moment.Moment;
-  public shortMonthName: Array<Array<IMonthObject>> = [];
-  public panels = Panels;
+export class LCMonthPickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @Input() newDate: moment.Moment;
-  @Input() config: DatePickerConfig;
-  @Output() selected: EventEmitter<moment.Moment> = new EventEmitter<moment.Moment>();
-  @Output() switchPannel: EventEmitter<Panels> = new EventEmitter<Panels>();
-  @Output() reset: EventEmitter<void> = new EventEmitter<void>();
+    public formattedYear: string;
+    public calendarData: ICalendarItem[][];
 
-  private navigationSubscription: Subscription;
-  private selectedItem: IMonthObject = null;
+    private _value: DateTime;
 
-  constructor(private cd: ChangeDetectorRef) {}
+    private readonly subscriptions: Subscription[] = [];
+    private navigationSubscription: Subscription;
 
-  switchPannels(event: Event, panel: Panels) {
-    this.switchPannel.emit(panel);
-  }
+    @Input() public set value(dateTime: DateTime) {
+        this._value = dateTime.clone();
+        this.datePicker.setSelectedDate(this._value);
+    };
+    @Input() public config: DatePickerConfig;
+    @Output() public selected: EventEmitter<DateTime> = new EventEmitter<DateTime>();
+    @Output() public dateChanged: EventEmitter<DateTime> = new EventEmitter<DateTime>();
+    @Output() public switchPanel: EventEmitter<Panel> = new EventEmitter<Panel>();
+    @Output() public reset: EventEmitter<void> = new EventEmitter<void>();
 
-  ngOnInit() {
-    this.navigationSubscription = this.config.navigationChanges.subscribe(dir => this.navigate(dir));
-    this.initCalendar();
-  }
+    @ViewChild('monthPicker', { static: true })
+    public monthPickerElement: ElementRef<HTMLTableElement>;
 
-  ngOnChanges(changes) {
-    if (changes.newDate) {
-      this.initCalendar();
-      this.cd.detectChanges();
-    }
-  }
+    @ViewChild('reset', { static: true })
+    public resetElement: ElementRef<HTMLDivElement>;
 
-  ngOnDestroy() {
-    this.cd.detach();
-    this.navigationSubscription.unsubscribe();
-  }
+    @ViewChild('yearPanel', { static: true })
+    public yearPanelElement: ElementRef<HTMLDivElement>;
 
-  private initCalendar() {
-    const selectedDate = this.newDate.toObject();
-    const currentDate = moment(moment.now()).toObject();
-    const monthNames = this.newDate
-      .locale(this.config.Localization)
-      .localeData()
-      .monthsShort();
+    constructor(
+        private readonly cd: ChangeDetectorRef,
+        private readonly datePicker: MonthPicker,
+        private readonly ngZone: NgZone,
+        private readonly renderer: Renderer2,
+    ) {}
 
-    let months = monthNames.map((key, index) => {
-      let month: IMonthObject = { key, index };
+    public ngOnInit(): void {
 
-      if (month.index == currentDate.months && selectedDate.years == currentDate.years) {
-        month = { ...month, current: true };
-      }
+        this.navigationSubscription = this.config.navigationChanges.subscribe(dir => this.navigate(dir));
+        this.subscriptions.push(
+            this.datePicker.getCalendarChanges().subscribe(() => {
+                this.calendarData = this.datePicker.getCalendarData();
+                this.formattedYear = this.datePicker.getFormattedYear();
 
-      if (
-        (month.index > this.config.MaxMonth && selectedDate.years == this.config.MaxYear) ||
-        (month.index < this.config.MinMonth && selectedDate.years == this.config.MinYear)
-      ) {
-        month = { ...month, disabled: true };
-      }
+                this.cd.detectChanges();
 
-      if (month.index == selectedDate.months) {
-        month = { ...month, active: true };
-        this.selectedItem = month;
-      }
-
-      return month;
-    });
-
-    this.shortMonthName = this.formatMonths(months);
-  }
-
-  private navigate(dir: ECalendarNavigation): void {
-    if (dir == ECalendarNavigation.Confirm) {
-      return this.setMonth(this.selectedItem);
-    } else if (dir == ECalendarNavigation.Left) {
-      this.newDate.month(this.selectedItem.index - 1);
-    } else if (dir == ECalendarNavigation.Right) {
-      this.newDate.month(this.selectedItem.index + 1);
-    } else if (dir == ECalendarNavigation.Up) {
-      this.newDate.month(this.selectedItem.index - 3);
-    } else if (dir == ECalendarNavigation.Down) {
-      this.newDate.month(this.selectedItem.index + 3);
+                this.setStyles();
+                this.dateChanged.emit(this.datePicker.getSelectedDateTime())
+            })
+        );
+        this.initializeCalendar();
     }
 
-    this.initCalendar();
-    this.cd.detectChanges();
-  }
+    public ngAfterViewInit(): void {
 
-  formatMonths(months: IMonthObject[]) {
-    return months.reduce(
-      (rows, month, index) => (index % 3 === 0 ? rows.push([month]) : rows[rows.length - 1].push(month)) && rows,
-      []
-    );
-  }
+        this.setStyles();
 
-  setMonth(item?: IMonthObject, event?) {
-    if (!item || item.disabled) {
-      return;
+        this.ngZone.runOutsideAngular(() => this.registerViewEvents());
     }
-    // this.selectedItem.active = false;
-    // item.active = true;
-    // this.selectedItem = item;
-    this.newDate.month(item.key);
-    this.initCalendar();
-    this.selected.emit(this.newDate);
-  }
 
-  resetDate(event) {
-    this.reset.emit();
-  }
+    public ngOnDestroy(): void {
+        this.subscriptions.forEach((sub) => sub.unsubscribe());
+		this.subscriptions.length = 0;
+
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
+        this.cd.detach();
+    }
+
+    public getValue(): DateTime {
+        return this.datePicker.getSelectedDateTime();
+    }
+
+    public nextYear(): void {
+        this.datePicker.nextYear();
+    }
+
+    public previousYear(): void {
+        this.datePicker.previousYear();
+    }
+
+    public selectItem(item?: ICalendarItem): void {
+
+        if (!item || item.disabled) {
+            return;
+        }
+
+        this.datePicker.selectItem(item);
+        this.datePicker.setCalendarData(this.datePicker.formatCalendarData());
+        this.selected.emit(this.datePicker.getSelectedDateTime());
+    }
+
+    public monthScroll(event: WheelEvent): void {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.deltaY < 0) {
+            this.nextYear();
+        }
+        if (event.deltaY > 0) {
+            this.previousYear();
+        }
+    }
+
+    public switchPanels(panel: Panel): void {
+        this.value = this.datePicker.getSelectedDateTime();
+        this.switchPanel.emit(panel);
+    }
+
+    public resetDate(): void {
+        this.reset.emit();
+    }
+
+    private navigate(dir: ECalendarNavigation): void {
+        if (dir === ECalendarNavigation.PageDown) {
+            this.previousYear();
+        } else if (dir === ECalendarNavigation.PageUp) {
+            this.nextYear();
+        } else if (dir === ECalendarNavigation.Confirm) {
+            this.datePicker.setCalendarData(this.datePicker.formatCalendarData());
+        } else if (dir === ECalendarNavigation.Left) {
+            this.datePicker.previousMonth();
+        } else if (dir === ECalendarNavigation.Right) {
+            this.datePicker.nextMonth();
+        } else if (dir === ECalendarNavigation.Up) {
+            this.datePicker.previousRow();
+        } else if (dir === ECalendarNavigation.Down) {
+            this.datePicker.nextRow();
+        }
+    }
+
+    private initializeCalendar(): void {
+        this.datePicker.setLocale(this.config.getLocalization());
+        this.datePicker.setTimezone(this.config.getTimezone());
+        this.datePicker.setCalendarBoundaries(this.config.getMinDate(), this.config.getMaxDate());
+        this.datePicker.setSelectedDate(this._value);
+    }
+
+    private registerViewEvents() {
+
+        this.subscriptions.push(
+            fromEvent<WheelEvent>(this.monthPickerElement.nativeElement, 'wheel')
+                .subscribe((event) => this.monthScroll(event))
+        );
+
+        this.subscriptions.push(
+            fromEvent<PointerEvent>(this.resetElement.nativeElement, 'click')
+                .subscribe(() => this.resetDate())
+        );
+
+        this.subscriptions.push(
+            fromEvent<PointerEvent>(this.yearPanelElement.nativeElement, 'click')
+                .subscribe(() => this.switchPanels(Panel.Year))
+        );
+    }
+
+    private setStyles(): void {
+        this.renderer
+            .setStyle(this.monthPickerElement.nativeElement.tHead, 'background', this.config.theme.primaryColor);
+    }
 }

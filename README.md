@@ -16,7 +16,7 @@
 
 - LC DatePicker is an Angular component that generates a datepicker calendar on your input element
 - Compatible with Angular up to v16.0.0
-- Only dependencies are RxJS, MomentJS and Font Awesome
+- Only dependencies are RxJS and Font Awesome
 - Customizable date format and language
 - Can be configured as time, date-time, date, month or year picker
 
@@ -44,7 +44,9 @@ import {LcDatePickerModule} from '@libusoftcicom/lc-datepicker';
   ],
   imports: [
     ...
-    ,LcDatePickerModule
+    LcDatePickerModule.withImplementation({adapter: LuxonDateAdapterService})
+    // or LcDatePickerModule.withImplementation({adapter: MomentDateAdapterService})
+    // It is also possible to extend LCDatePickerAdapter and implement the adapter using a different library.
   ],
   providers: [
     ...
@@ -65,64 +67,78 @@ import {DatePickerConfig, ECalendarType} from '@libusoftcicom/lc-datepicker';
 })
 export class AppComponent {
 
-  private dateValue: string = null;
   public config = new DatePickerConfig();
-  public CalendarOpened: boolean = false;
+  public inputDate: DateTime;
+  public CalendarOpened = false;
+  public CalendarRangeOpened = false;
 
-  constructor() {
+  constructor(
+    private readonly dateAdapter: LCDatePickerAdapter,
+    ...
+  ) {
 
     // configuration is optional
-    this.config.CalendarType = ECalendarType.Date;
-    this.config.Localization = 'en';
+    this.config.setCalendarType(ECalendarType.Date);
+    this.config.setLocalization('en');
+    this.inputDate = this.dateAdapter.now(this.config.getTimezone());
     ...
   }
 
-  public get Date() {
-    return this.dateValue;
+  public setCalendarDate(dateTime: DateTime): void {
+    this.dateInput.nativeElement.value = this.dateAdapter.toISOString(dateTime);
   }
 
-  public set Date(value: string) {
-    this.dateValue = value;
+  public toggleCalendarOpen(): void {
+    this.CalendarOpened = !this.CalendarOpened;
+    ...
   }
-
-}
 ```
 
 Use the following snippet inside your template for date-picker:
 
 ```shell
-<lc-datepicker [(opened)]="CalendarOpened" [config]="config" [(date)]="Date"></lc-datepicker>
+<lc-datepicker
+   [value]="inputDate"
+   [config]="config"
+   *ngIf="CalendarOpened"
+   (openedChange)="toggleCalendarOpen()"
+   (dateChange)="setCalendarDate($event)">
+ </lc-datepicker>
 ```
 
 Use the following snippet inside your template for date-range-picker:
 
 ```shell
-<lc-date-range-picker [(opened)]="CalendarOpened" [config]="config" [(date)]="Date"></lc-date-range-picker>
+<lc-date-range-picker
+   [valueFrom]="inputRangeDateFrom"
+   [valueTo]="inputRangeDateTo"
+   [config]="config"
+   *ngIf="CalendarRangeOpened"
+   (openedChange)="toggleCalendarRangeOpen()"
+   (dateChange)="setCalendarDateRange($event)">
+ </lc-date-range-picker> 
 ```
 
 ## DatePicker config parameters
 
-- CalendarType: ECalendarType
-- Localization: String
-- MaxYear: Number
-- MinYear: Number
-- MaxMonth: Number
-- MinMonth: Number
-- MaxDay: Number
-- MinDay: Number
-- ConfirmLabel: String
-- PrimaryColor: String
-- FontColor: String
-- Format: Moment.MomentInput
-- setDisabledDates( Array<Moment.MomentInput> )
-- addDisabledTimeRange( start<Moment.MomentInput>, stop<Moment.MomentInput> )</li>
+- confirmLabel: string
+- primaryColor: string
+- fontColor: string
+- setCalendarType(ECalendarType)
+- setLocalization(string)
+- setActivePanel(Panel)
+- setTimeFormat(boolean)
+- setTimezone(string)
+- setMinDate(DateTime)
+- setMaxDate(DateTime)
+- setDisabledDates(DateTime[])
+- addDisabledTimeRange(ITime)
 
 ## Developing
 
 ### Built With:
 
 - Angular
-- MomentJS
 - Font Awesome
 
 ### Setting up Dev

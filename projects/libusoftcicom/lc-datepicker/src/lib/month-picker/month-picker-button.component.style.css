@@ -1,0 +1,42 @@
+div {
+  height: 100%;
+}
+
+div:hover {
+  background: #efefef;
+}
+
+div.active {
+  outline: 1px solid #5e666f;
+}
+
+div.disabled {
+  background: rgba(234,234,234,0.05);
+}
+
+div.current {
+  background: rgba(94, 102, 111, 0.05);
+}
+
+div.disabled button {
+  color: rgb(187, 201, 216) !important;
+  cursor: default;
+}
+
+div:not(.disabled):hover {
+  outline: 1px solid #5e666f;
+}
+
+button {
+  width: 29px;
+  height: 100%;
+  background: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 14px;
+  text-align: center;
+  border: none;
+  outline: none;
+  text-transform: capitalize;
+}

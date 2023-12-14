@@ -1,0 +1,22 @@
+<table #yearPicker class="yearsCal" aria-describedby="a control for choosing years">
+  <thead>
+    <tr>
+      <th colspan="5">
+        <div class="selectbtn">
+          <button type="button" #previousYearsButton> <i class="fa fa-caret-left fa-lg" aria-hidden="true"></i> </button>
+        </div>
+        <div #reset class="selectbtn"> <i class="fa fa-home" aria-hidden="true"></i> </div>
+        <div class="selectbtn pullRight">
+          <button type="button" #nextYearsButton> <i class="fa fa-caret-right fa-lg" aria-hidden="true"></i> </button>
+        </div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of calendarData; let i = index">
+      <td *ngFor="let item of row; let j = index">
+        <lc-year-picker-button [item]="item" [row]="i" [column]="j" [config]="config" (selected)="selectItem($event)"></lc-year-picker-button>
+      </td>
+    </tr>
+  </tbody>
+</table>

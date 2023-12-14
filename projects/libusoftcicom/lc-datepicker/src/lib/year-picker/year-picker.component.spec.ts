@@ -1,108 +1,102 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import { LCYearPickerComponent } from './year-picker.component';
-import { LcDatePickerModule, DatePickerConfig, ECalendarType } from './../lc-date-picker.module';
+import {DatePickerConfig, ECalendarType} from './../lc-date-picker.module';
 
-import * as moment from 'moment';
+import {LCDatePickerAdapter} from '../lc-date-picker-adapter.class';
+import {LCYearPickerButtonComponent} from './year-picker-button.component';
+import {LuxonDateAdapterService} from '../../../../../../src/app/luxon-date-adapter.service';
 export enum CalendarType {
-  Time,
-  DateTime,
-  Date,
-  Month,
-  Year
+    Time,
+    DateTime,
+    Date,
+    Month,
+    Year
 }
 describe('LCYearPickerComponent', () => {
-  let component: LCYearPickerComponent;
-  let element: HTMLElement;
-  let fixture: ComponentFixture<LCYearPickerComponent>;
+    let component: LCYearPickerComponent;
+    let fixture: ComponentFixture<LCYearPickerComponent>;
+    let dateAdapter: LCDatePickerAdapter;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        LCYearPickerComponent
-      ]
-    })
-      .compileComponents();
-  }));
+    beforeEach(waitForAsync(() => {
+        TestBed.configureTestingModule({
+            declarations: [
+                LCYearPickerComponent,
+                LCYearPickerButtonComponent
+            ],
+            providers: [{
+                provide: LCDatePickerAdapter,
+                useClass: LuxonDateAdapterService
+            }]
+        })
+            .compileComponents()
+            .then(() => {
+                dateAdapter = TestBed.inject(LCDatePickerAdapter);
+                fixture = TestBed.createComponent(LCYearPickerComponent);
+                component = fixture.componentInstance;
+                const today = dateAdapter.today();
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(LCYearPickerComponent);
-    component = fixture.componentInstance;
-    element = fixture.debugElement.nativeElement;
-    component.newDate = moment();
+                component.config = new DatePickerConfig();
+                component.config.setCalendarType(ECalendarType.Year);
+                component.config.setLocalization('hr');
+                component.config.setMinDate(dateAdapter.setParts(dateAdapter.getStartOfYear(today), {year: 1900}));
+                component.config.setMaxDate(dateAdapter.setParts(dateAdapter.getStartOfYear(today), {year: 2099}));
+                component.config.labels = { confirmLabel: 'Odabir' };
+                component.value = today;
 
-    component.config = new DatePickerConfig();
-    component.config.CalendarType = ECalendarType.Year;
-    component.config.Localization = 'hr';
-    component.config.MinDate = { years: 1900 };
-    component.config.MaxDate = { years: 2100 };
-    component.config.Labels = {
-      confirmLabel: 'Odabir'
-    };
+                fixture.detectChanges();
+            });
+    }));
 
-    fixture.detectChanges();
-  });
+    it('should create YearPicker component', () => {
+        expect(component).toBeTruthy();
+    });
 
-  it('should create YearPicker component', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should format years array', () => {
+        const years = component.calendarData;
+        expect(years.length).toBe(5);
+        expect(years[0].length).toBe(5);
+    });
 
-  it('should format years array', () => {
-    const date = component.newDate;
-    const yearArray = component.yearsArrayFormated;
-    expect(yearArray.length).toBe(5);
-    expect(yearArray[0].length).toBe(5);
-  })
+    it('should set year on click', () => {
+        component.value = dateAdapter.setParts(dateAdapter.today(), {year: 2017});
+        const newDate =  dateAdapter.setParts(dateAdapter.today(), {year: 2015});
+        expect(component.getValue().getYear()).not.toBe(newDate.getYear());
+        component.selectItem({ value: newDate.getYear() });
+        expect(component.getValue().getYear()).toBe(newDate.getYear());
+    });
 
-  it('should set year on click', () => {
-    component.newDate = moment().year(2017);
-    const newDate = moment().year(2015);
-    expect(component.newDate.year()).not.toBe(newDate.year());
-    component.setYear({ year: newDate.year() });
-    expect(component.newDate.year()).toBe(newDate.year());
-  })
+    it('should switch to previous year group on click', () => {
+        component.value = dateAdapter.setParts(dateAdapter.today(), {year: 2017});
+        const yearArray = component.calendarData;
+        component.previousYears();
+        const prevYearArray = component.calendarData;
+        expect(prevYearArray[4][4].value).toBe(yearArray[0][0].value - 1);
+    });
 
-  it('should switch to previous year group on click', () => {
-    const date = moment().year(2017);
-    component.newDate = date;
-    component.formatYears();
-    const yearArray = component.yearsArrayFormated;
-    component.prevYears();
-    const prevYearArray = component.yearsArrayFormated;
-    expect(prevYearArray[4][4].year).toBe(yearArray[0][0].year - 1)
-  })
+    it('should switch to next year group on click', () => {
+        component.value = dateAdapter.setParts(dateAdapter.today(), {year: 2017});
+        const yearArray = component.calendarData;
+        component.nextYears();
+        const nextYearArray = component.calendarData;
+        expect(nextYearArray[0][0].value).toBe(yearArray[4][4].value + 1);
+    });
 
-  it('should switch to next year group on click', () => {
-    const date = moment().year(2017);
-    component.newDate = date;
-    component.formatYears();
-    const yearArray = component.yearsArrayFormated;
-    component.nextYears();
-    const nextYearArray = component.yearsArrayFormated;
-    expect(nextYearArray[0][0].year).toBe(yearArray[4][4].year + 1)
-  })
+    it('should switch to previous year group on scroll up', () => {
+        component.value = dateAdapter.setParts(dateAdapter.today(), {year: 2017});
+        const yearArray = component.calendarData;
+        const scrollEvent = new WheelEvent('test', { deltaY: 1 });
+        component.yearScroll(scrollEvent);
+        const newYearArray = component.calendarData;
+        expect(newYearArray[4][4].value).toBe(yearArray[0][0].value - 1);
+    });
 
-  it('should switch to previous year group on scroll up', () => {
-    const date = moment().year(2017);
-    component.newDate = date;
-    component.formatYears();
-    const yearArray = component.yearsArrayFormated;
-    const scrollEvent = new WheelEvent('test', { deltaY: 1 });
-    component.yearScroll(scrollEvent);
-    const newYearArray = component.yearsArrayFormated;
-    expect(newYearArray[4][4].year).toBe(yearArray[0][0].year - 1)
-  })
-
-  it('should switch to next year group on scroll up', () => {
-    const date = moment().year(2017);
-    component.newDate = date;
-    component.formatYears();
-    const yearArray = component.yearsArrayFormated;
-    const scrollEvent = new WheelEvent('test', { deltaY: -1 });
-    component.yearScroll(scrollEvent);
-    const newYearArray = component.yearsArrayFormated;
-    expect(newYearArray[0][0].year).toBe(yearArray[4][4].year + 1)
-  })
-
+    it('should switch to next year group on scroll up', () => {
+        component.value = dateAdapter.setParts(dateAdapter.today(), {year: 2017});
+        const yearArray = component.calendarData;
+        const scrollEvent = new WheelEvent('test', { deltaY: -1 });
+        component.yearScroll(scrollEvent);
+        const newYearArray = component.calendarData;
+        expect(newYearArray[0][0].value).toBe(yearArray[4][4].value + 1)
+    });
 });

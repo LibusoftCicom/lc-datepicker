@@ -1,146 +1,155 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnInit } from '@angular/core';
-import moment from 'moment';
+import {
+    Component,
+    Input,
+    Output,
+    EventEmitter,
+    ChangeDetectorRef,
+    ChangeDetectionStrategy,
+    OnInit,
+    ViewChild, ElementRef, AfterViewInit, OnDestroy, Renderer2
+} from '@angular/core';
+import {DatePickerConfig} from '../lc-date-picker-config-helper';
+import {DateTime} from '../date-time.class';
+import {TimePicker} from '../time-picker/time-picker.class';
+import {Subscription} from 'rxjs';
 
 
 
 @Component({
-    selector: 'lc-time-picker-compact',
-    templateUrl: `./time-picker-compact.component.html`,
-    styleUrls: ['./time-picker-compact.component.style.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+	selector: 'lc-time-picker-compact',
+	templateUrl: './time-picker-compact.component.html',
+	styleUrls: ['./time-picker-compact.component.style.css'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [TimePicker],
 })
-export class LCTimePickerCompactComponent implements OnInit {
+export class LCTimePickerCompactComponent implements OnInit, AfterViewInit, OnDestroy {
+	public is24HourFormat: boolean;
+	public formattedHour: string;
+	public formattedMinute: string;
+	public formattedAMPM: string;
 
-    public monthData;
-    public shortDayName;
-    public shortMonthName;
-    public is24HourFormat: boolean;
+    private _value: DateTime;
 
-    @Input() newDate: moment.Moment;
-    @Input() config;
-    @Output() selected: EventEmitter<moment.Moment> = new EventEmitter<moment.Moment>();
+	private readonly subscriptions: Subscription[] = [];
+	private readonly meridiemSubscriptions: Subscription[] = [];
 
-    constructor(private cd: ChangeDetectorRef) {}
+	@Input() public set value(dateTime: DateTime) {
+        this._value = dateTime.clone();
+        this.timePicker.setSelectedTime(this._value);
+    };
+	@Input() public config: DatePickerConfig;
+	@Output() public timeChanged: EventEmitter<DateTime> = new EventEmitter<DateTime>();
 
-    ngOnInit() {
-        this.setTimeFormat();
-        this.updateTime(false);
-    }
+	@ViewChild('timePicker', { static: true })
+	public timePickerElement: ElementRef<HTMLTableElement>;
 
-    setTimeFormat() {
-        this.is24HourFormat = this.newDate.format('LT').indexOf('M') === -1;
-    }
+	constructor(
+        private readonly cd: ChangeDetectorRef,
+        private readonly timePicker: TimePicker,
+        private readonly renderer: Renderer2,
+    ) {}
 
-    addHour() {
-        let hour = this.newDate.hour();
-        this.newDate.hour(++hour % 24);
-        this.updateTime(false);
-    }
+	public ngOnInit(): void {
+        this.subscriptions.push(
+            this.timePicker.getCalendarChanges().subscribe(() => {
+                this.is24HourFormat = this.timePicker.is24HourFormat();
+                this.formattedHour = this.timePicker.getFormattedHour();
+                this.formattedMinute = this.timePicker.getFormattedMinute();
+                this.formattedAMPM = this.timePicker.getFormattedAMPM();
 
-    subtractHour() {
-        let hour = this.newDate.hour();
-        this.newDate.hour((--hour + 24) % 24);
-        this.updateTime(true);
-    }
+                this.cd.detectChanges();
 
-    addMinute() {
-        let minute = this.newDate.minutes();
-        this.newDate.minute(++minute % 60);
-        this.updateTime(false);
-    }
-
-    subtractMinute() {
-        let minute = this.newDate.minute();
-        this.newDate.minute((--minute + 60) % 60);
-        this.updateTime(true);
-    }
-
-    hourScroll(event) {
-        this.preventDefault(event);
-        this.stopPropagation(event);
-        if (event.deltaY < 0) {
-            this.addHour();
-        }
-        if (event.deltaY > 0) {
-            this.subtractHour();
-        }
-    }
-
-    minuteScroll(event) {
-        this.preventDefault(event);
-        this.stopPropagation(event);
-        if (event.deltaY < 0) {
-            this.addMinute();
-        }
-        if (event.deltaY > 0) {
-            this.subtractMinute();
-        }
-    }
-
-    toggleMeridiem() {
-        this.newDate.hour((this.newDate.hour() + 12) % 24);
-        this.selected.emit(this.newDate);
-        this.cd.detectChanges();
-    }
-
-    updateTime(reverse) {
-
-        let updatedTime = false;
-
-        this.config.DisabledTimeRanges.forEach(timerange => {
-            let currentTime = moment({
-                h: this.newDate.hour(),
-                m: this.newDate.minutes()
-            });
-
-            let minimumTime = moment({
-                h: timerange.startTime.hour,
-                m: timerange.startTime.minute
+                this.setStyles();
+                this.timeChanged.emit(this.timePicker.getSelectedDateTime());
             })
+        );
 
-            let maximumTime = moment({
-                h: timerange.stopTime.hour,
-                m: timerange.stopTime.minute
-            })
+        this.initializeCalendar();
+	}
 
+	public ngAfterViewInit(): void {
 
-            if (currentTime.isBetween(minimumTime, maximumTime, 'minute', '[]')) {
+		this.setStyles();
+	}
 
-                if (reverse) {
-                    this.newDate.hour(minimumTime.hour())
-                    this.newDate.minutes(minimumTime.minutes())
-                    this.newDate.subtract(1, 'm');
-                }
-                else {
-                    this.newDate.hour(maximumTime.hour())
-                    this.newDate.minutes(maximumTime.minutes())
-                    this.newDate.add(1, 'm');
-                }
-                updatedTime = true;
-                return;
-            }
-        })
+	public ngOnDestroy(): void {
 
-        if (updatedTime) {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.subscriptions.length = 0;
+        this.meridiemSubscriptions.forEach(sub => sub.unsubscribe());
+        this.meridiemSubscriptions.length = 0;
 
-            this.updateTime(reverse);
-            return;
-        }
-
-        this.selected.emit(this.newDate);
+        this.cd.detach();
     }
 
-    private preventDefault(e: Event) {
-        if (e.preventDefault) {
-            e.preventDefault();
-        }
-        e.returnValue = false;
+	public addHour(): void {
+		this.timePicker.addHour();
+	}
+
+	public subtractHour(): void {
+		this.timePicker.subtractHour();
+	}
+
+	public addMinute(): void {
+		this.timePicker.addMinute();
+	}
+
+	public subtractMinute(): void {
+		this.timePicker.subtractMinute();
+	}
+
+	public hourScroll(event: WheelEvent): void {
+
+		event.preventDefault();
+		event.stopPropagation();
+		if (event.deltaY < 0) {
+			this.addHour();
+		}
+		if (event.deltaY > 0) {
+			this.subtractHour();
+		}
+	}
+
+	public minuteScroll(event: WheelEvent): void {
+
+		event.preventDefault();
+		event.stopPropagation();
+		if (event.deltaY < 0) {
+			this.addMinute();
+		}
+		if (event.deltaY > 0) {
+			this.subtractMinute();
+		}
+	}
+
+	public toggleMeridiem(): void {
+        this.timePicker.toggleMeridiem();
+	}
+
+	public scrollMeridiem(event: Event): void {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.toggleMeridiem();
+	}
+
+	public setTimeFormat(): void {
+        this.is24HourFormat = this.config.is24HourFormat();
+	}
+
+    private setStyles(): void {
+
+        this.renderer
+            .setStyle(this.timePickerElement.nativeElement.tBodies[0], 'color', this.config.theme.fontColor);
     }
 
-    private stopPropagation(e: Event) {
-        if (e.stopPropagation) {
-            e.stopPropagation();
-        }
-        e.cancelBubble = true;
+    private initializeCalendar(): void {
+
+        this.timePicker.setLocale(this.config.getLocalization());
+        this.timePicker.setTimezone(this.config.getTimezone());
+        this.timePicker.setDisabledTimeRanges(this.config.getDisabledTimeRanges());
+        this.is24HourFormat = this.config.is24HourFormat();
+        this.timePicker.setTimeFormat(this.is24HourFormat);
     }
 }

@@ -80,7 +80,6 @@ table {
 
 thead tr {
   height: 25px;
-  /*background: #5e666f;*/
   color: aliceblue;
 }
 
@@ -88,36 +87,18 @@ thead tr button {
   color: aliceblue;
 }
 
+tbody td {
+  text-align: center;
+}
+
 tr.days {
   height: 25px;
-  /*color: #5e666f;*/
   border-bottom: 1px solid #d8d8d8;
   background: aliceblue;
 }
 
 tr.days td {
   border: none;
-}
-
-td.active {
-  outline: 1px solid #5e666f;
-}
-
-td.disabled {
-  background: rgba(234, 234, 234, 0.05);
-}
-
-td.current {
-  background: rgba(94, 102, 111, 0.05);
-}
-
-td.disabled button {
-  color: rgb(187, 201, 216) !important;
-  cursor: default;
-}
-
-td:not(.disabled):hover {
-  outline: 1px solid #5e666f;
 }
 
 .selectbtn {

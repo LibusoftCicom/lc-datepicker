@@ -1,0 +1,27 @@
+.time-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arrows {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.selectbtn {
+  cursor: pointer;
+  font-size: 10px;
+  width: 18px;
+  padding: 0px 5px;
+  color: #5e666f;
+}
+
+.timeLabel {
+  font-size: x-large;
+  text-align: right;
+  width: 30px;
+  line-height: 1;
+}

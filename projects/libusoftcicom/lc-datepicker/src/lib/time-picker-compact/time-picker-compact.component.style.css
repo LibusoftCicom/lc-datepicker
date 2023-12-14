@@ -17,7 +17,7 @@ button {
   min-width: 30px;
   padding: 5px 0;
   border: 1px solid #e4e4e4;
-  
+
 }
 
 table {
@@ -81,6 +81,10 @@ td.active {
   background: rgb(230, 232, 234);
 }
 
+tbody td {
+  text-align: center;
+}
+
 
 .selectbtn{
     cursor: pointer;
@@ -103,5 +107,5 @@ td.active {
 }
 
 .clockCell{
-  width: 50px;
+  width: 35px;
 }

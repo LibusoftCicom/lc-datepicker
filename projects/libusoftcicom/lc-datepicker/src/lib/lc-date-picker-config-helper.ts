@@ -1,360 +1,270 @@
-import moment from 'moment';
-import { Subject, Observable } from 'rxjs';
-
-export enum ECalendarType {
-  Time,
-  DateTime,
-  Date,
-  MonthYear,
-  Year,
-  DateRange
-}
-
-export interface IDate {
-  years?: number;
-  months?: number;
-  date?: number;
-}
+import { Observable, Subject } from 'rxjs';
+import { Panel } from './base-date-picker.class';
+import { DateTime } from './date-time.class';
+import { ECalendarNavigation, ECalendarType } from './enums';
 
 export interface ITime {
-  minute: number;
-  hour: number;
+    minute: number;
+    hour: number;
 }
 
 export interface IDisabledTimeRanges {
-  startTime: ITime;
-  stopTime: ITime;
-}
-
-interface IDateRange {
-  minDate: IDate;
-  maxDate: IDate;
+    startTime: ITime;
+    stopTime: ITime;
 }
 
 export interface ILabels {
-  confirmLabel?: string;
+    confirmLabel?: string;
 }
 
 export interface IColorTheme {
-  primaryColor: string;
-  fontColor: string;
-}
-
-export interface IDisabledDates {
-  [date: string]: moment.Moment;
-}
-
-export enum ECalendarNavigation {
-  Up,
-  Right,
-  Down,
-  Left,
-  PageUp,
-  PageDown,
-  Confirm,
-  Close
+    primaryColor: string;
+    fontColor: string;
 }
 
 export class DatePickerConfig {
-  private calendarType: ECalendarType = ECalendarType.Date;
-  private localization: string = 'en';
-  private fromLabel: string = 'From';
-  private toLabel: string = 'To';
-  private defaultMinDate: IDate = {
-    date: 1,
-    months: 0,
-    years: 1900
-  };
-  private defaultMaxDate: IDate = {
-    date: 31,
-    months: 11,
-    years: 2099
-  };
-  private minDate: IDate = this.defaultMinDate;
-  private maxDate: IDate = this.defaultMaxDate;
-  private labels: ILabels = {
-    confirmLabel: 'Ok'
-  };
-  private theme: IColorTheme;
-  private format: moment.MomentInput;
-  private disabledDates: IDisabledDates = {};
-
-  private disabledTimeRanges: IDisabledTimeRanges[] = [];
-
-  private readonly navigationChanged: Subject<ECalendarNavigation> = new Subject();
-  public readonly panelChanges: Subject<ECalendarType> = new Subject();
-  private hostElement: HTMLElement = null;
-
-  constructor() {
-    this.theme = {
-      primaryColor: 'black',
-      fontColor: 'black'
+    private calendarType: ECalendarType = ECalendarType.Date;
+    public theme: IColorTheme = {primaryColor: '#5e666f', fontColor: '#5e666f'};
+    public labels: ILabels = {
+        confirmLabel: 'OK'
     };
-  }
+    public fromLabel = 'From';
+    public toLabel = 'To';
+    private use24HourFormat = true;
+    private localization = 'en';
+    private readonly defaultMinDate: DateTime = new DateTime(
+        1900,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        'UTC'
+    );
+    private readonly defaultMaxDate: DateTime = new DateTime(
+        2099,
+        11,
+        31,
+        0,
+        0,
+        0,
+        0,
+        'UTC'
+    );
+    private minDate: DateTime = this.defaultMinDate;
+    private maxDate: DateTime = this.defaultMaxDate;
+    private readonly disabledDates: DateTime[] = [];
 
-  get DisabledDates(): IDisabledDates {
-    return this.disabledDates;
-  }
+    private disabledTimeRanges: IDisabledTimeRanges[] = [];
 
-  /**
-   * to set list of dates which will be used as disabled
-   * @param dates
-   */
-  setDisabledDates(dates: Array<moment.MomentInput>) {
-    dates.forEach(date => {
-      let d = moment(date);
-      this.disabledDates[d.format('YYYY-MM-DD')] = d;
-    });
-  }
+    private readonly navigationChanged: Subject<ECalendarNavigation> = new Subject();
+    private hostElement: HTMLElement = null;
 
-  get CalendarType() {
-    return this.calendarType;
-  }
+    private open: boolean = false;
+    private activePanel: Panel;
+    private timezone: string = 'UTC';
 
-  set CalendarType(type: ECalendarType) {
-    this.calendarType = type;
-    this.panelChanges.next(this.calendarType);
-  }
+    constructor() {
+        this.theme = {
+            primaryColor: 'black',
+            fontColor: 'black'
+        };
 
-  get Localization() {
-    return this.localization;
-  }
-
-  set Localization(localization: string) {
-    this.localization = localization;
-  }
-
-  get MinDate() {
-    return this.minDate;
-  }
-
-  get DefaultMinDate() {
-    return this.defaultMinDate;
-  }
-
-  set MinDate(date: IDate) {
-    let d = moment(date);
-
-    if (!d.isValid()) {
-      throw 'Invalid MinDate format';
+        this.setActivePanelFromCalendarType(this.calendarType);
     }
 
-    this.minDate = date;
-  }
-
-  get MaxDate() {
-    return this.maxDate;
-  }
-
-  get DefaultMaxDate() {
-    return this.defaultMaxDate;
-  }
-
-  set MaxDate(date: IDate) {
-    let d = moment(date);
-
-    if (!d.isValid()) {
-      throw 'Invalid MaxDate format';
-    }
-    this.maxDate = date;
-  }
-
-  get MinYear() {
-    return this.minDate && this.minDate.years;
-  }
-
-  set MinYear(minYear: number) {
-    this.minDate.years = minYear;
-  }
-
-  get MaxYear() {
-    return this.maxDate && this.maxDate.years;
-  }
-
-  set MaxYear(minYear: number) {
-    this.maxDate.years = minYear;
-  }
-
-  get MinMonth() {
-    return this.minDate && this.minDate.months;
-  }
-
-  set MinMonth(minMonth: number) {
-    this.minDate.months = minMonth;
-  }
-
-  get MaxMonth() {
-    return this.maxDate && this.maxDate.months;
-  }
-
-  /**
-   * moment use 6 for 7th month, that's why we
-   * subtract -1
-   */
-  set MaxMonth(minMonth: number) {
-    this.maxDate.months = minMonth - 1;
-  }
-
-  get MinDay() {
-    return this.minDate && this.minDate.date;
-  }
-
-  set MinDay(minDay: number) {
-    this.minDate.date = minDay;
-  }
-
-  get MaxDay() {
-    return this.maxDate && this.maxDate.date;
-  }
-
-  set MaxDay(maxDay: number) {
-    this.maxDate.date = maxDay;
-  }
-
-  get Labels() {
-    return this.labels;
-  }
-
-  set Labels(label: ILabels) {
-    this.labels = label;
-  }
-
-  get ConfirmLabel() {
-    return this.labels.confirmLabel;
-  }
-
-  set ConfirmLabel(confirmLabel: string) {
-    this.labels.confirmLabel = confirmLabel;
-  }
-
-  get ColorTheme() {
-    return this.theme;
-  }
-
-  set ColorTheme(theme: IColorTheme) {
-    this.theme = theme;
-  }
-
-  get PrimaryColor() {
-    return this.theme.primaryColor;
-  }
-
-  set PrimaryColor(primaryColor: string) {
-    this.theme.primaryColor = primaryColor;
-  }
-
-  get FontColor() {
-    return this.theme.fontColor;
-  }
-
-  set FontColor(fontColor: string) {
-    this.theme.fontColor = fontColor;
-  }
-
-  get Format() {
-    return this.format;
-  }
-
-  set Format(val: moment.MomentInput) {
-    this.format = val;
-  }
-
-  get DisabledTimeRanges() {
-    return this.disabledTimeRanges;
-  }
-
-  get FromLabel() {
-    return this.fromLabel;
-  }
-
-  set FromLabel(val: string) {
-    this.fromLabel = val;
-  }
-
-  get ToLabel() {
-    return this.toLabel;
-  }
-
-  set ToLabel(val: string) {
-    this.toLabel = val;
-  }
-
-  public clearDisabledTimeRange() {
-    this.disabledTimeRanges = [];
-  }
-
-  public addDisabledTimeRange(start: moment.MomentInput, stop: moment.MomentInput) {
-    let min = moment(start, 'HH:mm');
-    let max = moment(stop, 'HH:mm');
-
-    if (!min.isValid() || !max.isValid()) {
-      throw 'Invalid start/stop time format';
+    public getTimezone(): string {
+        return this.timezone;
     }
 
-    if (min.diff(max) > 0) {
-      throw 'Stop time range must be after start';
+    public setTimezone(timezone: string): void {
+        this.timezone = timezone;
     }
 
-    this.disabledTimeRanges.push({
-      startTime: {
-        hour: min.hour(),
-        minute: min.minutes()
-      },
-      stopTime: {
-        hour: max.hours(),
-        minute: max.minutes()
-      }
-    });
-  }
-
-  public get navigationChanges(): Observable<ECalendarNavigation> {
-    return this.navigationChanged.asObservable();
-  }
-
-  public navigateRight(): void {
-    this.navigationChanged.next(ECalendarNavigation.Right);
-  }
-
-  public navigateLeft(): void {
-    this.navigationChanged.next(ECalendarNavigation.Left);
-  }
-
-  public navigateUp(): void {
-    this.navigationChanged.next(ECalendarNavigation.Up);
-  }
-
-  public navigateDown(): void {
-    this.navigationChanged.next(ECalendarNavigation.Down);
-  }
-
-  public nextPage(): void {
-    this.navigationChanged.next(ECalendarNavigation.PageUp);
-  }
-
-  public previousPage(): void {
-    this.navigationChanged.next(ECalendarNavigation.PageDown);
-  }
-
-  public confirm(): void {
-    this.navigationChanged.next(ECalendarNavigation.Confirm);
-  }
-
-  public close(): void {
-    this.navigationChanged.next(ECalendarNavigation.Close);
-  }
-
-  /** @internal */
-  public setHostElement(hostElement: HTMLElement): void {
-    if (!this.hostElement) {
-      this.hostElement = hostElement;
+    public getDisabledDates(): DateTime[] {
+        return this.disabledDates;
     }
-  }
 
-  public isFocused(): boolean {
-    return document.activeElement == this.hostElement;
-  }
+    /**
+     * to set list of dates which will be used as disabled
+     * @param dates
+     */
+    public setDisabledDates(dates: DateTime[]): void {
+        dates.forEach(date => {
+            this.disabledDates.push(date.clone());
+        });
+    }
 
-  public focus(): void {
-    this.hostElement && this.hostElement.focus();
-  }
+    public getCalendarType(): ECalendarType {
+        return this.calendarType;
+    }
+
+    public setCalendarType(type: ECalendarType): void {
+        this.calendarType = type;
+    }
+
+    public getLocalization(): string {
+        return this.localization;
+    }
+
+    public setLocalization(localization: string): void {
+        this.localization = localization;
+    }
+
+    public getDefaultMinDate(): DateTime {
+        return this.defaultMinDate.clone();
+    }
+
+    public getDefaultMaxDate(): DateTime {
+        return this.defaultMaxDate.clone();
+    }
+
+    public getMinDate(): DateTime {
+        return this.minDate.clone();
+    }
+
+    public setMinDate(date: DateTime): void {
+        this.minDate = date.clone();
+    }
+
+    public getMaxDate(): DateTime {
+        return this.maxDate.clone();
+    }
+
+    public setMaxDate(date: DateTime): void {
+        this.maxDate = date.clone();
+    }
+
+    public getDisabledTimeRanges(): IDisabledTimeRanges[] {
+        return this.disabledTimeRanges;
+    }
+
+    public clearDisabledTimeRange(): void {
+        this.disabledTimeRanges = [];
+    }
+
+    public addDisabledTimeRange(timeRange: IDisabledTimeRanges): void {
+        const min = timeRange.startTime;
+        const max = timeRange.stopTime;
+
+        if (!this.isValidTime(min) || !this.isValidTime(max)) {
+            throw new Error('Invalid start/stop time format');
+        }
+
+        if (!this.isValidTimeRange(min, max)) {
+            throw new Error('Stop time range must be after start');
+        }
+
+        this.disabledTimeRanges.push({
+            startTime: {
+                hour: min.hour,
+                minute: min.minute
+            },
+            stopTime: {
+                hour: max.hour,
+                minute: max.minute
+            }
+        });
+    }
+
+    public isOpen(): boolean {
+        return this.open;
+    }
+
+    public setOpen(open: boolean): void {
+        this.open = open;
+    }
+
+    public setActivePanel(panel: Panel): void {
+        this.activePanel = panel;
+    }
+
+    public setActivePanelFromCalendarType(calendarType: ECalendarType): void {
+        switch (calendarType) {
+            case ECalendarType.Date:
+                this.activePanel = Panel.Day;
+                break;
+            case ECalendarType.Year:
+                this.activePanel = Panel.Year;
+                break;
+            case ECalendarType.MonthYear:
+                this.activePanel = Panel.Month;
+                break;
+            case ECalendarType.Time:
+                this.activePanel = Panel.Time;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public getActivePanel(): Panel {
+        return this.activePanel;
+    }
+
+    public get navigationChanges(): Observable<ECalendarNavigation> {
+        return this.navigationChanged.asObservable();
+    }
+
+    public navigateRight(): void {
+        this.navigationChanged.next(ECalendarNavigation.Right);
+    }
+
+    public navigateLeft(): void {
+        this.navigationChanged.next(ECalendarNavigation.Left);
+    }
+
+    public navigateUp(): void {
+        this.navigationChanged.next(ECalendarNavigation.Up);
+    }
+
+    public navigateDown(): void {
+        this.navigationChanged.next(ECalendarNavigation.Down);
+    }
+
+    public nextPage(): void {
+        this.navigationChanged.next(ECalendarNavigation.PageUp);
+    }
+
+    public previousPage(): void {
+        this.navigationChanged.next(ECalendarNavigation.PageDown);
+    }
+
+    public confirm(): void {
+        this.navigationChanged.next(ECalendarNavigation.Confirm);
+    }
+
+    public close(): void {
+        this.navigationChanged.next(ECalendarNavigation.Close);
+    }
+
+    /** @internal */
+    public setHostElement(hostElement: HTMLElement): void {
+        this.hostElement = hostElement;
+    }
+
+    public isFocused(): boolean {
+        return document.activeElement == this.hostElement;
+    }
+
+    public focus(): void {
+        this.hostElement?.focus();
+    }
+
+    public setTimeFormat(use24HourFormat: boolean): void {
+        this.use24HourFormat = use24HourFormat;
+    }
+
+    public  is24HourFormat() {
+        return this.use24HourFormat;
+    }
+
+    private isValidTime(time: ITime): boolean {
+        return time.hour >= 0 && time.hour < 24 && time.minute >= 0 && time.minute < 60;
+    }
+
+    private isValidTimeRange(startTime: ITime, stopTime: ITime): boolean {
+        return startTime.hour < stopTime.hour || (startTime.hour === stopTime.hour && startTime.minute < stopTime.minute);
+    }
 }

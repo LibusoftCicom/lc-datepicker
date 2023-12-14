@@ -1,149 +1,150 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import { LCDayPickerComponent } from './day-picker.component';
-
-import { LcDatePickerModule, DatePickerConfig, ECalendarType } from './../lc-date-picker.module';
-import * as moment from 'moment';
-
+import {LCDatePickerAdapter} from '../lc-date-picker-adapter.class';
+import {LuxonDateAdapterService} from '../../../../../../src/app/luxon-date-adapter.service';
+import {DatePickerConfig} from '../lc-date-picker-config-helper';
+import {ECalendarType} from '../enums';
+import {LCDayPickerButtonComponent} from './day-picker-button.component';
 
 describe('LCDayPickerComponent', () => {
-  let component: LCDayPickerComponent;
-  let element: HTMLElement;
-  let fixture: ComponentFixture<LCDayPickerComponent>;
+    let component: LCDayPickerComponent;
+    let fixture: ComponentFixture<LCDayPickerComponent>;
+    let dateAdapter: LCDatePickerAdapter;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        LCDayPickerComponent
-      ]
-    })
-      .compileComponents();
-  }));
+    beforeEach(waitForAsync(() => {
+        TestBed.configureTestingModule({
+            declarations: [
+                LCDayPickerComponent,
+                LCDayPickerButtonComponent,
+            ],
+            providers: [{provide: LCDatePickerAdapter, useClass: LuxonDateAdapterService}]
+        })
+            .compileComponents()
+            .then(() => {
+                dateAdapter = TestBed.inject(LCDatePickerAdapter);
+                fixture = TestBed.createComponent(LCDayPickerComponent);
+                component = fixture.componentInstance;
+                const today = dateAdapter.today();
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(LCDayPickerComponent);
-    component = fixture.componentInstance;
-    element = fixture.debugElement.nativeElement;
-    component.newDate = moment();
+                component.config = new DatePickerConfig();
+                component.config.setCalendarType(ECalendarType.Date);
+                component.config.setLocalization('hr');
+                component.config.setMinDate(dateAdapter.setParts(dateAdapter.getStartOfYear(today), {year: 1900}));
+                component.config.setMaxDate(dateAdapter.setParts(dateAdapter.getStartOfYear(today), {year: 2099}));
+                component.config.labels = { confirmLabel: 'Odabir' };
+                component.value = today;
 
-    component.config = new DatePickerConfig();
-    component.config.CalendarType = ECalendarType.Date;
-    component.config.Localization = 'hr';
-    component.config.MinDate = { years: 1900 };
-    component.config.MaxDate = { years: 2100 };
-    component.config.Labels = {
-      confirmLabel: 'Odabir'
-    };
+                fixture.detectChanges();
+            });
+    }));
 
-    fixture.detectChanges();
-  });
+    it('should create DayPicker component', () => {
+        expect(component).toBeTruthy();
+    });
 
-  it('should create DayPicker component', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should set active date', () => {
 
-  it('should set active date', () => {
-    const date = moment().date(5);
-    component.newDate = date;
-    component.formatMonthData();
-    const activeDate = component.monthData
-      .reduce(( source, second ) => source.concat(second))
-      .filter(item => item != null ? item.active === true : false );
+        const date = dateAdapter.setParts(component.getValue(), {date: 2});
 
-    expect(activeDate.length).toBe(1);
-    expect(activeDate[0].date).toBe(date.toObject().date);
-  });
+        component.value = date;
 
-  it('should set inactive dates', () => {
-    const date = moment();
-    const minDate = moment().add(-10, 'day');
-    const maxDate = moment().add(10, 'day');
+        const activeDate = component.calendarData
+            .reduce(( source, second ) => source.concat(second))
+            .filter(item => item != null ? item.active : false );
 
-    component.newDate = date;
-    component.config.MinDate = minDate.toObject();
-    component.config.MaxDate = maxDate.toObject();
-    component.config.setDisabledDates([ moment().add(-5, 'day').format('YYYY-MM-DD'), moment().add(3, 'day').format('YYYY-MM-DD') ]);
+        expect(activeDate.length).toBe(1);
+        expect(activeDate[0].value).toBe(date.getDate());
+    });
 
-    component.formatMonthData();
+    it('should set inactive dates', () => {
+        const date = dateAdapter.today();
+        const minDate = dateAdapter.add(date,-10, 'day');
+        const maxDate = dateAdapter.add(date,10, 'day');
 
-    const flatDates = component.monthData.reduce(( source, second ) => [...source, ...second]);
-    const activeDateIndex = flatDates.findIndex((date) => date != null ? date.active === true : false );
+        component.getDayPicker().setMinDate(minDate);
+        component.getDayPicker().setMaxDate(maxDate);
+        component.getDayPicker().setDisabledDates([
+            dateAdapter.add(date,-5, 'day'),
+            dateAdapter.add(date,3, 'day'),
+        ]);
 
-    if(flatDates[activeDateIndex+3] ){
-      expect( flatDates[activeDateIndex+3].disabled ).toBe( true );
-    }
-    if(flatDates[activeDateIndex+2] ){
-      expect( flatDates[activeDateIndex+2].disabled ).toBe( undefined );
-    }
-    if(flatDates[activeDateIndex+10] ){
-      expect( flatDates[activeDateIndex+10].disabled ).toBe( undefined );
-    }
-    if(flatDates[activeDateIndex+11] ){
-      expect( flatDates[activeDateIndex+11].disabled ).toBe( true );
-    }
-    if(flatDates[activeDateIndex-5]){
-      expect( flatDates[activeDateIndex-5].disabled ).toBe( true );
-    }
-  });
+        component.value = date;
 
-  it('should switch to previous month on click', () => {
-    const currentMonth = component.newDate.month();
-    component.prevMonth();
-    const monthArray = component.monthData.reduce(( source, second ) => source.concat(second));
-    expect(monthArray[10].months).toBe(currentMonth === 0 ? 11 : currentMonth - 1);
-  });
+        const flatDates = component.calendarData.reduce(( source, second ) => [...source, ...second]);
+        const activeDateIndex = flatDates.findIndex((date) => date != null ? date.active : false );
 
-  it('should switch to next month on click', () => {
-    const currentMonth = component.newDate.month();
-    component.nextMonth();
-    const monthArray = component.monthData.reduce(( source, second ) => source.concat(second));
-    expect(monthArray[10].months).toBe( currentMonth === 11 ? 0 : currentMonth + 1);
-  });
+        if (flatDates[activeDateIndex + 3]) {
+            expect( flatDates[activeDateIndex + 3].disabled ).toBe( true );
+        }
+        if (flatDates[activeDateIndex + 2]) {
+            expect( flatDates[activeDateIndex + 2].disabled ).toBe( undefined );
+        }
+        if (flatDates[activeDateIndex + 10]) {
+            expect( flatDates[activeDateIndex + 10].disabled ).toBe( undefined );
+        }
+        if (flatDates[activeDateIndex + 11]) {
+            expect( flatDates[activeDateIndex + 11].disabled ).toBe( true );
+        }
+        if(flatDates[activeDateIndex - 5]){
+            expect( flatDates[activeDateIndex - 5].disabled ).toBe( true );
+        }
+    });
 
-  it('should switch to previous month on scroll up', () => {
-    const date = moment().month(4);
-    component.newDate = date;
-    component.ngOnInit();
-    const InitMonthArray = component.createMonthArray();
-    expect(InitMonthArray[0].months).toBe(4);
-    const scrollEvent = new WheelEvent('test', {deltaY: 1});
-    component.monthScroll(scrollEvent);
-    const monthArray = component.createMonthArray();
-    expect(monthArray[0].months).toBe(3);
-  });
+    it('should switch to previous month on click', () => {
+        const currentMonth = component.getValue().getMonth();
+        component.previousMonth();
 
-  it('should switch to next month on scroll down', () => {
-    const date = moment().month(4);
-    component.newDate = date;
-    component.ngOnInit();
-    const InitMonthArray = component.createMonthArray();
-    expect(InitMonthArray[0].months).toBe(4);
+        const newMonth = component.getValue().getMonth();
 
-    const scrollEvent = new WheelEvent('test', {deltaY: -1});
-    component.monthScroll(scrollEvent);
-    const monthArray = component.createMonthArray();
-    expect(monthArray[0].months).toBe(5);
-  });
+        expect(newMonth).toBe(currentMonth === 0 ? 11 : currentMonth - 1);
+    });
 
-  it('should set new date on click', () => {
-    const date = moment().date(3);
-    const newDate = moment().date(5).month(6).year(2017).toObject();
-    component.newDate = date;
-    component.dayClick(newDate);
-    expect(component.newDate.date()).toBe(newDate.date);
-    expect(component.newDate.month()).toBe(newDate.months);
-    expect(component.newDate.year()).toBe(newDate.years);
-  });
+    it('should switch to next month on click', () => {
+        const currentMonth = component.getValue().getMonth();
+        component.nextMonth();
 
+        const newMonth = component.getValue().getMonth();
 
-  it('should correctly set date when new date has less days than current date', () =>{
-    const date = moment().year(2018).month(3).date(30);
-    const newDate = moment().year(2018).month(2).date(31).toObject();
-    component.newDate = date;
-    component.dayClick(newDate);
-    expect(component.newDate.date()).toBe(newDate.date);
-    expect(component.newDate.month()).toBe(newDate.months);
-    expect(component.newDate.year()).toBe(newDate.years);
-  });
+        expect(newMonth).toBe( currentMonth === 11 ? 0 : currentMonth + 1);
+    });
+
+    it('should switch to previous month on scroll up', () => {
+        component.value = dateAdapter.setParts(dateAdapter.today(), {month: 4});
+
+        expect(component.getValue().getMonth()).toBe(4);
+
+        const scrollEvent = new WheelEvent('test', {deltaY: 1});
+        component.monthScroll(scrollEvent);
+
+        expect(component.getValue().getMonth()).toBe(3);
+    });
+
+    it('should switch to next month on scroll down', () => {
+        component.value = dateAdapter.setParts(dateAdapter.today(), {month: 4});
+
+        expect(component.getValue().getMonth()).toBe(4);
+
+        const scrollEvent = new WheelEvent('test', {deltaY: -1});
+        component.monthScroll(scrollEvent);
+
+        expect(component.getValue().getMonth()).toBe(5);
+    });
+
+    it('should set new date on click', () => {
+        const date = dateAdapter.setParts(dateAdapter.today(), {date: 3});
+        const newDate = dateAdapter.setParts(dateAdapter.today(), {date: 5});
+        component.value = date;
+        component.selectItem({value: newDate.getDate()});
+        expect(component.getValue().getDate()).toBe(newDate.getDate());
+        expect(component.getValue().getMonth()).toBe(newDate.getMonth());
+        expect(component.getValue().getYear()).toBe(newDate.getYear());
+    });
+
+    it('should correctly set date when new date has less days than current date', () =>{
+        component.value = dateAdapter.setParts(dateAdapter.today(), {date: 31, month: 4});
+        component.nextMonth();
+        expect(component.getValue().getDate()).toBe(30);
+        expect(component.getValue().getMonth()).toBe(5);
+    });
 });

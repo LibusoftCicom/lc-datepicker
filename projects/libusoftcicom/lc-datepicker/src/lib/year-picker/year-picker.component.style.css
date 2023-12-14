@@ -14,8 +14,8 @@ button {
 
 .yearsCal td {
   min-width: 30px;
-  padding: 5px 0;
-  outline: 1px solid transparent;    
+  padding: 0;
+  outline: 1px solid transparent;
 }
 
 .calendar {
@@ -76,26 +76,12 @@ thead tr {
   color: aliceblue;
 }
 
-thead tr button{  
+thead tr button{
   color: aliceblue;
 }
 
-.yearsCal td.disabled {
-  background: rgba(234,234,234,0.05);
-}
-
-.yearsCal td.current {
-  background: rgba(94, 102, 111, 0.05);
-}
-
-.yearsCal td.disabled button {
-  color: rgb(187, 201, 216) !important;
-  cursor: default;
-}
-
-.yearsCal td.active,
-.yearsCal td:not(.disabled):hover {
-  outline: 1px solid #5e666f;
+tbody td {
+  text-align: center;
 }
 
 .selectbtn{

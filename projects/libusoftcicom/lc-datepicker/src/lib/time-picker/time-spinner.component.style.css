@@ -1,0 +1,19 @@
+.time-spinner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.selectbtn {
+  cursor: pointer;
+  color: #5e666f;
+  width: 20px;
+  font-size: xx-large;
+}
+
+.timeDigit {
+  width: 65px;
+  font-size: larger;
+  line-height: 1;
+}

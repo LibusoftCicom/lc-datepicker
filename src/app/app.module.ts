@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 
 import { AppComponent } from './app.component';
+import {LuxonDateAdapterService} from './luxon-date-adapter.service';
 
 @NgModule({
   declarations: [
@@ -13,9 +14,11 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     FormsModule,
-    LcDatePickerModule
+    LcDatePickerModule.withImplementation({adapter: LuxonDateAdapterService}),
   ],
-  providers: [],
+  providers: [
+      LuxonDateAdapterService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

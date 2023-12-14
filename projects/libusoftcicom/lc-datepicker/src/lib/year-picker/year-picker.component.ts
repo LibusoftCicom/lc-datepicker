@@ -1,231 +1,197 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy, OnInit, OnChanges, OnDestroy } from '@angular/core';
-import { DatePickerConfig, ECalendarNavigation } from './../lc-date-picker-config-helper';
-import moment from 'moment';
-import { Subscription } from 'rxjs';
-
-export interface IYearobject {
-    year?: number;
-    active?: boolean;
-    disabled?: boolean;
-    current?: boolean;
-}
+import {
+    Component,
+    Input,
+    Output,
+    EventEmitter,
+    ChangeDetectorRef,
+    ChangeDetectionStrategy,
+    OnInit,
+    OnDestroy, ViewChild, ElementRef, NgZone, Renderer2, AfterViewInit,
+} from '@angular/core';
+import { DatePickerConfig } from './../lc-date-picker-config-helper';
+import {fromEvent, Subscription} from 'rxjs';
+import {ICalendarItem} from '../base-date-picker.class';
+import {YearPicker} from './year-picker.class';
+import {DateTime} from '../date-time.class';
+import {ECalendarNavigation} from '../enums';
 
 @Component({
     selector: 'lc-year-picker',
-    template: `
-    <table class="yearsCal" (wheel)="yearScroll($event)">
-    <thead align="center"  [style.background]="config.PrimaryColor">
-        <tr>
-            <th colspan="5">
-                <div class="selectbtn" >
-                    <button (click)="prevYears()"> <i class="fa fa-caret-left fa-lg" aria-hidden="true"></i> </button>
-                </div>
-                <div class="selectbtn" (click)="resetDate($event)"> <i class="fa fa-home" aria-hidden="true"></i> </div>
-                <div class="selectbtn pullRight" >
-                    <button (click)="nextYears()"> <i class="fa fa-caret-right fa-lg" aria-hidden="true"></i> </button>
-                </div>
-            </th>
-        </tr>
-    </thead>
-    <tbody align="center">
-        <tr *ngFor="let row of yearsArrayFormated">
-        <td *ngFor="let item of row" (click)="setYear(item, $event)" [ngClass]="{'active': item?.active, 'current': item?.current, 'disabled': item?.disabled}">
-            <button [style.color]="config.FontColor">{{item?.year}}</button>
-        </td>
-        </tr>
-    </tbody>
-    </table>
-`,
+    templateUrl: 'year-picker.component.html',
     styleUrls: ['./year-picker.component.style.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [YearPicker],
 })
-export class LCYearPickerComponent implements OnInit, OnChanges, OnDestroy {
+export class LCYearPickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
-    public tempYear: number;
-    public initYear: number;
-    public yearsArray: IYearobject[] = [];
-    public yearsArrayFormated: IYearobject[][];
+    public calendarData: ICalendarItem[][];
 
-    @Input() newDate: moment.Moment;
-    @Input() config: DatePickerConfig;
-    @Output() selected: EventEmitter<moment.Moment> = new EventEmitter<moment.Moment>();
-    @Output() reset: EventEmitter<void> = new EventEmitter<void>();
+    private _value: DateTime;
 
+    private readonly subscriptions: Subscription[] = [];
     private navigationSubscription: Subscription;
-    private selectedItem: IYearobject = null;
 
-    constructor(private cd: ChangeDetectorRef) { }
+    @Input() public set value(dateTime: DateTime) {
+        this._value = dateTime.clone();
+        this.datePicker.setSelectedDate(this._value);
+    };
+    @Input() public config: DatePickerConfig;
+    @Output() public selected: EventEmitter<DateTime> = new EventEmitter<DateTime>();
+    @Output() public dateChanged: EventEmitter<DateTime> = new EventEmitter<DateTime>();
+    @Output() public reset: EventEmitter<void> = new EventEmitter<void>();
 
-    ngOnInit() {
-        this.navigationSubscription = this.config.navigationChanges.subscribe((dir) => this.navigate(dir));
-        this.initCalendar();
+    @ViewChild('yearPicker', { static: true })
+    public yearPickerElement: ElementRef<HTMLTableElement>;
+
+    @ViewChild('previousYearsButton', { static: true })
+    public previousYearsButtonElement: ElementRef<HTMLButtonElement>;
+
+    @ViewChild('nextYearsButton', { static: true })
+    public nextYearsButtonElement: ElementRef<HTMLButtonElement>;
+
+    @ViewChild('reset', { static: true })
+    public resetElement: ElementRef<HTMLDivElement>;
+
+    constructor(
+        private readonly cd: ChangeDetectorRef,
+        private readonly datePicker: YearPicker,
+        private readonly ngZone: NgZone,
+        private readonly renderer: Renderer2,
+    ) {}
+
+    public ngOnInit(): void {
+
+        this.navigationSubscription =
+            this.config.navigationChanges.subscribe((dir) => this.navigate(dir));
+        this.subscriptions.push(
+            this.datePicker.getCalendarChanges().subscribe(() => {
+                this.calendarData = this.datePicker.getCalendarData();
+                this.cd.detectChanges();
+                this.setStyles();
+                this.dateChanged.emit(this.datePicker.getSelectedDateTime());
+            })
+        );
+        this.initializeCalendar();
     }
 
-    ngOnChanges(changes) {
-        if (changes.newDate) {
-            this.initCalendar();
-            this.cd.detectChanges();
-        }
+    public ngAfterViewInit(): void {
+        this.setStyles();
+
+        this.ngZone.runOutsideAngular(() => this.registerViewEvents());
     }
 
-    ngOnDestroy() {
+    public ngOnDestroy(): void {
+        this.subscriptions.forEach((sub) => sub.unsubscribe());
+        this.subscriptions.length = 0;
+
         this.navigationSubscription.unsubscribe();
         this.cd.detach();
     }
 
-    private initCalendar() {
-        this.tempYear = moment(this.newDate.toISOString()).year();
-        this.initYear = moment(this.newDate.toISOString()).year();
-        this.checkInitYear();
-        this.formatYears();
+    public getValue(): DateTime {
+        return this.datePicker.getSelectedDateTime();
     }
 
-    private navigate(dir:ECalendarNavigation): void {
-        switch(dir) {
-            case ECalendarNavigation.Confirm:
-                return this.setYear(this.selectedItem);
-            case ECalendarNavigation.Left:
-                this.selectYear(-1);
-                break;
-            case ECalendarNavigation.Right:
-                this.selectYear(1);
-                break;
-            case ECalendarNavigation.Up:
-                this.selectYear(-5);
-                break;
-            case ECalendarNavigation.Down:
-                this.selectYear(5);
-                break;
-            case ECalendarNavigation.PageUp:
-                this.prevYears();
-                break;
-            case ECalendarNavigation.PageDown:
-                this.nextYears();
-                break;
-        }
-
-        this.formatYears();
-        this.cd.detectChanges();
+    public previousYears(): void {
+        this.datePicker.previousYears();
     }
 
-    checkInitYear() {
-        let year = this.tempYear;
-        if (this.config.MinDate && this.config.MinDate.years) {
-            year = Math.max(year, this.config.MinYear);
-        }
-        if (this.config.MaxDate && this.config.MaxDate.years) {
-            year = Math.min(year, this.config.MaxYear);
-        }
-        this.tempYear = this.initYear = year;
+    public nextYears(): void {
+        this.datePicker.nextYears();
     }
 
-    formatYears() {
-        const selectedYear = this.tempYear;
-        const currentYear = moment(moment.now()).year();
+    public selectItem(item: ICalendarItem): void {
 
-        let minYear = Math.max(this.config.MinYear, selectedYear - 12);
-        const maxYear = Math.min(this.config.MaxYear + 1, minYear + 25);
-
-        if(maxYear - minYear < 25){
-            minYear = Math.max(this.config.MinYear, maxYear - 25)
-        }
-
-        for(let i = minYear; i < maxYear; i++){
-            this.yearsArray[i % minYear] = { year: i };
-
-            if (this.yearsArray[i % minYear].year == currentYear) {
-                this.yearsArray[i % minYear].current = true;
-            }
-
-            if (this.yearsArray[i % minYear].year == selectedYear) {
-                this.yearsArray[i % minYear].active = true;
-                this.selectedItem = this.yearsArray[i % minYear];
-            }
-        }
-
-        const yearsArrayFormated = this.yearsArray.filter(year => year !== null)
-
-        const rows = [];
-        for (let z = 0; z < 25; z++) {
-            z % 5 === 0
-                ? rows.push([yearsArrayFormated[z]])
-                : rows[rows.length - 1].push(yearsArrayFormated[z])
-        }
-        this.yearsArrayFormated = rows;
-
-    }
-
-    prevYears() {
-        this.tempYear -= 25;
-
-        if (this.tempYear < this.config.MinYear){
-            this.tempYear = this.config.MinYear;
-        }
-        this.prepareLayout();
-    }
-
-
-    nextYears() {
-        this.tempYear += 25;
-
-        if (this.tempYear > this.config.MaxYear) {
-            this.tempYear = this.config.MaxYear;
-        }
-        this.prepareLayout();
-    }
-
-    private prepareLayout() {
-        this.formatYears();
-        this.cd.detectChanges();
-        this.config.focus();
-    }
-
-    selectYear(jump: number) {
-        this.tempYear = this.tempYear+(jump);
-
-        if (this.tempYear < this.config.MinYear){
-            this.tempYear = this.config.MinYear
-        }
-        if (this.tempYear > this.config.MaxYear) {
-            this.tempYear = this.config.MaxYear
-        }
-    }
-
-    setYear(item: IYearobject, event?) {
         if (!item || item.disabled) {
             return;
         }
-        this.newDate.year(item.year);
-        this.initYear = item.year;
-        this.selected.emit(this.newDate);
+
+        this.datePicker.selectItem(item);
+        this.datePicker.setCalendarData(this.datePicker.formatCalendarData());
+        this.selected.emit(this.datePicker.getSelectedDateTime());
     }
 
-    yearScroll(event) {
-        this.preventDefault(event);
-        this.stopPropagation(event);
+    public yearScroll(event: WheelEvent): void {
+        event.preventDefault();
+        event.stopPropagation();
         if (event.deltaY < 0) {
             this.nextYears();
         }
         if (event.deltaY > 0) {
-            this.prevYears();
+            this.previousYears();
         }
     }
 
-    private preventDefault(e: Event) {
-        if (e.preventDefault) {
-            e.preventDefault();
-        }
-        e.returnValue = false;
-    }
-
-    private stopPropagation(e: Event) {
-        if (e.stopPropagation) {
-            e.stopPropagation();
-        }
-        e.cancelBubble = true;
-    }
-
-    resetDate(event) {
+    public resetDate(): void {
         this.reset.emit();
+    }
+
+    private navigate(dir: ECalendarNavigation): void {
+        switch (dir) {
+            case ECalendarNavigation.PageDown:
+                this.nextYears();
+                break;
+            case ECalendarNavigation.PageUp:
+                this.previousYears();
+                break;
+            case ECalendarNavigation.Confirm:
+                this.datePicker.setCalendarData(this.datePicker.formatCalendarData());
+                break;
+            case ECalendarNavigation.Left:
+                this.datePicker.previousYear();
+                break;
+            case ECalendarNavigation.Right:
+                this.datePicker.nextYear();
+                break;
+            case ECalendarNavigation.Up:
+                this.datePicker.previousRow();
+                break;
+            case ECalendarNavigation.Down:
+                this.datePicker.nextRow();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private initializeCalendar(): void {
+
+        this.datePicker.setLocale(this.config.getLocalization());
+        this.datePicker.setTimezone(this.config.getTimezone());
+        this.datePicker.setCalendarBoundaries(this.config.getMinDate(), this.config.getMaxDate());
+        this.datePicker.setSelectedDate(this._value);
+    }
+
+    private registerViewEvents(): void {
+        this.subscriptions.push(
+            fromEvent<WheelEvent>(this.yearPickerElement.nativeElement, 'wheel')
+                .subscribe((event) => this.yearScroll(event))
+        );
+
+        this.subscriptions.push(
+            fromEvent<PointerEvent>(this.previousYearsButtonElement.nativeElement, 'click')
+                .subscribe(() => {
+                    this.previousYears();
+                    this.config.focus();
+                })
+        );
+
+        this.subscriptions.push(
+            fromEvent<PointerEvent>(this.nextYearsButtonElement.nativeElement, 'click')
+                .subscribe(() =>{
+                    this.nextYears();
+                    this.config.focus();
+                })
+        );
+
+        this.subscriptions.push(
+            fromEvent<PointerEvent>(this.resetElement.nativeElement, 'click')
+                .subscribe(() => this.resetDate())
+        );
+    }
+
+    private setStyles(): void {
+        this.renderer
+            .setStyle(this.yearPickerElement.nativeElement.tHead, 'background', this.config.theme.primaryColor);
     }
 }
