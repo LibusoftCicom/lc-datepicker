@@ -1,0 +1,21 @@
+services:
+  lc-datepicker:
+    build:
+      context: .
+      dockerfile: Dockerfile_dev
+    container_name: lc-datepicker
+    volumes:
+      - .:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+    ports:
+      - "4200:4200"
+      - "49153:49153"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4200 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  node_modules:

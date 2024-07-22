@@ -1,0 +1,20 @@
+FROM node:20.15.1-bullseye-slim
+
+# dumb-init is need to correctly kill the container
+RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
+
+RUN npm i -g @angular/cli@18.0.0
+
+USER node
+
+WORKDIR /usr/src/app
+
+COPY package.json /usr/src/app/
+
+RUN npm i && chown -R node:node /usr/src/app/node_modules
+
+# 4200 is the app port, 49153 is the port for the file watcher
+EXPOSE 4200 49153
+
+# poll is used for hot reload
+CMD ["dumb-init", "ng", "serve", "--host", "0.0.0.0", "--poll", "1000"]
