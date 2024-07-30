@@ -11,15 +11,14 @@ import {
 	OnInit,
 	Output,
 	Renderer2,
-	ViewChild,
 } from '@angular/core';
-import {DatePickerConfig} from './lc-date-picker-config-helper';
+import {DatePickerConfig} from '../lc-date-picker-config-helper';
 import {Subscription} from 'rxjs';
-import {Panel} from './base-date-picker.class';
-import {DateTime} from './date-time.class';
-import {LCDatePickerAdapter} from './lc-date-picker-adapter.class';
-import {DatePicker} from './date-picker.class';
-import {ECalendarNavigation, ECalendarType} from './enums';
+import {Panel} from '../base-date-picker.class';
+import {DateTime} from '../date-time.class';
+import {LCDatePickerAdapter} from '../lc-date-picker-adapter.class';
+import {DatePicker} from '../date-picker.class';
+import {ECalendarNavigation, ECalendarType} from '../enums';
 
 export enum DateType {
 	From,
@@ -40,6 +39,7 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
     public selectedDateTimeFrom: DateTime;
     public selectedDateTimeTo: DateTime;
     public DateType: typeof DateType = DateType;
+    public opened = false;
 
     private datePickerFrom: DatePicker;
     private datePickerTo: DatePicker;
@@ -54,14 +54,7 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
     @Input() public valueFrom: DateTime;
     @Input() public valueTo: DateTime;
     @Input() public config: DatePickerConfig;
-    @Output() public openedChange: EventEmitter<void> = new EventEmitter<void>();
     @Output() public dateChange: EventEmitter<DateTime[]> = new EventEmitter<DateTime[]>();
-
-    @ViewChild('labelFrom', { static: false })
-    public labelFromElement: ElementRef<HTMLDivElement>;
-
-    @ViewChild('labelTo', { static: false })
-    public labelToElement: ElementRef<HTMLDivElement>;
 
     private readonly subscriptions: Subscription[] = [];
 
@@ -76,13 +69,12 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
 
         this.config.setHostElement(this._elementRef.nativeElement);
         this.initCalendar();
+        this.setupSubscriptions();
 
         this.cd.detectChanges();
     }
 
     public ngAfterViewInit(): void {
-
-        this.setStyles();
 
         this.cd.detectChanges();
     }
@@ -95,7 +87,7 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
     }
 
     public onDayChanged(type: DateType, date: DateTime): void {
-        
+
         switch (type) {
 			case DateType.From:
                 this.selectedDateTimeFrom = date.clone();
@@ -232,11 +224,7 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
 
     public confirm(): void {
         this.dateChange.emit([this.selectedDateTimeFrom, this.selectedDateTimeTo]);
-        this.openedChange.emit();
-    }
-
-    public close(): void {
-        this.openedChange.emit();
+        this.config.setOpen(false);
     }
 
     private getActivePanel(type: DateType): Panel {
@@ -245,43 +233,23 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
 
     private initCalendar(): void {
 
-		this.initializeDatepickers();
+		  this.initializeDatepickers();
 
-        this.activePanelFrom = this.datePickerFrom.getActivePanel();
-        this.activePanelTo = this.datePickerTo.getActivePanel();
+      this.activePanelFrom = this.datePickerFrom.getActivePanel();
+      this.activePanelTo = this.datePickerTo.getActivePanel();
 
-		this.setDateTimes();
+		  this.setDateTimes();
 
-        this.subscriptions.push(this.config.navigationChanges.subscribe((dir) => this.navigation(dir)));
-        this.subscriptions.push(
-            this.datePickerFrom.panelChanges.subscribe((type) => {
-                this.activePanelFrom = type;
-                this.cd.detectChanges();
-            })
-        );
-        this.subscriptions.push(
-            this.datePickerTo.panelChanges.subscribe((type) => {
-                this.activePanelTo = type;
-                this.cd.detectChanges();
-            })
-        );
-
-        this._elementRef.nativeElement.focus();
+      this._elementRef.nativeElement.focus();
     }
 
     private navigation(dir: ECalendarNavigation): void {
         if (dir === ECalendarNavigation.Close) {
-            this.close();
+            this.config.setOpen(false);
         }
         if (dir === ECalendarNavigation.Confirm) {
             this.confirm();
         }
-    }
-
-    private setStyles(): void {
-        
-        this.renderer.setStyle(this.labelFromElement.nativeElement, 'background', this.config.theme.primaryColor);
-        this.renderer.setStyle(this.labelToElement.nativeElement, 'background', this.config.theme.primaryColor);
     }
 
     private resetDatePickerFrom(): void {
@@ -415,4 +383,64 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
 				break;
 		}
 	}
+
+  private setupSubscriptions() {
+
+    this.subscriptions.push(
+      this.config.navigationChanges.subscribe((dir) => this.navigation(dir))
+    );
+
+    this.subscriptions.push(
+      this.datePickerFrom.panelChanges.subscribe((type) => {
+        this.activePanelFrom = type;
+        this.cd.detectChanges();
+      })
+    );
+
+    this.subscriptions.push(
+      this.datePickerTo.panelChanges.subscribe((type) => {
+        this.activePanelTo = type;
+        this.cd.detectChanges();
+      })
+    );
+
+    this.subscriptions.push(
+      this.config.getOpenChanges().subscribe((open) => {
+        this.opened = open;
+
+        const windowHeight = window.innerHeight;
+        const componentPosition = this._elementRef.nativeElement.parentNode.getBoundingClientRect();
+        if (windowHeight - componentPosition.top > this.calendarSize(this.datePickerFrom.getCalendarType())) {
+          this.componentMargin = 0;
+        } else {
+          this.componentMargin = this.calendarSize(this.datePickerFrom.getCalendarType()) * -1 + 'px';
+        }
+
+        this.cd.detectChanges();
+      }));
+  }
+
+  private calendarSize(type: ECalendarType) {
+    let height = 32;
+    if (this.datePickerFrom.getCalendarType() <= 1) {
+      height += 20;
+    }
+    switch (type) {
+      case ECalendarType.DateTime: {
+        height += 280;
+        break;
+      }
+      case ECalendarType.Date:
+      case ECalendarType.MonthYear:
+      case ECalendarType.Year: {
+        height += 240;
+        break;
+      }
+      case ECalendarType.Time: {
+        height += 140;
+        break;
+      }
+    }
+    return height;
+  }
 }

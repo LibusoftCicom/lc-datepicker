@@ -81,6 +81,7 @@ export class LCDayPickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
 		this.navigationSubscription =
 			this.config.navigationChanges.subscribe((dir) => this.navigate(dir));
+
 		this.subscriptions.push(
 			this.datePicker.getCalendarChanges().subscribe(() => {
 				this.shortDaysOfWeek = this.datePicker.getShortDaysOfWeek();
@@ -91,7 +92,7 @@ export class LCDayPickerComponent implements OnInit, AfterViewInit, OnDestroy {
 				this.cd.detectChanges();
 
 				this.setStyles();
-                this.dateChanged.emit(this.datePicker.getSelectedDateTime());
+        this.dateChanged.emit(this.datePicker.getSelectedDateTime());
 			})
 		);
 		this.initializeCalendar();
@@ -151,7 +152,7 @@ export class LCDayPickerComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	public switchPanels(panel: Panel): void {
-        this.dateChanged.emit(this.datePicker.getSelectedDateTime());
+    this.dateChanged.emit(this.datePicker.getSelectedDateTime());
 		this.switchPanel.emit(panel);
 	}
 
@@ -194,7 +195,7 @@ export class LCDayPickerComponent implements OnInit, AfterViewInit, OnDestroy {
         this.datePicker.initializeDaysOfWeek();
         this.datePicker.setCalendarBoundaries(this.config.getMinDate(), this.config.getMaxDate());
         this.datePicker.setDisabledDates(this.config.getDisabledDates());
-		this.datePicker.setSelectedDate(this._value);
+		    this.datePicker.setSelectedDate(this._value);
     }
 
 	private registerViewEvents(): void {

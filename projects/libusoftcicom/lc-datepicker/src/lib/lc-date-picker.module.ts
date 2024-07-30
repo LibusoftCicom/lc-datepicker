@@ -5,16 +5,17 @@ import { LCTimePickerCompactComponent } from './time-picker-compact/time-picker-
 import { LCDayPickerComponent } from './day-picker/day-picker.component';
 import { LCMonthPickerComponent } from './month-picker/month-picker.component';
 import { LCYearPickerComponent } from './year-picker/year-picker.component';
-import { LCDatePickerComponent } from './lc-date-picker.component';
-import { LCDateRangePickerComponent } from './lc-date-range-picker.component';
+import { LCDatePickerComponent } from './lc-datepicker/lc-date-picker.component';
+import { LCDateRangePickerComponent } from './lc-date-range-picker/lc-date-range-picker.component';
 import {LCDatePickerAdapter} from './lc-date-picker-adapter.class';
 import {LCDayPickerButtonComponent} from './day-picker/day-picker-button.component';
 import {LCMonthPickerButtonComponent} from './month-picker/month-picker-button.component';
 import {LCYearPickerButtonComponent} from './year-picker/year-picker-button.component';
 import {LCTimeSpinnerComponent} from './time-picker/time-spinner.component';
 import {LCTimeSpinnerCompactComponent} from './time-picker-compact/time-spinner-compact.component';
-import {LCConfirmButtonComponent} from './confirm-button.component';
-import {LCCalendarBackgroundComponent} from './calendar-background.component';
+import {LCConfirmButtonComponent} from './confirm-button/confirm-button.component';
+import {LCCalendarBackgroundComponent} from './calendar-background/calendar-background.component';
+import { LCHeaderComponent } from './header/header.component';
 
 export interface ImplementationConfig {
   adapter?: Type<LCDatePickerAdapter>;
@@ -37,8 +38,12 @@ export interface ImplementationConfig {
 		LCTimeSpinnerCompactComponent,
 		LCConfirmButtonComponent,
 		LCCalendarBackgroundComponent,
+    LCHeaderComponent,
 	],
-	exports: [LCDatePickerComponent, LCDateRangePickerComponent],
+	exports: [
+    LCDatePickerComponent,
+    LCDateRangePickerComponent
+  ],
 })
 export class LcDatePickerModule {
 	public static withImplementation(config: ImplementationConfig = {}): ModuleWithProviders<LcDatePickerModule> {
@@ -50,7 +55,9 @@ export class LcDatePickerModule {
 }
 
 export * from './lc-date-picker-config-helper';
-export * from './lc-date-picker.component';
-export * from './lc-date-range-picker.component';
+export * from './lc-datepicker/lc-date-picker.component';
+export * from './lc-date-range-picker/lc-date-range-picker.component';
 export * from './date-time.class';
 export * from './enums';
+export * from './base-date-picker.class';
+export * from './lc-date-picker-adapter.class';

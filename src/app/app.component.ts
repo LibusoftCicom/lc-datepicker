@@ -1,28 +1,28 @@
 import {
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    OnDestroy,
-    Renderer2,
-    ViewChild
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnDestroy, OnInit,
+  Renderer2,
+  ViewChild
 } from '@angular/core';
 import { DatePickerConfig } from '@libusoftcicom/lc-datepicker';
 import { Panel } from '@libusoftcicom/lc-datepicker/base-date-picker.class';
 import { DateTime } from '@libusoftcicom/lc-datepicker/date-time.class';
 import {ECalendarType} from '@libusoftcicom/lc-datepicker/enums';
 import {LCDatePickerAdapter} from '@libusoftcicom/lc-datepicker/lc-date-picker-adapter.class';
+import { Subscription } from 'rxjs';
 
 @Component({
 	selector: 'lc-app-root',
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit, OnDestroy {
 	public title = 'LC DatePicker';
 	public year = new Date().getFullYear();
-	public CalendarOpened = false;
-	public CalendarRangeOpened = false;
-	public config = new DatePickerConfig();
+	public dateConfig = new DatePickerConfig();
+	public dateRangeConfig: DatePickerConfig;
 
 	public inputDate: DateTime;
 	public inputRangeDateFrom: DateTime;
@@ -36,32 +36,34 @@ export class AppComponent implements OnDestroy {
 	@ViewChild('dateRangeInput', { static: true })
 	public dateRangeInput: ElementRef;
 
+  private readonly subscriptions: Subscription[] = [];
+
 	constructor(
 		private readonly renderer: Renderer2,
 		private readonly cd: ChangeDetectorRef,
 		private readonly dateAdapter: LCDatePickerAdapter,
 	) {
 
-		this.config.setCalendarType(ECalendarType.Date);
-		this.config.setLocalization('hr');
-		this.config.setActivePanel(Panel.Day);
-		this.config.setTimeFormat(false);
-		this.config.setTimezone('Europe/Zagreb');
+		this.dateConfig.setCalendarType(ECalendarType.Date);
+		this.dateConfig.setLocalization('hr');
+		this.dateConfig.setActivePanel(Panel.Day);
+		this.dateConfig.setTimeFormat(false);
+		this.dateConfig.setTimezone('Europe/Zagreb');
 
 		const minDate =
 			this.dateAdapter.subtract(
-				this.dateAdapter.subtract(this.dateAdapter.today(this.config.getTimezone()),
+				this.dateAdapter.subtract(this.dateAdapter.today(this.dateConfig.getTimezone()),
 					40, 'day'),
 				100, 'year');
 
 		const maxDate =
 			this.dateAdapter.add(
-				this.dateAdapter.add(this.dateAdapter.today(this.config.getTimezone()),
+				this.dateAdapter.add(this.dateAdapter.today(this.dateConfig.getTimezone()),
 					40, 'day'),
 				100, 'year');
 
-		this.config.setMinDate(minDate);
-		this.config.setMaxDate(maxDate);
+		this.dateConfig.setMinDate(minDate);
+		this.dateConfig.setMaxDate(maxDate);
 
 		// define range of unavailable dates
 		this.generateRandomDisabledDates();
@@ -69,102 +71,133 @@ export class AppComponent implements OnDestroy {
 		// define range of unavailable time
 		this.setDisabledTimeRanges();
 
-		this.config.labels = { confirmLabel: 'OK' };
+		this.dateConfig.labels = { confirmLabel: 'OK' };
 
-		this.config.theme.primaryColor = '#5e666f';
-		this.config.theme.fontColor = '#5e666f';
-		this.inputDate = this.dateAdapter.now(this.config.getTimezone());
-		this.inputRangeDateFrom = this.dateAdapter.today(this.config.getTimezone());
+		this.dateConfig.theme.primaryColor = '#5e666f';
+		this.dateConfig.theme.fontColor = '#5e666f';
+
+    this.dateRangeConfig = this.dateConfig.clone();
+
+		this.inputDate = this.dateAdapter.now(this.dateConfig.getTimezone());
+		this.inputRangeDateFrom = this.dateAdapter.today(this.dateConfig.getTimezone());
 		this.inputRangeDateTo = this.dateAdapter.add(this.inputRangeDateFrom, 1, 'day');
 
 		this.registerKeyNavigation();
 	}
 
-	public ngOnDestroy() {
-        this.cd.detach();
-    }
+  public ngOnInit(): void {
 
-	public toggleCalendarOpen(): void {
-		this.CalendarOpened = !this.CalendarOpened;
-		if (this.CalendarOpened) {
-			this.config.focus();
-		} else {
-			this.dateInput.nativeElement.click();
-			this.dateInput.nativeElement.select();
-		}
-        this.cd.detectChanges();
-	}
-	public toggleCalendarRangeOpen() {
-		this.CalendarRangeOpened = !this.CalendarRangeOpened;
-		if (this.CalendarRangeOpened) {
-			this.config.focus();
-		} else {
-			this.dateRangeInput.nativeElement.click();
-			this.dateRangeInput.nativeElement.select();
-		}
-        this.cd.detectChanges();
-	}
+    this.subscriptions.push(
+      this.dateConfig.getOpenChanges().subscribe((open) => {
+        if (open) {
+          this.dateConfig.focus();
+        } else {
+          this.dateInput.nativeElement.click();
+          this.dateInput.nativeElement.select();
+        }
+      })
+    );
 
-	public clearCalendar() {
+    this.subscriptions.push(
+      this.dateRangeConfig.getOpenChanges().subscribe((open) => {
+        if (open) {
+          this.dateRangeConfig.focus();
+        } else {
+          this.dateRangeInput.nativeElement.click();
+          this.dateRangeInput.nativeElement.select();
+        }
+      })
+    );
+  }
+
+	public ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+    this.subscriptions.length = 0;
+    this.cd.detach();
+  }
+
+  public openCalendar(): void {
+    this.dateConfig.setOpen(true);
+    this.dateConfig.focus();
+  }
+
+  public toggleCalendarOpen(): void {
+    this.dateConfig.setOpen(!this.dateConfig.isOpen());
+  }
+
+  public openCalendarRange(): void {
+    this.dateRangeConfig.setOpen(true);
+    this.dateRangeConfig.focus();
+  }
+
+	public clearCalendar(): void {
 		this.dateInput.nativeElement.value = '';
 	}
 
 	public updateLocalization(value): void {
-		this.config.setLocalization(value);
+		this.dateConfig.setLocalization(value);
+		this.dateRangeConfig.setLocalization(value);
 	}
 
 	public get CalendarType() {
-		return this.config.getCalendarType();
+		return this.dateConfig.getCalendarType();
 	}
 
 	public set CalendarType(value: ECalendarType) {
-		this.config.setCalendarType(1 * value);
+		this.dateConfig.setCalendarType(1 * value);
+		this.dateRangeConfig.setCalendarType(1 * value);
 	}
 	public get Localization() {
-		return this.config.getLocalization();
+		return this.dateConfig.getLocalization();
 	}
 
 	public set Localization(value: string) {
-		this.config.setLocalization(value);
+		this.dateConfig.setLocalization(value);
+		this.dateRangeConfig.setLocalization(value);
 	}
 
 	public get ConfirmLabel() {
-		return this.config.labels.confirmLabel;
+		return this.dateConfig.labels.confirmLabel;
 	}
 
 	public set ConfirmLabel(value: string) {
-		this.config.labels.confirmLabel = value;
+		this.dateConfig.labels.confirmLabel = value;
+		this.dateRangeConfig.labels.confirmLabel = value;
 	}
 
 	public get FromLabel() {
-		return this.config.fromLabel;
+		return this.dateConfig.fromLabel;
 	}
 
 	public set FromLabel(value: string) {
-		this.config.fromLabel = value;
+		this.dateConfig.fromLabel = value;
+		this.dateRangeConfig.fromLabel = value;
 	}
 	public get ToLabel() {
-		return this.config.toLabel;
+		return this.dateConfig.toLabel;
 	}
 
 	public set ToLabel(value: string) {
-		this.config.toLabel = value;
+		this.dateConfig.toLabel = value;
+		this.dateRangeConfig.toLabel = value;
 	}
 
 	public get PrimaryColor() {
-		return this.config.theme.primaryColor;
+		return this.dateConfig.theme.primaryColor;
 	}
 
 	public set PrimaryColor(value: string) {
-		this.config.theme.primaryColor = value;
+		this.dateConfig.theme.primaryColor = value;
+		this.dateRangeConfig.theme.primaryColor = value;
 	}
 
 	public get FontColor() {
-		return this.config.theme.fontColor;
+		return this.dateConfig.theme.fontColor;
 	}
 
 	public set FontColor(value: string) {
-		this.config.theme.fontColor = value;
+		this.dateConfig.theme.fontColor = value;
+		this.dateRangeConfig.theme.fontColor = value;
 	}
 
 	public setCalendarDate(dateTime: DateTime): void {
@@ -196,24 +229,24 @@ export class AppComponent implements OnDestroy {
 			.fill(null)
 			.map(() => {
 				const rand = Math.floor(Math.random() * (15 - -15) + -15);
-				return this.dateAdapter.add(this.dateAdapter.today(this.config.getTimezone()), rand, 'days');
+				return this.dateAdapter.add(this.dateAdapter.today(this.dateConfig.getTimezone()), rand, 'days');
 			});
 
-		this.config.setDisabledDates(this.randomDisabledDates);
+		this.dateConfig.setDisabledDates(this.randomDisabledDates);
 	}
 
 	private setDisabledTimeRanges() {
-		this.config.addDisabledTimeRange({
+		this.dateConfig.addDisabledTimeRange({
 			startTime: { hour: 0, minute: 0 },
 			stopTime: { hour: 7, minute: 59 },
 		});
 
-		this.config.addDisabledTimeRange({
+		this.dateConfig.addDisabledTimeRange({
 			startTime: { hour: 14, minute: 0 },
 			stopTime: { hour: 16, minute: 59 },
 		});
 
-		this.config.addDisabledTimeRange({
+		this.dateConfig.addDisabledTimeRange({
 			startTime: { hour: 21, minute: 0 },
 			stopTime: { hour: 23, minute: 59 },
 		});
@@ -225,7 +258,7 @@ export class AppComponent implements OnDestroy {
 	 */
 	private registerKeyNavigation(): void {
 		this.renderer.listen('document', 'keydown', (event: KeyboardEvent) => {
-			if (!this.config.isFocused()) {
+			if (!this.dateConfig.isFocused()) {
 				return;
 			}
 
@@ -240,33 +273,33 @@ export class AppComponent implements OnDestroy {
 			}
 
 			if (event.key === "ArrowUp") {
-				this.config.navigateUp();
+				this.dateConfig.navigateUp();
 			}
 			if (event.key === "ArrowDown") {
-				this.config.navigateDown();
+				this.dateConfig.navigateDown();
 			}
 
 			if (event.key === "ArrowRight" && !event.shiftKey) {
-				this.config.navigateRight();
+				this.dateConfig.navigateRight();
 			}
 
 			if (event.key === "ArrowLeft" && !event.shiftKey) {
-				this.config.navigateLeft();
+				this.dateConfig.navigateLeft();
 			}
 
 			if (event.key === "Enter") {
-				this.config.confirm();
+				this.dateConfig.confirm();
 			}
 
 			if (event.key === "Escape") {
-				this.config.close();
+				this.dateConfig.close();
 			}
 
 			if (event.key === "PageDown") {
-				this.config.nextPage();
+				this.dateConfig.nextPage();
 			}
 			if (event.key === "PageUp") {
-				this.config.previousPage();
+				this.dateConfig.previousPage();
 			}
 		});
 	}
@@ -276,25 +309,25 @@ export class AppComponent implements OnDestroy {
 	 */
 	private changePanelType(jump: number) {
 		const calendarKeys = Object.keys(ECalendarType).filter((val) => isNaN(parseInt(val)));
-		const currentIndex = calendarKeys.findIndex((type) => this.config.getCalendarType() === ECalendarType[type]);
+		const currentIndex = calendarKeys.findIndex((type) => this.dateConfig.getCalendarType() === ECalendarType[type]);
 
 		if (currentIndex + jump < calendarKeys.length && currentIndex + jump >= 0) {
-			this.CalendarOpened = false;
+			this.dateConfig.setOpen(false);
 			this.cd.detectChanges();
-			this.config.setCalendarType(ECalendarType[calendarKeys[currentIndex + jump]]);
-			this.CalendarOpened = true;
+			this.dateConfig.setCalendarType(ECalendarType[calendarKeys[currentIndex + jump]]);
+      this.dateConfig.setOpen(true);
 			this.cd.detectChanges();
 		} else if (currentIndex + jump >= calendarKeys.length) {
-			this.CalendarOpened = false;
+      this.dateConfig.setOpen(false);
 			this.cd.detectChanges();
-			this.config.setCalendarType(ECalendarType[calendarKeys[0]]);
-			this.CalendarOpened = true;
+			this.dateConfig.setCalendarType(ECalendarType[calendarKeys[0]]);
+      this.dateConfig.setOpen(true);
 			this.cd.detectChanges();
 		} else {
-			this.CalendarOpened = false;
+      this.dateConfig.setOpen(false);
 			this.cd.detectChanges();
-			this.config.setCalendarType(ECalendarType[calendarKeys[calendarKeys.length - 1]]);
-			this.CalendarOpened = true;
+			this.dateConfig.setCalendarType(ECalendarType[calendarKeys[calendarKeys.length - 1]]);
+      this.dateConfig.setOpen(true);
 			this.cd.detectChanges();
 		}
 	}

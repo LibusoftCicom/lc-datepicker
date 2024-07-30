@@ -61,7 +61,8 @@ export class DatePickerConfig {
     private readonly navigationChanged: Subject<ECalendarNavigation> = new Subject();
     private hostElement: HTMLElement = null;
 
-    private open: boolean = false;
+    private open = false;
+    private readonly openChanges: Subject<boolean> = new Subject();
     private activePanel: Panel;
     private timezone: string = 'UTC';
 
@@ -174,6 +175,7 @@ export class DatePickerConfig {
 
     public setOpen(open: boolean): void {
         this.open = open;
+        this.openChanges.next(this.open);
     }
 
     public setActivePanel(panel: Panel): void {
@@ -205,6 +207,10 @@ export class DatePickerConfig {
 
     public get navigationChanges(): Observable<ECalendarNavigation> {
         return this.navigationChanged.asObservable();
+    }
+
+    public getOpenChanges(): Observable<boolean> {
+        return this.openChanges.asObservable();
     }
 
     public navigateRight(): void {
@@ -258,6 +264,20 @@ export class DatePickerConfig {
 
     public  is24HourFormat() {
         return this.use24HourFormat;
+    }
+
+    public clone(): DatePickerConfig {
+        const config = new DatePickerConfig();
+        config.setCalendarType(this.calendarType);
+        config.setLocalization(this.localization);
+        config.setMinDate(this.minDate);
+        config.setMaxDate(this.maxDate);
+        config.setDisabledDates(this.disabledDates);
+        config.setTimezone(this.timezone);
+        config.theme = Object.assign(this.theme);
+        config.labels = Object.assign(this.labels);
+        config.setTimeFormat(this.use24HourFormat);
+        return config;
     }
 
     private isValidTime(time: ITime): boolean {

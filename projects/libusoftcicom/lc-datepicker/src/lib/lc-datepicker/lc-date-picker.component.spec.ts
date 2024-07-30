@@ -1,23 +1,23 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { LCDatePickerComponent } from './lc-date-picker.component';
-import { LCTimePickerComponent } from './time-picker/time-picker.component';
-import { LCTimePickerCompactComponent } from './time-picker-compact/time-picker-compact.component';
+import { LCTimePickerComponent } from '../time-picker/time-picker.component';
+import { LCTimePickerCompactComponent } from '../time-picker-compact/time-picker-compact.component';
 
-import { LCDayPickerComponent } from './day-picker/day-picker.component';
-import { LCMonthPickerComponent } from './month-picker/month-picker.component';
-import { LCYearPickerComponent } from './year-picker/year-picker.component';
-import { LCDatePickerAdapter } from './lc-date-picker-adapter.class';
-import { LuxonDateAdapterService } from '../../../../../src/app/luxon-date-adapter.service';
-import { LCConfirmButtonComponent } from './confirm-button.component';
-import { LCTimeSpinnerCompactComponent } from './time-picker-compact/time-spinner-compact.component';
-import { LCDayPickerButtonComponent } from './day-picker/day-picker-button.component';
-import { LCCalendarBackgroundComponent } from './calendar-background.component';
-import { Panel } from './base-date-picker.class';
-import {LCMonthPickerButtonComponent} from './month-picker/month-picker-button.component';
-import { DatePickerConfig } from './lc-date-picker-config-helper';
-import { ECalendarType } from './enums';
-import { DateTime } from './date-time.class';
+import { LCDayPickerComponent } from '../day-picker/day-picker.component';
+import { LCMonthPickerComponent } from '../month-picker/month-picker.component';
+import { LCYearPickerComponent } from '../year-picker/year-picker.component';
+import { LCDatePickerAdapter } from '../lc-date-picker-adapter.class';
+import { LuxonDateAdapterService } from '../../../../../../src/app/luxon-date-adapter.service';
+import { LCConfirmButtonComponent } from '../confirm-button/confirm-button.component';
+import { LCTimeSpinnerCompactComponent } from '../time-picker-compact/time-spinner-compact.component';
+import { LCDayPickerButtonComponent } from '../day-picker/day-picker-button.component';
+import { LCCalendarBackgroundComponent } from '../calendar-background/calendar-background.component';
+import { Panel } from '../base-date-picker.class';
+import {LCMonthPickerButtonComponent} from '../month-picker/month-picker-button.component';
+import { DatePickerConfig } from '../lc-date-picker-config-helper';
+import { ECalendarType } from '../enums';
+import { DateTime } from '../date-time.class';
 
 describe('LCDatePickerComponent', () => {
 	let component: LCDatePickerComponent;
