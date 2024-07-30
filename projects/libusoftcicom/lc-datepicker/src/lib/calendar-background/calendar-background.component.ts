@@ -1,12 +1,15 @@
 import {
-    ChangeDetectionStrategy,
-    Component, ElementRef,
-    EventEmitter,
-    NgZone,
-    OnDestroy, OnInit,
-    Output, ViewChild,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Input,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  ViewChild
 } from '@angular/core';
-import {fromEvent, Subscription} from 'rxjs';
+import { fromEvent, Subscription } from 'rxjs';
+import { DatePickerConfig } from '../lc-date-picker-config-helper';
 
 @Component({
     selector: 'lc-calendar-background',
@@ -18,10 +21,11 @@ export class LCCalendarBackgroundComponent implements OnInit, OnDestroy {
 
     private subscription: Subscription;
 
-    @Output() public closed: EventEmitter<void> = new EventEmitter<void>();
-
     @ViewChild('calendarBackground', { static: true })
     public calendarBackgroundElement: ElementRef<HTMLDivElement>;
+
+    @Input()
+    public config: DatePickerConfig;
 
     constructor(
         private readonly ngZone: NgZone,
@@ -42,7 +46,7 @@ export class LCCalendarBackgroundComponent implements OnInit, OnDestroy {
                 this.calendarBackgroundElement.nativeElement,
                 'click'
             ).subscribe(() => {
-                this.closed.emit();
+                this.config.setOpen(false);
             });
     }
 }

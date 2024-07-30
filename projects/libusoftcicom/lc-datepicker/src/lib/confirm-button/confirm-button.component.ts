@@ -8,7 +8,7 @@ import {
     Output, Renderer2, ViewChild,
 } from '@angular/core';
 import {fromEvent, Subscription} from 'rxjs';
-import {DatePickerConfig} from './lc-date-picker-config-helper';
+import {DatePickerConfig} from '../lc-date-picker-config-helper';
 
 @Component({
     selector: 'lc-confirm-button',

@@ -1,7 +1,5 @@
-<div [ngSwitch]="activePanelFrom" class="calendar">
-    <div #labelFrom class="dateRangeLabel">
-        {{ config.fromLabel }}
-    </div>
+<div [ngSwitch]="activePanelFrom" class="calendar" *ngIf="opened">
+    <lc-header [headerLabel]="config.fromLabel" [backgroundColor]="config.theme.primaryColor"></lc-header>
     <lc-year-picker
             *ngSwitchCase="3"
             [value]="selectedDateTimeFrom"
@@ -31,10 +29,8 @@
             (switchPanel)="onSwitchPanel(DateType.From, $event)"
     ></lc-day-picker>
 </div>
-<div [ngSwitch]="activePanelTo" class="calendar">
-    <div #labelTo class="dateRangeLabel">
-        {{ config.toLabel }}
-    </div>
+<div [ngSwitch]="activePanelTo" class="calendar" *ngIf="opened">
+    <lc-header [headerLabel]="config.toLabel" [backgroundColor]="config.theme.primaryColor"></lc-header>
     <lc-year-picker
             *ngSwitchCase="3"
             [value]="selectedDateTimeTo"
@@ -64,5 +60,5 @@
             (switchPanel)="onSwitchPanel(DateType.To, $event)"
     ></lc-day-picker>
 </div>
-<lc-confirm-button [config]="config" (confirmed)="confirm()"></lc-confirm-button>
-<lc-calendar-background (closed)="close()"></lc-calendar-background>
+<lc-confirm-button [config]="config" (confirmed)="confirm()" *ngIf="opened"></lc-confirm-button>
+<lc-calendar-background [config]="config" *ngIf="opened"></lc-calendar-background>

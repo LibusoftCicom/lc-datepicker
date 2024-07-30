@@ -11,7 +11,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <a href="http://www.spi.hr" target="_blank"><img src="./assets/logo.png" alt="Libusoft Cicom logo"/></a>
-    <a class="navbar-brand" href="#" *ngIf="CalendarOpened">LC DatePicker</a>
+    <a class="navbar-brand" href="#">LC DatePicker</a>
 </nav>
 
 <!-- Main jumbotron for a primary marketing message or call to action -->
@@ -39,7 +39,7 @@
                     <div>
                         <ul>
                             <li>LC DatePicker is an Angular component that generates a datepicker calendar on your input element</li>
-                            <li>Compatible with Angular 2+ up to Angular v16.0.0</li>
+                            <li>Compatible with Angular 2+ up to Angular v17.0.0</li>
                             <li>Only dependencies are RxJS and Font Awesome</li>
                             <li>Customizable language</li>
                             <li>Can be configured as time, date-time, date, month or year picker</li>
@@ -122,8 +122,6 @@
 
                                 &nbsp;public config = new DatePickerConfig();<br />
                                 &nbsp;public inputDate: DateTime;<br />
-                                &nbsp;public CalendarOpened = false;<br />
-                                &nbsp;public CalendarRangeOpened = false;<br />
                                 <br />
                                 &nbsp;constructor(<br />
                                 &nbsp;&nbsp;private readonly dateAdapter: LCDatePickerAdapter,<br />
@@ -139,13 +137,6 @@
                                 &nbsp;public setCalendarDate(dateTime: DateTime): void &#123;<br />
                                 &nbsp;&nbsp;this.dateInput.nativeElement.value = this.dateAdapter.toISOString(dateTime);<br />
                                 &nbsp;&#125;<br />
-
-
-                                &nbsp;public toggleCalendarOpen(): void &#123;<br />
-                                &nbsp;&nbsp;this.CalendarOpened = !this.CalendarOpened;<br />
-                                &nbsp;&nbsp;...<br />
-                                &nbsp;&#125;<br />
-                                &#125;
                             </code>
                         </li>
                         <li>
@@ -154,8 +145,6 @@
                                 &lt;lc-datepicker<br/>
                                 &nbsp;&nbsp;[value]="inputDate"<br/>
                                 &nbsp;&nbsp;[config]="config"<br/>
-                                &nbsp;&nbsp;*ngIf="CalendarOpened"<br/>
-                                &nbsp;&nbsp;(openedChange)="toggleCalendarOpen()"<br/>
                                 &nbsp;&nbsp;(dateChange)="setCalendarDate($event)"&gt;<br/>
                                 &lt;/lc-datepicker&gt;
                             </code>
@@ -165,8 +154,6 @@
                                 &nbsp;&nbsp;[valueFrom]="inputRangeDateFrom"<br />
                                 &nbsp;&nbsp;[valueTo]="inputRangeDateTo"<br />
                                 &nbsp;&nbsp;[config]="config"<br />
-                                &nbsp;&nbsp;*ngIf="CalendarRangeOpened"<br />
-                                &nbsp;&nbsp;(openedChange)="toggleCalendarRangeOpen()"<br />
                                 &nbsp;&nbsp;(dateChange)="setCalendarDateRange($event)"&gt;<br />
                                 &lt;/lc-date-range-picker&gt;
                             </code>
@@ -189,16 +176,14 @@
                     <div class="input-group">
                         <input type="text" class="form-control" #dateInput />
                         <span class="input-group-btn">
-              <button class="btn btn-secondary" type="button" (click)="toggleCalendarOpen()">
+              <button class="btn btn-secondary" type="button" (click)="openCalendar()">
                 <i class="fa fa-calendar" aria-hidden="true"></i>
               </button>
             </span>
                     </div>
                     <lc-datepicker
                             [value]="inputDate"
-                            [config]="config"
-                            *ngIf="CalendarOpened"
-                            (openedChange)="toggleCalendarOpen()"
+                            [config]="dateConfig"
                             (dateChange)="setCalendarDate($event)">
                     </lc-datepicker>
                 </div>
@@ -207,7 +192,7 @@
                     <div class="input-group">
                         <input type="text" class="form-control" #dateRangeInput />
                         <span class="input-group-btn">
-              <button class="btn btn-secondary" type="button" (click)="toggleCalendarRangeOpen()">
+              <button class="btn btn-secondary" type="button" (click)="openCalendarRange()">
                 <i class="fa fa-calendar" aria-hidden="true"></i>
               </button>
             </span>
@@ -215,9 +200,7 @@
                     <lc-date-range-picker
                             [valueFrom]="inputRangeDateFrom"
                             [valueTo]="inputRangeDateTo"
-                            [config]="config"
-                            *ngIf="CalendarRangeOpened"
-                            (openedChange)="toggleCalendarRangeOpen()"
+                            [config]="dateRangeConfig"
                             (dateChange)="setCalendarDateRange($event)">
                     </lc-date-range-picker>
                 </div>
@@ -259,7 +242,7 @@
                         <select class="form-control col-sm-12" id="inlineFormCustomSelect" [(ngModel)]="CalendarType">
                             <option [attr.value]="0">Time picker</option>
                             <option [attr.value]="1">DateTime picker</option>
-                            <option selected [attr.value]="2">Date picker</option>
+                            <option [attr.value]="2">Date picker</option>
                             <option [attr.value]="3">Month picker</option>
                             <option [attr.value]="4">Year picker</option>
                         </select>

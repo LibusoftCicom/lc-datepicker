@@ -1,4 +1,4 @@
-<div [ngSwitch]="activePanel" class="calendar">
+<div [ngSwitch]="activePanel" class="calendar" *ngIf="opened">
     <lc-year-picker
             *ngSwitchCase="3"
             (selected)="onYearSelected($event)"
@@ -45,4 +45,4 @@
     </div>
     <lc-confirm-button *ngIf="calendarType <= 1" [config]="config" (confirmed)="confirm()"></lc-confirm-button>
 </div>
-<lc-calendar-background (closed)="close()"></lc-calendar-background>
+<lc-calendar-background [config]="config" *ngIf="opened"></lc-calendar-background>

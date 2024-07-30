@@ -1,23 +1,23 @@
 import {
-    AfterViewInit,
-    ChangeDetectionStrategy,
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    EventEmitter,
-    HostBinding,
-    Input,
-    OnDestroy,
-    OnInit,
-    Output,
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostBinding,
+  Input, OnChanges,
+  OnDestroy,
+  OnInit,
+  Output, SimpleChanges
 } from '@angular/core';
-import { DatePickerConfig } from './lc-date-picker-config-helper';
+import { DatePickerConfig } from '../lc-date-picker-config-helper';
 import { Subscription } from 'rxjs';
-import { DateTime } from './date-time.class';
-import {DatePicker} from './date-picker.class';
-import { Panel } from './base-date-picker.class';
-import { LCDatePickerAdapter } from './lc-date-picker-adapter.class';
-import {ECalendarType, ECalendarNavigation} from './enums';
+import { DateTime } from '../date-time.class';
+import {DatePicker} from '../date-picker.class';
+import { Panel } from '../base-date-picker.class';
+import { LCDatePickerAdapter } from '../lc-date-picker-adapter.class';
+import {ECalendarType, ECalendarNavigation} from '../enums';
 
 @Component({
     selector: 'lc-datepicker',
@@ -30,6 +30,7 @@ export class LCDatePickerComponent implements OnInit, AfterViewInit, OnDestroy {
     public activePanel: Panel;
     public selectedDateTime: DateTime;
     public calendarType: ECalendarType;
+    public opened = false;
 
     private datePicker: DatePicker;
 
@@ -41,7 +42,6 @@ export class LCDatePickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     @Input() public value: DateTime;
     @Input() public config: DatePickerConfig;
-    @Output() public openedChange: EventEmitter<void> = new EventEmitter<void>();
     @Output() public dateChange: EventEmitter<DateTime> = new EventEmitter<DateTime>();
 
     private readonly subscriptions: Subscription[] = [];
@@ -56,6 +56,7 @@ export class LCDatePickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.config.setHostElement(this._elementRef.nativeElement);
         this.initCalendar();
+        this.setupSubscriptions();
     }
 
     public ngAfterViewInit(): void {
@@ -188,11 +189,7 @@ export class LCDatePickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     public confirm(): void {
         this.dateChange.emit(this.selectedDateTime);
-        this.openedChange.emit();
-    }
-
-    public close(): void {
-        this.openedChange.emit();
+        this.config.setOpen(false);
     }
 
     private getActivePanel(): Panel {
@@ -206,19 +203,46 @@ export class LCDatePickerComponent implements OnInit, AfterViewInit, OnDestroy {
         this.activePanel = this.getActivePanel();
         this.selectedDateTime =
             this.dateAdapter.setParts(this.value, {second: 0, millisecond: 0});
+    }
 
-        this.subscriptions.push(this.config.navigationChanges.subscribe((dir) => this.navigation(dir)));
-        this.subscriptions.push(
-            this.datePicker.panelChanges.subscribe((type) => {
-                this.activePanel = type;
-                this.cd.detectChanges();
-            })
-        );
+    private setupSubscriptions(): void {
+
+      this.subscriptions.push(
+        this.config.navigationChanges.subscribe((dir) => this.navigation(dir))
+      );
+
+      this.subscriptions.push(
+        this.datePicker.panelChanges.subscribe((type) => {
+          this.activePanel = type;
+          this.cd.detectChanges();
+        })
+      );
+
+      this.subscriptions.push(
+        this.config.getOpenChanges().subscribe((open) => {
+          this.opened = open;
+
+          if (this.opened) {
+
+            const windowHeight = window.innerHeight;
+            const componentPosition = this._elementRef.nativeElement.parentNode.getBoundingClientRect();
+            if (windowHeight - componentPosition.top > this.calendarSize(this.calendarType)) {
+              this.componentMargin = 0;
+            } else {
+              this.componentMargin = this.calendarSize(this.calendarType) * -1 + 'px';
+            }
+
+            this.initCalendar();
+          }
+
+          this.cd.detectChanges();
+        })
+      );
     }
 
     private navigation(dir: ECalendarNavigation): void {
         if (dir === ECalendarNavigation.Close) {
-            this.close();
+            this.config.setOpen(false);
         }
     }
 
