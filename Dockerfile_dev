@@ -1,7 +1,9 @@
 FROM node:20.15.1-bullseye-slim
 
-# dumb-init is need to correctly kill the container
-RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
+# dumb-init is needed to correctly kill the container
+RUN apt-get update  \
+    && apt-get install -y --no-install-recommends dumb-init \
+    && apt-get install -y --no-install-recommends curl
 
 RUN npm i -g @angular/cli@18.0.0
 
