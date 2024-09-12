@@ -1,64 +1,14 @@
 <div [ngSwitch]="activePanelFrom" class="calendar" *ngIf="opened">
-    <lc-header [headerLabel]="config.fromLabel" [backgroundColor]="config.theme.primaryColor"></lc-header>
-    <lc-year-picker
-            *ngSwitchCase="3"
-            [value]="selectedDateTimeFrom"
-            (selected)="onYearSelected(DateType.From, $event)"
-            (dateChanged)="onYearChanged(DateType.From, $event)"
-            (reset)="onReset(DateType.From)"
-            [config]="config"
-    ></lc-year-picker>
-
-    <lc-month-picker
-            *ngSwitchCase="2"
-            [value]="selectedDateTimeFrom"
-            (selected)="onMonthSelected(DateType.From, $event)"
-            (dateChanged)="onMonthChanged(DateType.From, $event)"
-            (reset)="onReset(DateType.From)"
-            [config]="config"
-            (switchPanel)="onSwitchPanel(DateType.From, $event)"
-    ></lc-month-picker>
-
-    <lc-day-picker
-            *ngSwitchCase="1"
-            [value]="selectedDateTimeFrom"
-            (selected)="onDaySelected(DateType.From, $event)"
-            (dateChanged)="onDayChanged(DateType.From, $event)"
-            (reset)="onReset(DateType.From)"
-            [config]="config"
-            (switchPanel)="onSwitchPanel(DateType.From, $event)"
-    ></lc-day-picker>
+    <lc-header [headerLabel]="fromControl.getLabels().fromLabel" [backgroundColor]="fromControl.getTheme().primaryColor"></lc-header>
+    <lc-year-picker *ngSwitchCase="3" [control]="fromControl"></lc-year-picker>
+    <lc-month-picker *ngSwitchCase="2" [control]="fromControl"></lc-month-picker>
+    <lc-day-picker *ngSwitchCase="1" [control]="fromControl"></lc-day-picker>
 </div>
 <div [ngSwitch]="activePanelTo" class="calendar" *ngIf="opened">
-    <lc-header [headerLabel]="config.toLabel" [backgroundColor]="config.theme.primaryColor"></lc-header>
-    <lc-year-picker
-            *ngSwitchCase="3"
-            [value]="selectedDateTimeTo"
-            (selected)="onYearSelected(DateType.To, $event)"
-            (dateChanged)="onYearChanged(DateType.To, $event)"
-            (reset)="onReset(DateType.To)"
-            [config]="config"
-    ></lc-year-picker>
-
-    <lc-month-picker
-            *ngSwitchCase="2"
-            [value]="selectedDateTimeTo"
-            (selected)="onMonthSelected(DateType.To, $event)"
-            (dateChanged)="onMonthChanged(DateType.To, $event)"
-            (reset)="onReset(DateType.To)"
-            [config]="config"
-            (switchPanel)="onSwitchPanel(DateType.To, $event)"
-    ></lc-month-picker>
-
-    <lc-day-picker
-            *ngSwitchCase="1"
-            [value]="selectedDateTimeTo"
-            (selected)="onDaySelected(DateType.To, $event)"
-            (dateChanged)="onDayChanged(DateType.To, $event)"
-            (reset)="onReset(DateType.To)"
-            [config]="config"
-            (switchPanel)="onSwitchPanel(DateType.To, $event)"
-    ></lc-day-picker>
+    <lc-header [headerLabel]="toControl.getLabels().toLabel" [backgroundColor]="toControl.getTheme().primaryColor"></lc-header>
+    <lc-year-picker *ngSwitchCase="3" [control]="toControl"></lc-year-picker>
+    <lc-month-picker *ngSwitchCase="2" [control]="toControl"></lc-month-picker>
+    <lc-day-picker *ngSwitchCase="1" [control]="toControl"></lc-day-picker>
 </div>
-<lc-confirm-button [config]="config" (confirmed)="confirm()" *ngIf="opened"></lc-confirm-button>
-<lc-calendar-background [config]="config" *ngIf="opened"></lc-calendar-background>
+<lc-confirm-button *ngIf="opened" [control]="fromControl" (confirmed)="confirm()"></lc-confirm-button>
+<lc-calendar-background *ngIf="opened" [control]="fromControl"></lc-calendar-background>

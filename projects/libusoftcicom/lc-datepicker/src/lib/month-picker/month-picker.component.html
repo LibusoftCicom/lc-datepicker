@@ -14,7 +14,7 @@
   <tbody>
   <tr *ngFor="let row of calendarData; let i = index">
     <td #items *ngFor="let item of row; let j = index">
-      <lc-month-picker-button [item]="item" [row]="i" [column]="j" [config]="config" (selected)="selectItem($event)"></lc-month-picker-button>
+      <lc-month-picker-button [control]="control" [item]="item" [row]="i" [column]="j"></lc-month-picker-button>
     </td>
   </tr>
   </tbody>

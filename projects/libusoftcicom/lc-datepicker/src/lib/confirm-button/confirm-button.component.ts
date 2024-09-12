@@ -1,55 +1,63 @@
 import {
-    ChangeDetectionStrategy,
-    Component, ElementRef,
-    EventEmitter,
-    Input,
-    NgZone,
-    OnDestroy, OnInit,
-    Output, Renderer2, ViewChild,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter, Input,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  Output,
+  Renderer2,
+  ViewChild
 } from '@angular/core';
-import {fromEvent, Subscription} from 'rxjs';
-import {DatePickerConfig} from '../lc-date-picker-config-helper';
+import { fromEvent, Subscription } from 'rxjs';
+import { LCDatePickerControl } from '../lc-date-picker-control';
 
 @Component({
-    selector: 'lc-confirm-button',
-    templateUrl: 'confirm-button.component.html',
-    styleUrls: ['./confirm-button.component.style.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'lc-confirm-button',
+  templateUrl: 'confirm-button.component.html',
+  styleUrls: ['./confirm-button.component.style.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LCConfirmButtonComponent implements OnInit, OnDestroy {
 
-    private subscription: Subscription;
+  private subscription: Subscription;
 
-    @Input() public config: DatePickerConfig;
-    @Output() public confirmed: EventEmitter<void> = new EventEmitter<void>();
+  @Input() public control: LCDatePickerControl;
 
-    @ViewChild('confirmButton', { static: true })
-    public confirmButtonElement: ElementRef<HTMLButtonElement>;
+  @Output() public confirmed: EventEmitter<void> = new EventEmitter<void>();
 
-    constructor(
-        private readonly ngZone: NgZone,
-        private readonly renderer: Renderer2,
-    ) {}
+  @ViewChild('confirmButton', { static: true })
+  public confirmButtonElement: ElementRef<HTMLButtonElement>;
 
-    public ngOnInit(): void {
-        this.ngZone.runOutsideAngular(() => this.registerViewEvents());
-        this.setStyles();
-    }
+  constructor(
+    private readonly ngZone: NgZone,
+    private readonly renderer: Renderer2,
+  ) {}
 
-    public ngOnDestroy(): void {
-        this.subscription.unsubscribe();
-    }
+  public ngOnInit(): void {
+    this.ngZone.runOutsideAngular(() => this.registerViewEvents());
+    this.setStyles();
+  }
 
-    private registerViewEvents(): void {
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 
-        this.subscription =
-            fromEvent<PointerEvent>(this.confirmButtonElement.nativeElement, 'click')
-            .subscribe(() => {
-            this.confirmed.emit();
+  private registerViewEvents(): void {
+
+    this.subscription =
+      fromEvent<PointerEvent>(this.confirmButtonElement.nativeElement, 'click')
+        .subscribe(() => {
+          this.control.setValue(
+            this.control.getValue(),
+            true
+          );
+          this.confirmed.emit();
         });
-    }
+  }
 
-    private setStyles(): void {
-        this.renderer.setStyle(this.confirmButtonElement.nativeElement, 'background', this.config.theme.primaryColor);
-    }
+  private setStyles(): void {
+    this.renderer.setStyle(this.confirmButtonElement.nativeElement, 'background', this.control.getTheme().primaryColor);
+  }
 }

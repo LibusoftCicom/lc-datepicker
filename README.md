@@ -15,7 +15,7 @@
 # Description
 
 - LC DatePicker is an Angular component that generates a datepicker calendar on your input element
-- Compatible with Angular up to v16.0.0
+- Compatible with Angular up to v18.0.0
 - Only dependencies are RxJS and Font Awesome
 - Customizable date format and language
 - Can be configured as time, date-time, date, month or year picker
@@ -25,7 +25,6 @@
 - Firefox (latest)
 - Chrome (latest)
 - Chromium (latest)
-- Edge
 
 ## Installing / Getting started
 
@@ -67,30 +66,64 @@ import {DatePickerConfig, ECalendarType} from '@libusoftcicom/lc-datepicker';
 })
 export class AppComponent {
 
-  public config = new DatePickerConfig();
   public inputDate: DateTime;
-  public CalendarOpened = false;
-  public CalendarRangeOpened = false;
+  public datePickerConfig: DatePickerConfig;
+	public dateRangePickerConfig: DatePickerConfig;
 
   constructor(
     private readonly dateAdapter: LCDatePickerAdapter,
     ...
   ) {
 
-    // configuration is optional
-    this.config.setCalendarType(ECalendarType.Date);
-    this.config.setLocalization('en');
-    this.inputDate = this.dateAdapter.now(this.config.getTimezone());
-    ...
+   const timezone = 'Europe/Zagreb';
+   // For dates use ISO 8601 formatted strings, e.g. 2024-09-12T22:00:00.000Z
+   // For LCDateRangePickerComponent separate the first and second date using /,
+   // e.g. 2024-09-12T22:00:00.000Z/2024-09-13T22:00:00.000Z
+   this.inputDate = this.dateAdapter.toISOString(this.dateAdapter.now(timezone));
+   // configuration is optional, except for the value.
+   // Other properties will be given default values.
+   const datePickerConfiguration: IDatePickerConfiguration = {
+     value: this.inputDate,
+     calendarType: ECalendarType.Date,
+     localization: 'hr',
+     hourFormat: EHourFormat.TWENTY_FOUR_HOUR,
+     timezone: timezone,
+     minimumDate: minDate,
+     maximumDate: maxDate,
+     disabledDates: [
+       2024-09-12T22:00:00.000Z
+       // ...
+     ],
+     disabledTimeRanges: [
+       {startTime: {hour: 0, minute: 0}, stopTime: {hour: 7, minute: 59}}
+       // ...
+     ]
+     labels: { confirmLabel: 'OK', fromLabel: 'From', toLabel: 'To' },
+     theme: { primaryColor: '#5e666f', fontColor: '#5e666f' }
+   };
+   this.datePickerConfig = new DatePickerConfig(datePickerConfiguration, this.dateAdapter);
+   
+   const today = this.dateAdapter.today(timezone);
+
+    const dateRangePickerConfiguration = {
+      ...Object.assign(datePickerConfiguration),
+      value: this.dateAdapter.toISOString(today) + '/' + this.dateAdapter.toISOString(this.dateAdapter.add(today, 1, 'day')),
+      calendarType: ECalendarType.DateRange
+    };
+
+    this.dateRangePickerConfig = new DatePickerConfig(dateRangePickerConfiguration, this.dateAdapter);
+   ...
   }
 
-  public setCalendarDate(dateTime: DateTime): void {
-    this.dateInput.nativeElement.value = this.dateAdapter.toISOString(dateTime);
+  public setCalendarDate(dateTime: string): void {
+   this.dateInput.nativeElement.value = dateTime;
   }
-
-  public toggleCalendarOpen(): void {
-    this.CalendarOpened = !this.CalendarOpened;
-    ...
+  
+  public setDatePickerOpen(open: boolean): void {
+    if (!open) {
+      this.dateInput.nativeElement.click();
+      this.dateInput.nativeElement.select();
+    }
   }
 ```
 
@@ -98,10 +131,8 @@ Use the following snippet inside your template for date-picker:
 
 ```shell
 <lc-datepicker
-   [value]="inputDate"
-   [config]="config"
-   *ngIf="CalendarOpened"
-   (openedChange)="toggleCalendarOpen()"
+   [config]="datePickerConfig"
+   (openedChange)="setDatePickerOpen($event)"
    (dateChange)="setCalendarDate($event)">
  </lc-datepicker>
 ```
@@ -110,29 +141,27 @@ Use the following snippet inside your template for date-range-picker:
 
 ```shell
 <lc-date-range-picker
-   [valueFrom]="inputRangeDateFrom"
-   [valueTo]="inputRangeDateTo"
-   [config]="config"
-   *ngIf="CalendarRangeOpened"
-   (openedChange)="toggleCalendarRangeOpen()"
+   [config]="dateRangePickerConfig"
+   (openedChange)="setDateRangePickerOpen($event)"
    (dateChange)="setCalendarDateRange($event)">
  </lc-date-range-picker> 
 ```
 
-## DatePicker config parameters
+## IDatePickerConfiguration properties
 
-- confirmLabel: string
-- primaryColor: string
+- value: string;
+- calendarType?: ECalendarType
+- theme?: IColorTheme
 - fontColor: string
-- setCalendarType(ECalendarType)
-- setLocalization(string)
-- setActivePanel(Panel)
-- setTimeFormat(boolean)
-- setTimezone(string)
-- setMinDate(DateTime)
-- setMaxDate(DateTime)
-- setDisabledDates(DateTime[])
-- addDisabledTimeRange(ITime)
+- labels?: ILabels
+- hourFormat?: EHourFormat
+- localization?: string
+- minimumDate?: string
+- maximumDate?: string
+- disabledDates?: string[]
+- disabledTimeRanges?: IDisabledTimeRange[]
+- timezone?: string
+- open?: boolean
 
 ## Developing
 
@@ -143,7 +172,7 @@ Use the following snippet inside your template for date-range-picker:
 
 ### Setting up Dev
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.1.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.0.
 
 [Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
 
@@ -162,7 +191,7 @@ Open "http://localhost:4200" in browser
 
 ### Building
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.1.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.0.
 
 [Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
 
@@ -183,7 +212,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Tests
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.1.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.0.
 
 [Angular CLI](https://github.com/angular/angular-cli) must be installed before building LC DatePicker component.
 

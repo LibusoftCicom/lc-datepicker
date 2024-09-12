@@ -9,10 +9,35 @@
     </thead>
     <tbody>
     <tr>
-        <td class="pullRight"><lc-time-spinner [value]="formattedHour" [config]="config" (incremented)="addHour()" (decremented)="subtractHour()" (scrolled)="hourScroll($event)"></lc-time-spinner></td>
+        <td class="pullRight">
+          <lc-time-spinner
+            [value]="formattedHour"
+            [control]="control"
+            (incremented)="addHour()"
+            (decremented)="subtractHour()"
+            (scrolled)="hourScroll($event)">
+          </lc-time-spinner>
+        </td>
         <td class="divider">:</td>
-        <td class="pullLeft"><lc-time-spinner [value]="formattedMinute" [config]="config" (incremented)="addMinute()" (decremented)="subtractMinute()" (scrolled)="minuteScroll($event)"></lc-time-spinner></td>
-        <td><lc-time-spinner *ngIf="!is24HourFormat" [value]="formattedAMPM" [config]="config" (incremented)="toggleMeridiem()" (decremented)="toggleMeridiem()" (scrolled)="scrollMeridiem($event)"></lc-time-spinner></td>
+        <td class="pullLeft">
+          <lc-time-spinner
+            [value]="formattedMinute"
+            [control]="control"
+            (incremented)="addMinute()"
+            (decremented)="subtractMinute()"
+            (scrolled)="minuteScroll($event)">
+          </lc-time-spinner>
+        </td>
+        <td>
+          <lc-time-spinner
+            *ngIf="hourFormat === EHourFormat.TWELVE_HOUR"
+            [value]="formattedAMPM"
+            [control]="control"
+            (incremented)="toggleMeridiem()"
+            (decremented)="toggleMeridiem()"
+            (scrolled)="scrollMeridiem($event)">
+          </lc-time-spinner>
+        </td>
     </tr>
     </tbody>
 </table>

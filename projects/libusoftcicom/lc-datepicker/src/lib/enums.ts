@@ -17,3 +17,14 @@ export enum ECalendarNavigation {
     Confirm,
     Close
 }
+
+export enum EHourFormat {
+  TWENTY_FOUR_HOUR,
+  TWELVE_HOUR
+}
+
+export enum DateType {
+  REGULAR,
+  FROM,
+  TO,
+}

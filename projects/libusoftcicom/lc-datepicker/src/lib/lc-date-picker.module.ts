@@ -54,7 +54,8 @@ export class LcDatePickerModule {
 	}
 }
 
-export * from './lc-date-picker-config-helper';
+export * from './lc-date-picker-config';
+export * from './lc-date-picker-control';
 export * from './lc-datepicker/lc-date-picker.component';
 export * from './lc-date-range-picker/lc-date-range-picker.component';
 export * from './date-time.class';

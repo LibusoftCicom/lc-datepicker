@@ -13,11 +13,11 @@ import { LCConfirmButtonComponent } from '../confirm-button/confirm-button.compo
 import { LCTimeSpinnerCompactComponent } from '../time-picker-compact/time-spinner-compact.component';
 import { LCDayPickerButtonComponent } from '../day-picker/day-picker-button.component';
 import { LCCalendarBackgroundComponent } from '../calendar-background/calendar-background.component';
-import { Panel } from '../base-date-picker.class';
-import {LCMonthPickerButtonComponent} from '../month-picker/month-picker-button.component';
-import { DatePickerConfig } from '../lc-date-picker-config-helper';
+import { LCMonthPickerButtonComponent } from '../month-picker/month-picker-button.component';
 import { ECalendarType } from '../enums';
-import { DateTime } from '../date-time.class';
+import { Panel } from '../base-date-picker.class';
+import { IDatePickerConfiguration } from '../lc-date-picker-control';
+import { DatePickerConfig } from '../lc-date-picker-config';
 
 describe('LCDatePickerComponent', () => {
 	let component: LCDatePickerComponent;
@@ -53,14 +53,18 @@ describe('LCDatePickerComponent', () => {
 				component = fixture.componentInstance;
 				const today = dateAdapter.today();
 
-				component.config = new DatePickerConfig();
-				component.config.setCalendarType(ECalendarType.DateTime);
-				component.config.setLocalization('hr');
-				component.config.setMinDate(dateAdapter.setParts(dateAdapter.getStartOfYear(today), { year: 1900 }));
-				component.config.setMaxDate(dateAdapter.setParts(dateAdapter.getStartOfYear(today), { year: 2099 }));
-				component.config.labels = { confirmLabel: 'Odabir' };
+        const config:IDatePickerConfiguration = {
+          value: dateAdapter.toISOString(today),
+          calendarType: ECalendarType.DateTime,
+          localization: 'hr',
+          minimumDate: dateAdapter.toISOString(dateAdapter.setParts(dateAdapter.getStartOfYear(today), {year: 1900})),
+          maximumDate: dateAdapter.toISOString(dateAdapter.setParts(dateAdapter.getStartOfYear(today), {year: 2099})),
+          labels: {confirmLabel: 'Odabir'}
+        };
 
-				component.value = today;
+        component.config = new DatePickerConfig(config, dateAdapter);
+
+        component.config.setHostElement(fixture.nativeElement);
 
 				fixture.detectChanges();
 			});
@@ -71,40 +75,28 @@ describe('LCDatePickerComponent', () => {
 	});
 
 	it('should set init date', () => {
-		const date = dateAdapter.now();
-		component.value = date;
-		expect(dateAdapter.toISOString(component.getValue())).toBe(dateAdapter.toISOString(date));
+		const date = dateAdapter.toISOString(dateAdapter.now());
+		component.config.setValue(date);
+		expect(component.config.getValue()).toBe(date);
 	});
 
-	it('should set new date on dayPicker click', () => {
-		const newDate = dateAdapter.add(dateAdapter.now(), 1, 'day');
-		component.onDaySelected(newDate);
-		expect(dateAdapter.toISOString(component.getSelectedDateTime())).toBe(dateAdapter.toISOString(newDate));
-	});
-
-	it('should set new month on monthPicker click', () => {
-		const newDate = dateAdapter.setParts(dateAdapter.now(), { month: 1, date: 1 });
-		component.onMonthSelected(newDate);
-		expect(component.getSelectedDateTime().getMonth()).toBe(newDate.getMonth());
-	});
-
-	it('should set new year on yearPicker click', () => {
-		const newDate = dateAdapter.setParts(dateAdapter.now(), { month: 1, date: 1, year: 2016 });
-		component.onYearSelected(newDate);
-		expect(component.getSelectedDateTime().getYear()).toBe(newDate.getYear());
+	it('should set new date on click', () => {
+		const newDate = dateAdapter.toISOString(dateAdapter.add(dateAdapter.now(), 1, 'day'));
+		component.config.setValue(newDate);
+		expect(component.config.getValue()).toBe(newDate);
 	});
 
 	it('should switch on Month panel on click', () => {
-		component.onSwitchPanel(Panel.Month);
-		expect(component.activePanel).toBe(Panel.Month);
+		component.config.setCalendarType(ECalendarType.MonthYear);
+		expect(component.config.getPanel()).toBe(Panel.Month);
 	});
 
 	it('should emit date on click', () => {
-	    const date = dateAdapter.setParts(dateAdapter.today(), {hour: 5, minute: 45});
-	    component.onDaySelected(date);
-	    let emitedDate: string;
-	    component.dateChange.subscribe((date: DateTime) => emitedDate = dateAdapter.toISOString(date));
-	    component.confirm();
-	    expect(emitedDate).toBe(dateAdapter.toISOString(date));
+	    const date = dateAdapter.toISOString(dateAdapter.setParts(dateAdapter.today(), {hour: 5, minute: 45}));
+	    component.config.setValue(date);
+	    let emittedDate: string;
+	    component.dateChange.subscribe((date: string) => emittedDate = date);
+	    component.changeDate();
+	    expect(emittedDate).toBe(date);
 	});
 });

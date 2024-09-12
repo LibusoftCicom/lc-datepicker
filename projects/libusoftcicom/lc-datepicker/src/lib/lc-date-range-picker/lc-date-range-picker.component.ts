@@ -1,428 +1,205 @@
 import {
-	AfterViewInit,
-	ChangeDetectionStrategy,
-	ChangeDetectorRef,
-	Component,
-	ElementRef,
-	EventEmitter,
-	HostBinding,
-	Input,
-	OnDestroy,
-	OnInit,
-	Output,
-	Renderer2,
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostBinding,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output
 } from '@angular/core';
-import {DatePickerConfig} from '../lc-date-picker-config-helper';
-import {Subscription} from 'rxjs';
-import {Panel} from '../base-date-picker.class';
-import {DateTime} from '../date-time.class';
-import {LCDatePickerAdapter} from '../lc-date-picker-adapter.class';
-import {DatePicker} from '../date-picker.class';
-import {ECalendarNavigation, ECalendarType} from '../enums';
-
-export enum DateType {
-	From,
-	To,
-}
+import { Subscription } from 'rxjs';
+import { Panel } from '../base-date-picker.class';
+import { DateType, ECalendarNavigation, ECalendarType } from '../enums';
+import { IColorTheme, ILabels, LCDatePickerControl } from '../lc-date-picker-control';
+import { DatePickerConfig } from '../lc-date-picker-config';
 
 @Component({
-    selector: 'lc-date-range-picker',
-    templateUrl: 'lc-date-range-picker.component.html',
-    styleUrls: ['./lc-date-range-picker.component.style.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'lc-date-range-picker',
+  templateUrl: 'lc-date-range-picker.component.html',
+  styleUrls: ['./lc-date-range-picker.component.style.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
-    public activePanelFrom: Panel;
-    public activePanelTo: Panel;
+  protected activePanelFrom: Panel;
+  protected activePanelTo: Panel;
+  protected opened: boolean;
+  protected fromControl: LCDatePickerControl;
+  protected toControl: LCDatePickerControl;
 
-    public selectedDateTimeFrom: DateTime;
-    public selectedDateTimeTo: DateTime;
-    public DateType: typeof DateType = DateType;
-    public opened = false;
+  @HostBinding('style.margin-top')
+  public componentMargin;
 
-    private datePickerFrom: DatePicker;
-    private datePickerTo: DatePicker;
+  @HostBinding('attr.tabindex')
+  public tabIndex = 0;
 
-    @HostBinding('style.margin-top')
-    public componentMargin;
+  @Input() public config: DatePickerConfig;
+  @Output() public dateChange: EventEmitter<string> = new EventEmitter<string>();
+  @Output() public openedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-    @HostBinding('attr.tabindex')
-    public tabIndex = 0;
+  private readonly subscriptions: Subscription[] = [];
 
+  constructor(
+    private readonly cd: ChangeDetectorRef,
+    private readonly _elementRef: ElementRef,
+  ) {
+  }
 
-    @Input() public valueFrom: DateTime;
-    @Input() public valueTo: DateTime;
-    @Input() public config: DatePickerConfig;
-    @Output() public dateChange: EventEmitter<DateTime[]> = new EventEmitter<DateTime[]>();
+  public ngOnInit(): void {
 
-    private readonly subscriptions: Subscription[] = [];
+    this.fromControl = this.config.getControl(DateType.FROM);
+    this.toControl = this.config.getControl(DateType.TO);
+    this.config.setHostElement(this._elementRef.nativeElement);
+    this.initCalendar();
+    this.setupSubscriptions();
 
-    constructor(
-        private readonly cd: ChangeDetectorRef,
-        private readonly _elementRef: ElementRef,
-        private readonly renderer: Renderer2,
-        private readonly dateAdapter: LCDatePickerAdapter
-    ) {}
+    this.cd.detectChanges();
+  }
 
-    public ngOnInit(): void {
+  public ngAfterViewInit(): void {
 
-        this.config.setHostElement(this._elementRef.nativeElement);
-        this.initCalendar();
-        this.setupSubscriptions();
+    this.cd.detectChanges();
+  }
 
-        this.cd.detectChanges();
+  public ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.subscriptions.length = 0;
+
+    this.cd.detach();
+  }
+
+  public confirm(): void {
+    this.dateChange.emit(this.config.getValue());
+    this.setOpen(false);
+  }
+
+  public isOpen(): boolean {
+    return this.config.isOpen();
+  }
+
+  public setOpen(open: boolean): void {
+    this.config.setOpen(open);
+  }
+
+  public getLocalization(): string {
+    return this.config.getLocalization();
+  }
+
+  public setLocalization(localization: string): void {
+    this.config.setLocalization(localization);
+  }
+
+  public getLabels(): ILabels {
+    return this.config.getLabels();
+  }
+
+  public setLabels(labels: ILabels): void {
+    this.config.setLabels(labels);
+  }
+
+  public getTheme(): IColorTheme {
+    return this.config.getTheme();
+  }
+
+  public setTheme(theme: IColorTheme): void {
+    this.config.setTheme(theme);
+  }
+
+  public getTimezone(): string {
+    return this.config.getTimezone();
+  }
+
+  public getDisabledDates(): string[] {
+    return this.config.getDisabledDates();
+  }
+
+  public setDisabledDates(dates: string[]): void {
+    this.config.setDisabledDates(dates);
+  }
+
+  public isFocused(): boolean {
+    return this.config.isFocused();
+  }
+
+  public focus(): void {
+    this.config.focus();
+  }
+
+  private getActivePanel(dateType: DateType): Panel {
+    return this.config.getPanel(dateType);
+  }
+
+  private initCalendar(): void {
+
+    this.activePanelFrom = this.config.getPanel(DateType.FROM);
+    this.activePanelTo = this.config.getPanel(DateType.TO);
+
+    this._elementRef.nativeElement.focus();
+  }
+
+  private navigation(dir: ECalendarNavigation): void {
+    if (dir === ECalendarNavigation.Close) {
+      this.setOpen(false);
     }
-
-    public ngAfterViewInit(): void {
-
-        this.cd.detectChanges();
+    if (dir === ECalendarNavigation.Confirm) {
+      this.confirm();
     }
-
-    public ngOnDestroy(): void {
-        this.subscriptions.forEach(subscription => subscription.unsubscribe());
-        this.subscriptions.length = 0;
-
-        this.cd.detach();
-    }
-
-    public onDayChanged(type: DateType, date: DateTime): void {
-
-        switch (type) {
-			case DateType.From:
-                this.selectedDateTimeFrom = date.clone();
-                break;
-			case DateType.To:
-                this.selectedDateTimeTo = date.clone();
-                break;
-		}
-    }
-
-    public onMonthChanged(type: DateType, date: DateTime): void {
-
-        switch (type) {
-			case DateType.From:
-                this.selectedDateTimeFrom =
-                    this.dateAdapter.setParts(
-                        this.selectedDateTimeFrom,
-                        { month: date.getMonth(), year: date.getYear() }
-                    );
-                break;
-			case DateType.To:
-                this.selectedDateTimeTo =
-                    this.dateAdapter.setParts(
-                        this.selectedDateTimeTo,
-                        { month: date.getMonth(), year: date.getYear() }
-                    );
-                break;
-		}
-    }
-
-    public onYearChanged(type: DateType, date: DateTime): void {
-
-        switch (type) {
-			case DateType.From:
-                this.selectedDateTimeFrom =
-                    this.dateAdapter.setParts(this.selectedDateTimeFrom, {year: date.getYear() });
-                break;
-			case DateType.To:
-                this.selectedDateTimeTo =
-                    this.dateAdapter.setParts(this.selectedDateTimeTo, { year: date.getYear() });
-                break;
-		}
-    }
-
-    public onDaySelected(type: DateType, date: DateTime): void {
-
-        switch (type) {
-            case DateType.From:
-                this.selectedDateTimeFrom = date.clone();
-                break;
-            case DateType.To:
-                this.selectedDateTimeTo = date.clone();
-                break;
-        }
-
-        this.dateChange.emit([this.selectedDateTimeFrom, this.selectedDateTimeTo]);
-        this.config.focus();
-    }
-
-    public onMonthSelected(type: DateType, date: DateTime): void {
-
-        switch (type) {
-            case DateType.From:
-                this.selectedDateTimeFrom =
-                    this.dateAdapter.setParts(
-                        this.selectedDateTimeFrom,
-                        { month: date.getMonth(), year: date.getYear() }
-                    );
-                break;
-            case DateType.To:
-                this.selectedDateTimeTo =
-                    this.dateAdapter.setParts(
-                        this.selectedDateTimeTo,
-                        { month: date.getMonth(), year: date.getYear() }
-                    );
-                break;
-        }
-
-        this.dateChange.emit([this.selectedDateTimeFrom, this.selectedDateTimeTo]);
-
-		if (this.datePickerFrom.getCalendarType() !== ECalendarType.MonthYear) {
-			this.onSwitchPanel(type, Panel.Day);
-		}
-    }
-
-    public onYearSelected(type: DateType, date: DateTime): void {
-
-        switch (type) {
-            case DateType.From:
-                this.selectedDateTimeFrom =
-                    this.dateAdapter.setParts(this.selectedDateTimeFrom, {year: date.getYear()});
-                break;
-            case DateType.To:
-                this.selectedDateTimeTo =
-                    this.dateAdapter.setParts(this.selectedDateTimeTo, {year: date.getYear()});
-                break;
-        }
-
-        this.dateChange.emit([this.selectedDateTimeFrom, this.selectedDateTimeTo]);
-		if (this.datePickerFrom.getCalendarType() !== ECalendarType.Year) {
-			this.onSwitchPanel(type, Panel.Month);
-		}
-    }
-
-    public onSwitchPanel(type: DateType, panel: Panel): void {
-
-        switch (type) {
-            case DateType.From:
-                this.datePickerFrom.setPanel(panel);
-                this.activePanelFrom = this.getActivePanel(type);
-                break;
-            case DateType.To:
-                this.datePickerTo.setPanel(panel);
-                this.activePanelTo = this.getActivePanel(type);
-                break;
-        }
-        this.cd.detectChanges();
-        this.config.focus();
-    }
-
-    public onReset(type: DateType): void {
-
-        switch(type) {
-            case DateType.From:
-                this.resetDatePickerFrom();
-                break;
-            case DateType.To:
-                this.resetDatePickerTo();
-                break;
-        }
-
-        this.cd.detectChanges();
-    }
-
-    public confirm(): void {
-        this.dateChange.emit([this.selectedDateTimeFrom, this.selectedDateTimeTo]);
-        this.config.setOpen(false);
-    }
-
-    private getActivePanel(type: DateType): Panel {
-        return type === DateType.From ? this.datePickerFrom.getActivePanel() : this.datePickerTo.getActivePanel();
-    }
-
-    private initCalendar(): void {
-
-		  this.initializeDatepickers();
-
-      this.activePanelFrom = this.datePickerFrom.getActivePanel();
-      this.activePanelTo = this.datePickerTo.getActivePanel();
-
-		  this.setDateTimes();
-
-      this._elementRef.nativeElement.focus();
-    }
-
-    private navigation(dir: ECalendarNavigation): void {
-        if (dir === ECalendarNavigation.Close) {
-            this.config.setOpen(false);
-        }
-        if (dir === ECalendarNavigation.Confirm) {
-            this.confirm();
-        }
-    }
-
-    private resetDatePickerFrom(): void {
-        switch (this.datePickerFrom.getCalendarType()) {
-            case ECalendarType.Date:
-                this.selectedDateTimeFrom = this.dateAdapter.today(this.config.getTimezone());
-                break;
-            case ECalendarType.DateTime:
-            case ECalendarType.Time:
-                this.selectedDateTimeFrom = this.dateAdapter.now(this.config.getTimezone());
-                break;
-            case ECalendarType.MonthYear:
-                this.selectedDateTimeFrom =
-                    this.dateAdapter.getStartOfMonth(this.dateAdapter.today(this.config.getTimezone()));
-                break;
-            case ECalendarType.Year:
-                this.selectedDateTimeFrom =
-                    this.dateAdapter.getStartOfYear(this.dateAdapter.today(this.config.getTimezone()));
-                break;
-            default:
-                break;
-        }
-    }
-
-    private resetDatePickerTo(): void {
-        switch (this.datePickerTo.getCalendarType()) {
-            case ECalendarType.Date:
-                this.selectedDateTimeTo = this.dateAdapter.today(this.config.getTimezone());
-                break;
-            case ECalendarType.DateTime:
-            case ECalendarType.Time:
-                this.selectedDateTimeTo = this.dateAdapter.now(this.config.getTimezone());
-                break;
-            case ECalendarType.MonthYear:
-                this.selectedDateTimeTo =
-                    this.dateAdapter.getStartOfMonth(this.dateAdapter.today(this.config.getTimezone()));
-                break;
-            case ECalendarType.Year:
-                this.selectedDateTimeTo =
-                    this.dateAdapter.getStartOfYear(this.dateAdapter.today(this.config.getTimezone()));
-                break;
-            default:
-                break;
-        }
-    }
-
-	private initializeDatepickers() {
-
-		let calendarType: ECalendarType = this.config.getCalendarType();
-
-		if (
-			calendarType === ECalendarType.Time
-			|| calendarType === ECalendarType.DateTime
-			|| calendarType === ECalendarType.DateRange
-		) {
-			calendarType = ECalendarType.Date;
-		}
-
-		this.datePickerFrom = new DatePicker(this.config);
-		this.datePickerFrom.setCalendarType(calendarType);
-		this.datePickerTo = new DatePicker(this.config);
-		this.datePickerTo.setCalendarType(calendarType);
-		this.datePickerFrom.setActivePanel(calendarType);
-		this.datePickerTo.setActivePanel(calendarType);
-	}
-
-	private setDateTimes(): void {
-
-		switch (this.datePickerFrom.getCalendarType()) {
-			case ECalendarType.Date:
-				this.selectedDateTimeFrom =
-					this.dateAdapter.setParts(this.valueFrom,
-						{
-							hour: 0,
-							minute: 0,
-							second: 0,
-							millisecond: 0
-						});
-				this.selectedDateTimeTo =
-                    this.dateAdapter.setParts(this.valueTo,
-                        {
-                            hour: 0,
-                            minute: 0,
-                            second: 0,
-                            millisecond: 0
-                        });
-				break;
-			case ECalendarType.MonthYear:
-				this.selectedDateTimeFrom =
-					this.dateAdapter.setParts(this.valueFrom,
-						{
-							date: 1,
-							hour: 0,
-							minute: 0,
-							second: 0,
-							millisecond: 0
-						});
-				this.selectedDateTimeTo =
-                    this.dateAdapter.setParts(this.valueTo,
-                    {
-                        date: 1,
-                        hour: 0,
-                        minute: 0,
-                        second: 0,
-                        millisecond: 0
-                    });
-				break;
-			case ECalendarType.Year:
-				this.selectedDateTimeFrom =
-					this.dateAdapter
-						.setParts(this.valueFrom,
-							{
-								month: 0,
-								date: 1,
-								hour: 0,
-								minute: 0,
-								second: 0,
-								millisecond: 0
-							});
-				this.selectedDateTimeTo =
-                    this.dateAdapter
-                        .setParts(this.valueTo,
-                        {
-                                month: 0,
-                                date: 1,
-                                hour: 0,
-                                minute: 0,
-                                second: 0,
-                                millisecond: 0
-                            });
-				break;
-		}
-	}
+  }
 
   private setupSubscriptions() {
 
     this.subscriptions.push(
-      this.config.navigationChanges.subscribe((dir) => this.navigation(dir))
+      this.config.getOpenChanges()
+        .subscribe(open => {
+          this.opened = open;
+
+          if (this.opened) {
+            this.setCalendarPosition();
+          }
+
+          this.cd.detectChanges();
+          this.openedChange.emit(this.opened);
+        })
     );
 
     this.subscriptions.push(
-      this.datePickerFrom.panelChanges.subscribe((type) => {
-        this.activePanelFrom = type;
-        this.cd.detectChanges();
-      })
+      this.config.getNavigationChanges()
+        .subscribe(dir => this.navigation(dir))
     );
 
     this.subscriptions.push(
-      this.datePickerTo.panelChanges.subscribe((type) => {
-        this.activePanelTo = type;
-        this.cd.detectChanges();
-      })
-    );
-
-    this.subscriptions.push(
-      this.config.getOpenChanges().subscribe((open) => {
-        this.opened = open;
-
-        const windowHeight = window.innerHeight;
-        const componentPosition = this._elementRef.nativeElement.parentNode.getBoundingClientRect();
-        if (windowHeight - componentPosition.top > this.calendarSize(this.datePickerFrom.getCalendarType())) {
-          this.componentMargin = 0;
-        } else {
-          this.componentMargin = this.calendarSize(this.datePickerFrom.getCalendarType()) * -1 + 'px';
+      this.config.getPanelChanges().subscribe((type: {panel: Panel, dateType: DateType}) => {
+        if (type.dateType === DateType.FROM) {
+          this.activePanelFrom = type.panel;
+        }
+        else {
+          this.activePanelTo = type.panel;
         }
 
         this.cd.detectChanges();
-      }));
+      })
+    );
   }
 
-  private calendarSize(type: ECalendarType) {
+  private setCalendarPosition(): void {
+    const windowHeight = window.innerHeight;
+    const componentPosition = this._elementRef.nativeElement.parentNode.getBoundingClientRect();
+    this.componentMargin =
+      (windowHeight - componentPosition.top > this.calendarSize(this.config.getCalendarType()))
+        ? 0
+        : this.calendarSize(this.config.getCalendarType()) * -1 + 'px';
+  }
+
+  private calendarSize(type: ECalendarType): number {
     let height = 32;
-    if (this.datePickerFrom.getCalendarType() <= 1) {
+    if (
+      this.config.getCalendarType() === ECalendarType.Time ||
+      this.config.getCalendarType() === ECalendarType.DateTime
+    ) {
       height += 20;
     }
     switch (type) {
@@ -431,6 +208,7 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
         break;
       }
       case ECalendarType.Date:
+      case ECalendarType.DateRange:
       case ECalendarType.MonthYear:
       case ECalendarType.Year: {
         height += 240;

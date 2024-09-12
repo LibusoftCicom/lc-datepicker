@@ -1,48 +1,12 @@
 <div [ngSwitch]="activePanel" class="calendar" *ngIf="opened">
-    <lc-year-picker
-            *ngSwitchCase="3"
-            (selected)="onYearSelected($event)"
-            (dateChanged)="onYearChanged($event)"
-            (reset)="onReset()"
-            [config]="config"
-            [value]="selectedDateTime"
-    ></lc-year-picker>
+    <lc-year-picker *ngSwitchCase="3" [control]="control"></lc-year-picker>
+    <lc-month-picker *ngSwitchCase="2" [control]="control"></lc-month-picker>
+    <lc-day-picker *ngSwitchCase="1" [control]="control"></lc-day-picker>
+    <lc-time-picker *ngSwitchCase="0" [control]="control"></lc-time-picker>
 
-    <lc-month-picker
-            *ngSwitchCase="2"
-            (selected)="onMonthSelected($event)"
-            (dateChanged)="onMonthChanged($event)"
-            (reset)="onReset()"
-            [config]="config"
-            [value]="selectedDateTime"
-            (switchPanel)="onSwitchPanel($event)"
-    ></lc-month-picker>
-
-    <lc-day-picker
-            *ngSwitchCase="1"
-            (selected)="onDaySelected($event)"
-            (dateChanged)="onDayChanged($event)"
-            (reset)="onReset()"
-            [config]="config"
-            [value]="selectedDateTime"
-            (switchPanel)="onSwitchPanel($event)"
-    ></lc-day-picker>
-
-    <lc-time-picker
-            *ngSwitchCase="0"
-            [config]="config"
-            [value]="selectedDateTime"
-            (timeChanged)="onTimeChanged($event)"
-            (reset)="onReset()"
-    ></lc-time-picker>
-
-    <div class="dateTimeToggle" *ngIf="calendarType === 1">
-        <lc-time-picker-compact
-                [config]="config"
-                [value]="selectedDateTime"
-                (timeChanged)="onTimeChanged($event)"
-        ></lc-time-picker-compact>
+    <div class="dateTimeToggle" *ngIf="calendarType === ECalendarType.DateTime">
+        <lc-time-picker-compact [control]="control"></lc-time-picker-compact>
     </div>
-    <lc-confirm-button *ngIf="calendarType <= 1" [config]="config" (confirmed)="confirm()"></lc-confirm-button>
+    <lc-confirm-button *ngIf="calendarType <= 1" [control]="control" (confirmed)="confirm()"></lc-confirm-button>
 </div>
-<lc-calendar-background [config]="config" *ngIf="opened"></lc-calendar-background>
+<lc-calendar-background *ngIf="opened" [control]="control"></lc-calendar-background>

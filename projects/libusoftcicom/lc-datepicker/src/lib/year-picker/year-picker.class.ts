@@ -1,7 +1,8 @@
 import {DateTime} from '../date-time.class';
 import {LCDatePickerAdapter} from '../lc-date-picker-adapter.class';
-import {Injectable} from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import {BaseDatePicker, ICalendarItem} from '../base-date-picker.class';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class YearPicker extends BaseDatePicker {
@@ -9,9 +10,17 @@ export class YearPicker extends BaseDatePicker {
 	public readonly YEARS_PER_CALENDAR = 25;
 	public readonly YEARS_PER_ROW = 5;
 
-	constructor(private readonly dateAdapter: LCDatePickerAdapter) {
+  public selectedChanged: Subject<ICalendarItem> = new EventEmitter<ICalendarItem>();
+
+	constructor(
+    private readonly dateAdapter: LCDatePickerAdapter,
+  ) {
 		super();
 	}
+
+  public getSelectedChanged(): Observable<ICalendarItem> {
+    return this.selectedChanged.asObservable();
+  }
 
 	public getCalendarData(): ICalendarItem[][] {
 		return this.calendarData;
@@ -26,16 +35,23 @@ export class YearPicker extends BaseDatePicker {
 		return this.calendarData[row][column];
 	}
 
-	public selectItem(item: ICalendarItem): void {
-		this.selectedDateTime = this.dateAdapter.setParts(this.selectedDateTime, {year: item.value});
+	public setCalendarItem(row: number, column: number): void {
+    const item = this.calendarData[row][column];
+    if (!item || item.disabled) {
+      return;
+    }
+
+    this.selectedChanged.next(item);
 	}
 
 	public formatCalendarData(): ICalendarItem[][] {
 
 		const yearsArray: ICalendarItem[][] = [];
 
+    const currentYear = (this.control.getValue() as DateTime).getYear();
+
 		const minYear =
-			this.getSelectedDateTime().getYear() - this.getSelectedDateTime().getYear() % this.YEARS_PER_CALENDAR;
+      currentYear - currentYear % this.YEARS_PER_CALENDAR;
 		const maxYear = minYear + this.YEARS_PER_CALENDAR;
 
 		let yearsRow: ICalendarItem[] = [];
@@ -58,12 +74,13 @@ export class YearPicker extends BaseDatePicker {
 		// If the year of max date is e.g. 2021, this will return 2000 (assuming 25 years per group),
 		// i.e. the year in the top left corner of the calendar.
 		// This year is then used to prevent the user from going past the screen with the maximum date.
-		const minCalendarYear = this.maxDate.getYear() - this.maxDate.getYear() % this.YEARS_PER_CALENDAR;
-		if (this.selectedDateTime.getYear() >= minCalendarYear) {
+		const minCalendarYear =
+      this.control.getMaxDate().getYear() - this.control.getMaxDate().getYear() % this.YEARS_PER_CALENDAR;
+		if (this.control.getValue().getYear() >= minCalendarYear) {
 			return;
 		}
 
-		this.selectedDateTime = this.dateAdapter.add(this.selectedDateTime,this.YEARS_PER_CALENDAR, 'years');
+		this.control.setValue(this.dateAdapter.add(this.control.getValue(),this.YEARS_PER_CALENDAR, 'years'));
 		this.calendarData = this.formatCalendarData();
 		this.calendarChanges.next();
 	}
@@ -73,36 +90,15 @@ export class YearPicker extends BaseDatePicker {
 		// If the year of min date is e.g. 1912, this will return 1900 (assuming 25 years per group),
 		// i.e. the year in the top left corner of the calendar.
 		// This year is then used to prevent the user from going past the screen with the minimum date.
-		const minCalendarYear = this.minDate.getYear() - this.minDate.getYear() % this.YEARS_PER_CALENDAR;
-		if (this.selectedDateTime.getYear() < minCalendarYear + this.YEARS_PER_CALENDAR) {
+		const minCalendarYear =
+      this.control.getMinDate().getYear() - this.control.getMinDate().getYear() % this.YEARS_PER_CALENDAR;
+		if (this.control.getValue().getYear() < minCalendarYear + this.YEARS_PER_CALENDAR) {
 			return;
 		}
 
-		this.selectedDateTime = this.dateAdapter.subtract(this.selectedDateTime, this.YEARS_PER_CALENDAR, 'years');
+		this.control.setValue(this.dateAdapter.subtract(this.control.getValue(), this.YEARS_PER_CALENDAR, 'years'));
 		this.calendarData = this.formatCalendarData();
 		this.calendarChanges.next();
-	}
-
-	public getSelectedDateTime(): DateTime {
-		return this.selectedDateTime.clone();
-	}
-
-	public setSelectedDateTime(dateTime: DateTime): void {
-		this.selectedDateTime = dateTime.clone();
-	}
-
-	public setCalendarBoundaries(minDateTime: DateTime, maxDateTime: DateTime): void {
-		if (this.dateAdapter.isSame(
-			this.dateAdapter.getStartOfYear(minDateTime),
-			this.dateAdapter.getStartOfYear(maxDateTime)
-		)) {
-			this.minDate = this.dateAdapter.getStartOfYear(this.DEFAULT_MIN_DATE);
-			this.maxDate = this.dateAdapter.getStartOfYear(this.DEFAULT_MAX_DATE);
-			throw new Error('Invalid min/max date. Max date should be at least 1 day after min date');
-		}
-
-		this.minDate = this.dateAdapter.getStartOfYear(minDateTime);
-		this.maxDate = this.dateAdapter.getStartOfYear(maxDateTime);
 	}
 
 	public previousYear(): void {
@@ -122,24 +118,30 @@ export class YearPicker extends BaseDatePicker {
 		this.addYears(this.YEARS_PER_ROW);
 	}
 
-	public setSelectedDate(date: DateTime): void {
+	public setSelectedDate(): void {
 
-		if (this.minDate && this.maxDate && this.dateAdapter.isSame(this.minDate, this.maxDate)) {
+		if (
+      this.control.getMinDate() &&
+      this.control.getMaxDate() &&
+      this.dateAdapter.isSame(this.control.getMinDate(), this.control.getMaxDate())
+    ) {
 			return;
 		}
 
-		if (date === undefined) {
-			date = this.dateAdapter.getStartOfYear(this.dateAdapter.today(this.timezone));
+		if (
+      this.control.getMinDate() &&
+      this.dateAdapter.isBefore(this.control.getValue(), this.control.getMinDate())
+    ) {
+			this.control.setValue(this.dateAdapter.getStartOfYear(this.control.getMinDate()));
 		}
-
-		if (this.minDate && this.dateAdapter.isBefore(date, this.minDate)) {
-			this.selectedDateTime = this.dateAdapter.getStartOfYear(this.minDate);
-		}
-		else if (this.maxDate && this.dateAdapter.isAfter(date, this.maxDate)) {
-			this.selectedDateTime = this.dateAdapter.getStartOfYear(this.maxDate);
+		else if (
+      this.control.getMaxDate() &&
+      this.dateAdapter.isAfter(this.control.getValue(), this.control.getMaxDate())
+    ) {
+			this.control.setValue(this.dateAdapter.getStartOfYear(this.control.getMaxDate()));
 		}
 		else {
-			this.selectedDateTime = this.dateAdapter.getStartOfYear(date);
+			this.control.setValue(this.dateAdapter.getStartOfYear(this.control.getValue()));
 		}
 
 		this.calendarData = this.formatCalendarData();
@@ -148,13 +150,16 @@ export class YearPicker extends BaseDatePicker {
 
 	public addYears(amount: number): void {
 
-		const newYear = this.dateAdapter.add(this.selectedDateTime, amount, 'years');
+		const newYear = this.dateAdapter.add(this.control.getValue(), amount, 'years');
 
-		if ((newYear.getYear() < this.minDate.getYear()) || (newYear.getYear() > this.maxDate.getYear())) {
+		if (
+      newYear.getYear() < this.control.getMinDate().getYear() ||
+      newYear.getYear() > this.control.getMaxDate().getYear()
+    ) {
 			return;
 		}
 
-		this.selectedDateTime =  newYear;
+		this.control.setValue(newYear);
 		this.calendarData = this.formatCalendarData();
 		this.calendarChanges.next();
 	}
@@ -164,11 +169,17 @@ export class YearPicker extends BaseDatePicker {
 	}
 
 	private isYearDisabled(date: DateTime): boolean {
-		if (this.minDate && this.dateAdapter.isBefore(date, this.dateAdapter.getStartOfYear(this.minDate))) {
+		if (
+      this.control.getMinDate() &&
+      this.dateAdapter.isBefore(date, this.dateAdapter.getStartOfYear(this.control.getMinDate()))
+    ) {
 			return true;
 		}
 
-		return this.maxDate && this.dateAdapter.isAfter(date, this.dateAdapter.getEndOfYear(this.maxDate));
+		return (
+      this.control.getMaxDate() &&
+      this.dateAdapter.isAfter(date, this.dateAdapter.getEndOfYear(this.control.getMaxDate()))
+    );
 	}
 
 	private createCalendarItem(i: number): ICalendarItem {
@@ -183,7 +194,7 @@ export class YearPicker extends BaseDatePicker {
 			0,
 			0,
 			0,
-			this.selectedDateTime.getTimeZone()
+			this.control.getValue().getTimeZone()
 		);
 
 		if (this.isYearDisabled(startOfYear)) {
@@ -193,13 +204,13 @@ export class YearPicker extends BaseDatePicker {
 		if (
 			this.dateAdapter.isSame(
 				startOfYear,
-				this.dateAdapter.getStartOfYear(this.dateAdapter.today(this.timezone))
+				this.dateAdapter.getStartOfYear(this.dateAdapter.today(this.control.getTimezone()))
 			)
 		) {
 			item.current = true;
 		}
 
-		if (this.dateAdapter.isSame(startOfYear, this.selectedDateTime)) {
+		if (this.dateAdapter.isSame(startOfYear, this.control.getValue())) {
 			item.active = true;
 		}
 		return item;

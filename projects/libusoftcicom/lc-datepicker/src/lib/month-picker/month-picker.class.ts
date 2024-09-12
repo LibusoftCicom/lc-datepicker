@@ -1,5 +1,5 @@
 import {DateTime} from '../date-time.class';
-import {DateTimePart, LCDatePickerAdapter} from '../lc-date-picker-adapter.class';
+import {LCDatePickerAdapter} from '../lc-date-picker-adapter.class';
 import {Injectable} from '@angular/core';
 import {BaseDatePicker, ICalendarItem} from '../base-date-picker.class';
 
@@ -8,7 +8,9 @@ export class MonthPicker extends BaseDatePicker {
 
 	public ROW_LENGTH = 3;
 
-	constructor(private readonly dateAdapter: LCDatePickerAdapter) {
+	constructor(
+    private readonly dateAdapter: LCDatePickerAdapter,
+  ) {
 		super();
 	}
 
@@ -25,14 +27,10 @@ export class MonthPicker extends BaseDatePicker {
 		return this.calendarData[row][column];
 	}
 
-	public selectItem(item: ICalendarItem): void {
-		this.selectedDateTime = this.dateAdapter.setParts(this.selectedDateTime, {month: item.value});
-	}
-
 	public formatCalendarData(): ICalendarItem[][] {
 		const monthArray: ICalendarItem[][] = [];
 
-		const months = this.dateAdapter.getLocalizedMonthsShort(this.locale);
+		const months = this.dateAdapter.getLocalizedMonthsShort(this.control.getLocalization());
 
 		let row: ICalendarItem[] = [];
 
@@ -50,60 +48,39 @@ export class MonthPicker extends BaseDatePicker {
 		return monthArray;
 	}
 
-	public getSelectedDateTime(): DateTime {
-		return this.selectedDateTime.clone();
-	}
-
-	public getFormattedYear(): string {
-		return this.dateAdapter.formatDateTimePart(this.selectedDateTime, DateTimePart.YEAR, this.locale);
-	}
-
 	public previousYear(): void {
 
-		this.selectedDateTime = this.dateAdapter.subtract(this.selectedDateTime, 1, 'years');
+		this.control.setValue(this.dateAdapter.subtract(this.control.getValue(), 1, 'years'));
 		this.calendarData = this.formatCalendarData();
 		this.calendarChanges.next();
 	}
 
 	public nextYear(): void {
 
-		this.selectedDateTime = this.dateAdapter.add(this.selectedDateTime, 1, 'years');
+		this.control.setValue(this.dateAdapter.add(this.control.getValue(), 1, 'years'));
 		this.calendarData = this.formatCalendarData();
 		this.calendarChanges.next();
-	}
-	public setCalendarBoundaries(minDateTime: DateTime, maxDateTime: DateTime): void {
-
-		if (this.dateAdapter.isSame(
-			this.dateAdapter.getStartOfMonth(minDateTime),
-			this.dateAdapter.getStartOfMonth(maxDateTime)
-		)) {
-			this.minDate = this.dateAdapter.getStartOfMonth(this.DEFAULT_MIN_DATE);
-			this.maxDate = this.dateAdapter.getStartOfMonth(this.DEFAULT_MAX_DATE);
-			throw new Error('Invalid min/max date. Max date should be at least 1 day after min date');
-		}
-
-		this.minDate = this.dateAdapter.getStartOfMonth(minDateTime);
-		this.maxDate = this.dateAdapter.getStartOfMonth(maxDateTime);
 	}
 
 	public setSelectedDate(date: DateTime): void {
 
-		if (this.minDate && this.maxDate && this.dateAdapter.isSame(this.minDate, this.maxDate)) {
+		if (
+      this.control.getMinDate() &&
+      this.control.getMaxDate() &&
+      this.dateAdapter.isSame(this.control.getMinDate(), this.control.getMaxDate())
+    ) {
 			return;
 		}
 
 		if (date === undefined) {
-			date = this.dateAdapter.getStartOfMonth(this.dateAdapter.today(this.timezone));
+			date = this.dateAdapter.getStartOfMonth(this.dateAdapter.today(this.control.getTimezone()));
 		}
 
-		if (this.minDate && this.dateAdapter.isBefore(date, this.minDate)) {
-			this.selectedDateTime = this.dateAdapter.getStartOfMonth(this.minDate);
+		if (this.control.getMinDate() && this.dateAdapter.isBefore(date, this.control.getMinDate())) {
+			this.control.setValue(this.dateAdapter.getStartOfMonth(this.control.getMinDate()));
 		}
-		else if (this.maxDate && this.dateAdapter.isAfter(date, this.maxDate)) {
-			this.selectedDateTime = this.dateAdapter.getStartOfMonth(this.maxDate);
-		}
-		else {
-			this.selectedDateTime = this.dateAdapter.getStartOfMonth(date);
+		else if (this.control.getMaxDate() && this.dateAdapter.isAfter(date, this.control.getMaxDate())) {
+			this.control.setValue(this.dateAdapter.getStartOfMonth(this.control.getMaxDate()));
 		}
 
 		this.calendarData = this.formatCalendarData();
@@ -127,7 +104,7 @@ export class MonthPicker extends BaseDatePicker {
 	}
 
 	private addMonths(amount: number): void {
-		this.selectedDateTime = this.dateAdapter.add(this.selectedDateTime, amount, 'months')
+		this.control.setValue(this.dateAdapter.add(this.control.getValue(), amount, 'months'));
 		this.calendarData = this.formatCalendarData();
 		this.calendarChanges.next();
 	}
@@ -139,7 +116,7 @@ export class MonthPicker extends BaseDatePicker {
 	private createCalendarItem(months: string[], i: number): ICalendarItem {
 		const item: ICalendarItem = { value: i, text: months[i] };
 
-		const startOfMonth = this.dateAdapter.setParts(this.selectedDateTime, {month: i, date: 1});
+		const startOfMonth = this.dateAdapter.setParts(this.control.getValue(), {month: i, date: 1});
 
 		if (this.isMonthDisabled(startOfMonth)) {
 			item.disabled = true;
@@ -148,23 +125,32 @@ export class MonthPicker extends BaseDatePicker {
 		if (
 			this.dateAdapter.isSame(
 				startOfMonth,
-				this.dateAdapter.getStartOfMonth(this.dateAdapter.today(this.timezone))
+				this.dateAdapter.getStartOfMonth(this.dateAdapter.today(this.control.getTimezone()))
 			)
 		) {
 			item.current = true;
 		}
 
-		if (this.dateAdapter.isSame(startOfMonth, this.selectedDateTime)) {
+		if (
+      startOfMonth.getMonth() === this.control.getValue().getMonth() &&
+      startOfMonth.getYear() === this.control.getValue().getYear()
+    ) {
 			item.active = true;
 		}
 		return item;
 	}
 
 	private isMonthDisabled(date: DateTime): boolean {
-		if (this.minDate && this.dateAdapter.isBefore(date, this.dateAdapter.getStartOfMonth(this.minDate))) {
+		if (
+      this.control.getMinDate() &&
+      this.dateAdapter.isBefore(date, this.dateAdapter.getStartOfMonth(this.control.getMinDate()))
+    ) {
 			return true;
 		}
 
-		return this.maxDate && this.dateAdapter.isAfter(date, this.dateAdapter.getEndOfMonth(this.maxDate));
+		return (
+      this.control.getMaxDate() &&
+      this.dateAdapter.isAfter(date, this.dateAdapter.getEndOfMonth(this.control.getMaxDate()))
+    );
 	}
 }

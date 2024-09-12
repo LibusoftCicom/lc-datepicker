@@ -1,135 +1,139 @@
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { LCTimePickerComponent } from './time-picker.component';
-import {DatePickerConfig, ECalendarType} from './../lc-date-picker.module';
-import {LCDatePickerAdapter} from '../lc-date-picker-adapter.class';
-import {LCTimeSpinnerComponent} from './time-spinner.component';
-import {LuxonDateAdapterService} from '../../../../../../src/app/luxon-date-adapter.service';
+import { ECalendarType, EHourFormat, IDatePickerConfiguration, LCDatePickerControl } from './../lc-date-picker.module';
+import { LCDatePickerAdapter } from '../lc-date-picker-adapter.class';
+import { LCTimeSpinnerComponent } from './time-spinner.component';
+import { LuxonDateAdapterService } from '../../../../../../src/app/luxon-date-adapter.service';
 
 describe('LCTimePickerComponent', () => {
-    let component: LCTimePickerComponent;
-    let fixture: ComponentFixture<LCTimePickerComponent>;
-    let dateAdapter: LCDatePickerAdapter;
+  let component: LCTimePickerComponent;
+  let fixture: ComponentFixture<LCTimePickerComponent>;
+  let dateAdapter: LCDatePickerAdapter;
 
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            declarations: [
-                LCTimePickerComponent,
-                LCTimeSpinnerComponent
-            ],
-            providers: [{
-                provide: LCDatePickerAdapter,
-                useClass: LuxonDateAdapterService
-            }]
-        })
-            .compileComponents()
-            .then(() => {
-                dateAdapter = TestBed.inject(LCDatePickerAdapter);
-                fixture = TestBed.createComponent(LCTimePickerComponent);
-                component = fixture.componentInstance;
-                const today = dateAdapter.today();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        LCTimePickerComponent,
+        LCTimeSpinnerComponent
+      ],
+      providers: [{
+        provide: LCDatePickerAdapter,
+        useClass: LuxonDateAdapterService
+      }]
+    })
+      .compileComponents()
+      .then(() => {
+        dateAdapter = TestBed.inject(LCDatePickerAdapter);
+        fixture = TestBed.createComponent(LCTimePickerComponent);
+        component = fixture.componentInstance;
+        const today = dateAdapter.today();
 
-                component.config = new DatePickerConfig();
-                component.config.setCalendarType(ECalendarType.Time);
-                component.config.setLocalization('hr');
-                component.config.setMinDate(dateAdapter.setParts(dateAdapter.getStartOfYear(today), {year: 1900}));
-                component.config.setMaxDate(dateAdapter.setParts(dateAdapter.getStartOfYear(today), {year: 2099}));
-                component.config.labels = { confirmLabel: 'Odabir' };
+        const config: IDatePickerConfiguration = {
+          value: dateAdapter.toISOString(today),
+          calendarType: ECalendarType.Time,
+          localization: 'hr',
+          minimumDate: dateAdapter.toISOString(dateAdapter.setParts(dateAdapter.getStartOfYear(today), {year: 1900})),
+          maximumDate: dateAdapter.toISOString(dateAdapter.setParts(dateAdapter.getStartOfYear(today), {year: 2099})),
+          labels: {confirmLabel: 'Odabir'}
+        };
 
-                component.value = today;
+        component.control = new LCDatePickerControl(config, dateAdapter);
 
-                fixture.detectChanges();
-            });
-    }));
+        component.control.setHostElement(fixture.nativeElement);
 
-    it('should create TimePicker component', () => {
-        expect(component).toBeTruthy();
-    });
+        fixture.detectChanges();
+      });
+  }));
 
-    it('should check 12h format', () => {
-        component.value = dateAdapter.now();
-        component.config.setTimeFormat(false);
-        component.setTimeFormat();
-        expect(component.is24HourFormat).toBeFalsy();
-    });
+  it('should create TimePicker component', () => {
+    expect(component).toBeTruthy();
+  });
 
-    it('should check 24h format', () => {
+  it('should check 12h format', () => {
+      component.control.setValue(dateAdapter.now());
+      component.control.setHourFormat(EHourFormat.TWELVE_HOUR);
+      component.setTimeFormat();
+      expect(component.hourFormat).toBe(EHourFormat.TWELVE_HOUR);
+  });
 
-        component.value = dateAdapter.now();
-        component.config.setTimeFormat(true);
-        component.setTimeFormat();
-        expect(component.is24HourFormat).toBeTruthy();
-    });
+  it('should check 24h format', () => {
 
-    it('should add hour on click', () => {
+      component.control.setValue(dateAdapter.now());
+      component.control.setHourFormat(EHourFormat.TWENTY_FOUR_HOUR);
+      component.setTimeFormat();
+      expect(component.hourFormat).toBe(EHourFormat.TWENTY_FOUR_HOUR);
+  });
 
-        component.value = dateAdapter.setParts(dateAdapter.now(), {hour: 5});
-        component.addHour();
-        expect(component.getValue().getHour()).toBe(6);
-    });
+  it('should add hour on click', () => {
 
-    it('should subtract hour on click', () => {
+      component.control.setValue(dateAdapter.setParts(dateAdapter.now(), {hour: 5}));
+      component.addHour();
+      expect(component.control.getValue().getHour()).toBe(6);
+  });
 
-        component.value = dateAdapter.setParts(dateAdapter.now(), {hour: 5});
-        component.subtractHour();
-        expect(component.getValue().getHour()).toBe(4);
-    });
+  it('should subtract hour on click', () => {
 
-    it('should add minute on click', () => {
+      component.control.setValue(dateAdapter.setParts(dateAdapter.now(), {hour: 5}));
+      component.subtractHour();
+      expect(component.control.getValue().getHour()).toBe(4);
+  });
 
-        component.value = dateAdapter.setParts(dateAdapter.now(), {minute: 15});
-        component.addMinute();
-        expect(component.getValue().getMinute()).toBe(16);
-    });
+  it('should add minute on click', () => {
 
-    it('should subtract minute on click', () => {
+      component.control.setValue(dateAdapter.setParts(dateAdapter.now(), {minute: 15}));
+      component.addMinute();
+      expect(component.control.getValue().getMinute()).toBe(16);
+  });
 
-        component.value = dateAdapter.setParts(dateAdapter.now(), {minute: 15});
-        component.subtractMinute();
-        expect(component.getValue().getMinute()).toBe(14);
-    });
+  it('should subtract minute on click', () => {
 
-    it('should add hour on scroll up', () => {
+      component.control.setValue(dateAdapter.setParts(dateAdapter.now(), {minute: 15}));
+      component.subtractMinute();
+      expect(component.control.getValue().getMinute()).toBe(14);
+  });
 
-        component.value = dateAdapter.setParts(dateAdapter.now(), {hour: 5});
-        let scrollEvent = new WheelEvent('test', { deltaY: -1 })
-        component.hourScroll(scrollEvent);
-        expect(component.getValue().getHour()).toBe(6);
-    });
+  it('should add hour on scroll up', () => {
 
-    it('should subtract hour on scroll down', () => {
+      component.control.setValue(dateAdapter.setParts(dateAdapter.now(), {hour: 5}));
+      let scrollEvent = new WheelEvent('test', { deltaY: -1 })
+      component.hourScroll(scrollEvent);
+      expect(component.control.getValue().getHour()).toBe(6);
+  });
 
-        component.value = dateAdapter.setParts(dateAdapter.now(), {hour: 5});
-        let scrollEvent = new WheelEvent('test', { deltaY: 1 })
-        component.hourScroll(scrollEvent);
-        expect(component.getValue().getHour()).toBe(4);
-    });
+  it('should subtract hour on scroll down', () => {
 
-    it('should add minute on scroll up', () => {
+      component.control.setValue(dateAdapter.setParts(dateAdapter.now(), {hour: 5}));
+      let scrollEvent = new WheelEvent('test', { deltaY: 1 })
+      component.hourScroll(scrollEvent);
+      expect(component.control.getValue().getHour()).toBe(4);
+  });
 
-        component.value = dateAdapter.setParts(dateAdapter.now(), {minute: 15});
-        let scrollEvent = new WheelEvent('test', { deltaY: -1 })
-        component.minuteScroll(scrollEvent);
-        expect(component.getValue().getMinute()).toBe(16);
-    });
+  it('should add minute on scroll up', () => {
 
-    it('should subtract minute on scroll down', () => {
+      component.control.setValue(dateAdapter.setParts(dateAdapter.now(), {minute: 15}));
+      let scrollEvent = new WheelEvent('test', { deltaY: -1 })
+      component.minuteScroll(scrollEvent);
+      expect(component.control.getValue().getMinute()).toBe(16);
+  });
 
-        component.value = dateAdapter.setParts(dateAdapter.now(), {minute: 15});
-        let scrollEvent = new WheelEvent('test', { deltaY: 1 })
-        component.minuteScroll(scrollEvent);
-        expect(component.getValue().getMinute()).toBe(14);
-    });
+  it('should subtract minute on scroll down', () => {
 
-    it('should toggle meridiem on click', () => {
+      component.control.setValue(dateAdapter.setParts(dateAdapter.now(), {minute: 15}));
+      let scrollEvent = new WheelEvent('test', { deltaY: 1 })
+      component.minuteScroll(scrollEvent);
+      expect(component.control.getValue().getMinute()).toBe(14);
+  });
 
-        component.value = dateAdapter.setParts(dateAdapter.now(), {hour: 5});
-        component.config.setTimeFormat(false);
-        component.setTimeFormat();
-        component.toggleMeridiem();
-        expect(component.getValue().getHour()).toBe(17);
-        component.toggleMeridiem();
-        expect(component.getValue().getHour()).toBe(5);
-    });
+  it('should toggle meridiem on click', () => {
+
+      component.control.setValue(dateAdapter.setParts(dateAdapter.now(), {hour: 5}));
+      component.control.setHourFormat(EHourFormat.TWELVE_HOUR);
+      component.setTimeFormat();
+      component.toggleMeridiem();
+      expect(component.control.getValue().getHour()).toBe(17);
+      component.toggleMeridiem();
+      expect(component.control.getValue().getHour()).toBe(5);
+  });
 
 });

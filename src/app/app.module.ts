@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 
 import { AppComponent } from './app.component';
-import {LuxonDateAdapterService} from './luxon-date-adapter.service';
+import { MomentDateAdapterService } from './moment-date-adapter.service';
 
 @NgModule({
   declarations: [
@@ -14,10 +14,11 @@ import {LuxonDateAdapterService} from './luxon-date-adapter.service';
   imports: [
     BrowserModule,
     FormsModule,
-    LcDatePickerModule.withImplementation({adapter: LuxonDateAdapterService}),
+    LcDatePickerModule.withImplementation({adapter: MomentDateAdapterService}),
   ],
   providers: [
-      LuxonDateAdapterService,
+    MomentDateAdapterService,
+    // LuxonDateAdapterService,
   ],
   bootstrap: [AppComponent]
 })

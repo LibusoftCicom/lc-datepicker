@@ -1,14 +1,4 @@
-import {
-    ChangeDetectionStrategy,
-    Component, ElementRef,
-    EventEmitter,
-    Input,
-    NgZone,
-    OnDestroy, OnInit,
-    Output, Renderer2, ViewChild,
-} from '@angular/core';
-import {fromEvent, Subscription} from 'rxjs';
-import {DatePickerConfig} from '../lc-date-picker-config-helper';
+import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
 
 @Component({
     selector: 'lc-header',

@@ -28,7 +28,7 @@
     </tr>
     <tr *ngFor="let row of calendarData; let i = index">
       <td *ngFor="let item of row; let j = index">
-        <lc-day-picker-button [item]="item" [row]="i" [column]="j" [config]="config" (selected)="selectItem($event)" *ngIf="item"></lc-day-picker-button>
+        <lc-day-picker-button [control]="control" [item]="item" [row]="i" [column]="j" *ngIf="item"></lc-day-picker-button>
       </td>
     </tr>
   </tbody>

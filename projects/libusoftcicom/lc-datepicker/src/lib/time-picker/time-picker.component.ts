@@ -1,181 +1,180 @@
 import {
-    Component,
-    Input,
-    Output,
-    EventEmitter,
-    ChangeDetectorRef,
-    ChangeDetectionStrategy,
-    OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone, Renderer2
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef, Input,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  Renderer2,
+  ViewChild
 } from '@angular/core';
-import { DatePickerConfig } from './../lc-date-picker-config-helper';
-import {DateTime} from '../date-time.class';
-import {TimePicker} from './time-picker.class';
-import {fromEvent, Subscription} from 'rxjs';
+import { LCDatePickerControl } from '../lc-date-picker-control';
+import { TimePicker } from './time-picker.class';
+import { fromEvent, Subscription } from 'rxjs';
+import { EHourFormat } from '../enums';
 
 @Component({
-    selector: 'lc-time-picker',
-    templateUrl: 'time-picker.component.html',
-    styleUrls: ['./time-picker.component.style.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [TimePicker]
+  selector: 'lc-time-picker',
+  templateUrl: 'time-picker.component.html',
+  styleUrls: ['./time-picker.component.style.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [TimePicker]
 })
 export class LCTimePickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
-    public is24HourFormat: boolean;
-    public formattedHour: string;
-    public formattedMinute: string;
-    public formattedAMPM: string;
+  public hourFormat: EHourFormat;
+  public formattedHour: string;
+  public formattedMinute: string;
+  public formattedAMPM: string;
 
-    private _value: DateTime;
+  private readonly subscriptions: Subscription[] = [];
+  private readonly meridiemSubscriptions: Subscription[] = [];
 
-    private readonly subscriptions: Subscription[] = [];
-    private readonly meridiemSubscriptions: Subscription[] = [];
+  protected readonly EHourFormat = EHourFormat;
 
-    @Input() public set value(dateTime: DateTime) {
-        this._value = dateTime.clone();
-        this.timePicker.setSelectedTime(this._value);
-    };
-    @Input() public config: DatePickerConfig;
-    @Output() public timeChanged: EventEmitter<DateTime> = new EventEmitter<DateTime>();
-    @Output() public reset: EventEmitter<void> = new EventEmitter<void>();
+  @Input() public control: LCDatePickerControl;
 
-    @ViewChild('timePicker', { static: true })
-    public timePickerElement: ElementRef<HTMLTableElement>;
+  @ViewChild('timePicker', { static: true })
+  public timePickerElement: ElementRef<HTMLTableElement>;
 
-    @ViewChild('header', { static: true })
-    public headerElement: ElementRef<HTMLTableCellElement>;
+  @ViewChild('header', { static: true })
+  public headerElement: ElementRef<HTMLTableCellElement>;
 
-    @ViewChild('reset', { static: true })
-    public resetElement: ElementRef<HTMLDivElement>;
+  @ViewChild('reset', { static: true })
+  public resetElement: ElementRef<HTMLDivElement>;
 
-    constructor(
-        private readonly cd: ChangeDetectorRef,
-        private readonly timePicker: TimePicker,
-        private readonly ngZone: NgZone,
-        private readonly renderer: Renderer2,
-    ) {}
+  constructor(
+    private readonly cd: ChangeDetectorRef,
+    private readonly timePicker: TimePicker,
+    private readonly ngZone: NgZone,
+    private readonly renderer: Renderer2,
+  ) {}
 
-    public ngOnInit(): void {
-        this.subscriptions.push(
-            this.timePicker.getCalendarChanges().subscribe(() => {
-                this.is24HourFormat = this.timePicker.is24HourFormat();
-                this.formattedHour = this.timePicker.getFormattedHour();
-                this.formattedMinute = this.timePicker.getFormattedMinute();
-                this.formattedAMPM = this.timePicker.getFormattedAMPM();
+  public ngOnInit(): void {
 
-                this.cd.detectChanges();
+    this.timePicker.setControl(this.control);
 
-                this.setStyles();
-                this.timeChanged.emit(this.timePicker.getSelectedDateTime());
-            })
-        );
+    this.subscriptions.push(
+      this.timePicker.getCalendarChanges().subscribe(() => this.updateTemplate())
+    );
 
-        this.initializeCalendar();
+    this.subscriptions.push(
+      this.control.getResetChanges().subscribe(() => {
+        this.timePicker.updateTime(false);
+        this.updateTemplate();
+      })
+    );
+
+    this.updateTemplate();
+  }
+
+  public ngAfterViewInit(): void {
+
+    this.setStyles();
+    this.ngZone.runOutsideAngular(() => this.registerViewEvents());
+  }
+
+  public ngOnDestroy(): void {
+
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.length = 0;
+    this.meridiemSubscriptions.forEach(sub => sub.unsubscribe());
+    this.meridiemSubscriptions.length = 0;
+
+    this.cd.detach();
+  }
+
+  public setTimeFormat(): void {
+    this.hourFormat = this.control.getHourFormat();
+  }
+
+  public addHour(): void {
+    this.timePicker.addHour();
+  }
+
+  public subtractHour(): void {
+    this.timePicker.subtractHour();
+  }
+
+  public addMinute(): void {
+    this.timePicker.addMinute();
+  }
+
+  public subtractMinute(): void {
+    this.timePicker.subtractMinute();
+  }
+
+  public hourScroll(event: WheelEvent): void {
+
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.deltaY < 0) {
+      this.addHour();
     }
-
-    public ngAfterViewInit(): void {
-
-        this.setStyles();
-        this.ngZone.runOutsideAngular(() => this.registerViewEvents());
+    if (event.deltaY > 0) {
+      this.subtractHour();
     }
+  }
 
-    public ngOnDestroy(): void {
+  public minuteScroll(event: WheelEvent): void {
 
-        this.subscriptions.forEach(sub => sub.unsubscribe());
-        this.subscriptions.length = 0;
-        this.meridiemSubscriptions.forEach(sub => sub.unsubscribe());
-        this.meridiemSubscriptions.length = 0;
-
-        this.cd.detach();
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.deltaY < 0) {
+      this.addMinute();
     }
-
-    public getValue(): DateTime {
-        return this.timePicker.getSelectedDateTime();
+    if (event.deltaY > 0) {
+      this.subtractMinute();
     }
+  }
 
-    public setTimeFormat(): void {
-        this.is24HourFormat = this.config.is24HourFormat();
-    }
+  public resetTime(): void {
+    this.control.reset();
+  }
 
-    public addHour(): void {
-        this.timePicker.addHour();
-    }
+  public toggleMeridiem(): void {
+    this.timePicker.toggleMeridiem();
+  }
 
-    public subtractHour(): void {
-        this.timePicker.subtractHour();
-    }
+  public scrollMeridiem(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
 
-    public addMinute(): void {
-        this.timePicker.addMinute();
-    }
+    this.toggleMeridiem();
+  }
 
-    public subtractMinute(): void {
-        this.timePicker.subtractMinute();
-    }
+  private updateTemplate(): void {
+    this.hourFormat = this.control.getHourFormat();
+    this.formattedHour = this.timePicker.getFormattedHour();
+    this.formattedMinute = this.timePicker.getFormattedMinute();
+    this.formattedAMPM = this.timePicker.getFormattedAMPM();
 
-    public hourScroll(event: WheelEvent): void {
+    this.cd.detectChanges();
 
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.deltaY < 0) {
-            this.addHour();
-        }
-        if (event.deltaY > 0) {
-            this.subtractHour();
-        }
-    }
+    this.setStyles();
+  }
 
-    public minuteScroll(event: WheelEvent): void {
+  private setStyles(): void {
 
-        event.preventDefault();
-        event.stopPropagation();
-        if (event.deltaY < 0) {
-            this.addMinute();
-        }
-        if (event.deltaY > 0) {
-            this.subtractMinute();
-        }
-    }
+    this.renderer
+      .setStyle(this.timePickerElement.nativeElement.tHead, 'background', this.control.getTheme().primaryColor);
+    this.renderer
+      .setStyle(this.timePickerElement.nativeElement.tBodies[0], 'color', this.control.getTheme().fontColor);
+    this.renderer
+      .setAttribute(
+        this.headerElement.nativeElement,
+        'colspan',
+        this.hourFormat === EHourFormat.TWENTY_FOUR_HOUR ? '3' : '4'
+      );
+  }
 
-    public resetTime(): void {
-        this.reset.emit();
-    }
+  private registerViewEvents() {
 
-    public toggleMeridiem(): void {
-        this.timePicker.toggleMeridiem();
-    }
-
-    public scrollMeridiem(event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.toggleMeridiem();
-    }
-
-    private setStyles(): void {
-
-        this.renderer
-            .setStyle(this.timePickerElement.nativeElement.tHead, 'background', this.config.theme.primaryColor);
-        this.renderer
-            .setStyle(this.timePickerElement.nativeElement.tBodies[0], 'color', this.config.theme.fontColor);
-        this.renderer
-            .setAttribute(this.headerElement.nativeElement, 'colspan', this.is24HourFormat ? '3' : '4');
-    }
-
-    private registerViewEvents() {
-
-        this.subscriptions.push(
-            fromEvent<PointerEvent>(this.resetElement.nativeElement, 'click')
-                .subscribe(() => this.resetTime())
-        );
-    }
-
-    private initializeCalendar(): void {
-
-        this.timePicker.setLocale(this.config.getLocalization());
-        this.timePicker.setTimezone(this.config.getTimezone());
-        this.timePicker.setDisabledTimeRanges(this.config.getDisabledTimeRanges());
-        this.is24HourFormat = this.config.is24HourFormat();
-        this.timePicker.setTimeFormat(this.is24HourFormat);
-    }
+    this.subscriptions.push(
+      fromEvent<PointerEvent>(this.resetElement.nativeElement, 'click')
+        .subscribe(() => this.resetTime())
+    );
+  }
 }

@@ -5,14 +5,33 @@
                 <i class="fa fa-clock-o fa-2x" aria-hidden="true"></i>
             </td>
             <td>
-                <lc-time-spinner-compact [value]="formattedHour" [config]="config" (incremented)="addHour()" (decremented)="subtractHour()" (scrolled)="hourScroll($event)"></lc-time-spinner-compact>
+                <lc-time-spinner-compact
+                  [value]="formattedHour"
+                  [control]="control"
+                  (incremented)="addHour()"
+                  (decremented)="subtractHour()"
+                  (scrolled)="hourScroll($event)">
+                </lc-time-spinner-compact>
             </td>
                 <td class="divider">:</td>
             <td>
-                <lc-time-spinner-compact [value]="formattedMinute" [config]="config" (incremented)="addMinute()" (decremented)="subtractMinute()" (scrolled)="minuteScroll($event)"></lc-time-spinner-compact>
+                <lc-time-spinner-compact
+                  [value]="formattedMinute"
+                  [control]="control"
+                  (incremented)="addMinute()"
+                  (decremented)="subtractMinute()"
+                  (scrolled)="minuteScroll($event)">
+                </lc-time-spinner-compact>
             </td>
             <td>
-                <lc-time-spinner-compact *ngIf="!is24HourFormat" [value]="formattedAMPM" [config]="config" (incremented)="toggleMeridiem()" (decremented)="toggleMeridiem()" (scrolled)="scrollMeridiem($event)"></lc-time-spinner-compact>
+                <lc-time-spinner-compact
+                  *ngIf="hourFormat === EHourFormat.TWELVE_HOUR"
+                  [value]="formattedAMPM"
+                  [control]="control"
+                  (incremented)="toggleMeridiem()"
+                  (decremented)="toggleMeridiem()"
+                  (scrolled)="scrollMeridiem($event)">
+                </lc-time-spinner-compact>
             </td>
         </tr>
     </tbody>

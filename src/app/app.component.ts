@@ -1,34 +1,25 @@
+import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  OnDestroy, OnInit,
-  Renderer2,
-  ViewChild
-} from '@angular/core';
-import { DatePickerConfig } from '@libusoftcicom/lc-datepicker';
-import { Panel } from '@libusoftcicom/lc-datepicker/base-date-picker.class';
-import { DateTime } from '@libusoftcicom/lc-datepicker/date-time.class';
-import {ECalendarType} from '@libusoftcicom/lc-datepicker/enums';
-import {LCDatePickerAdapter} from '@libusoftcicom/lc-datepicker/lc-date-picker-adapter.class';
-import { Subscription } from 'rxjs';
+  DatePickerConfig,
+  ECalendarType,
+  EHourFormat,
+  IDatePickerConfiguration,
+  IDisabledTimeRange,
+  LCDatePickerAdapter
+} from '@libusoftcicom/lc-datepicker';
 
 @Component({
 	selector: 'lc-app-root',
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent {
 	public title = 'LC DatePicker';
 	public year = new Date().getFullYear();
-	public dateConfig = new DatePickerConfig();
-	public dateRangeConfig: DatePickerConfig;
+	public datePickerConfig: DatePickerConfig;
+	public dateRangePickerConfig: DatePickerConfig;
 
-	public inputDate: DateTime;
-	public inputRangeDateFrom: DateTime;
-	public inputRangeDateTo: DateTime;
-
-	public randomDisabledDates: DateTime[] = [];
+	public inputDate: string;
 
 	@ViewChild('dateInput', { static: true })
 	public dateInput: ElementRef;
@@ -36,178 +27,164 @@ export class AppComponent implements OnInit, OnDestroy {
 	@ViewChild('dateRangeInput', { static: true })
 	public dateRangeInput: ElementRef;
 
-  private readonly subscriptions: Subscription[] = [];
-
 	constructor(
 		private readonly renderer: Renderer2,
-		private readonly cd: ChangeDetectorRef,
 		private readonly dateAdapter: LCDatePickerAdapter,
 	) {
 
-		this.dateConfig.setCalendarType(ECalendarType.Date);
-		this.dateConfig.setLocalization('hr');
-		this.dateConfig.setActivePanel(Panel.Day);
-		this.dateConfig.setTimeFormat(false);
-		this.dateConfig.setTimezone('Europe/Zagreb');
+    const timezone = 'Europe/Zagreb';
+    const minDate =
+      this.dateAdapter.toISOString(
+        this.dateAdapter.subtract(
+          this.dateAdapter.subtract(this.dateAdapter.today(timezone), 40, 'day'),
+          100,
+          'year'
+        )
+      );
 
-		const minDate =
-			this.dateAdapter.subtract(
-				this.dateAdapter.subtract(this.dateAdapter.today(this.dateConfig.getTimezone()),
-					40, 'day'),
-				100, 'year');
+    const maxDate =
+      this.dateAdapter.toISOString(
+        this.dateAdapter.add(
+          this.dateAdapter.add(this.dateAdapter.today(timezone), 40, 'day'),
+          100,
+          'year'
+        )
+      );
 
-		const maxDate =
-			this.dateAdapter.add(
-				this.dateAdapter.add(this.dateAdapter.today(this.dateConfig.getTimezone()),
-					40, 'day'),
-				100, 'year');
+    this.inputDate = this.dateAdapter.toISOString(this.dateAdapter.now(timezone));
 
-		this.dateConfig.setMinDate(minDate);
-		this.dateConfig.setMaxDate(maxDate);
+    const datePickerConfiguration: IDatePickerConfiguration = {
+      value: this.inputDate,
+      calendarType: ECalendarType.Date,
+      localization: 'hr',
+      hourFormat: EHourFormat.TWENTY_FOUR_HOUR,
+      timezone,
+      minimumDate: minDate,
+      maximumDate: maxDate,
+      disabledDates: this.generateRandomDisabledDates(timezone),
+      disabledTimeRanges: this.getDisabledTimeRanges(),
+      labels: { confirmLabel: 'OK', fromLabel: 'From', toLabel: 'To' },
+      theme: { primaryColor: '#5e666f', fontColor: '#5e666f' }
+    };
 
-		// define range of unavailable dates
-		this.generateRandomDisabledDates();
+    this.datePickerConfig = new DatePickerConfig(datePickerConfiguration, this.dateAdapter);
 
-		// define range of unavailable time
-		this.setDisabledTimeRanges();
+    const today = this.dateAdapter.today(timezone);
 
-		this.dateConfig.labels = { confirmLabel: 'OK' };
+    const dateRangePickerConfiguration = {
+      ...Object.assign(datePickerConfiguration),
+      value: this.dateAdapter.toISOString(today) + '/' + this.dateAdapter.toISOString(this.dateAdapter.add(today, 1, 'day')),
+      calendarType: ECalendarType.DateRange
+    };
 
-		this.dateConfig.theme.primaryColor = '#5e666f';
-		this.dateConfig.theme.fontColor = '#5e666f';
-
-    this.dateRangeConfig = this.dateConfig.clone();
-
-		this.inputDate = this.dateAdapter.now(this.dateConfig.getTimezone());
-		this.inputRangeDateFrom = this.dateAdapter.today(this.dateConfig.getTimezone());
-		this.inputRangeDateTo = this.dateAdapter.add(this.inputRangeDateFrom, 1, 'day');
+    this.dateRangePickerConfig = new DatePickerConfig(dateRangePickerConfiguration, this.dateAdapter);
 
 		this.registerKeyNavigation();
 	}
 
-  public ngOnInit(): void {
-
-    this.subscriptions.push(
-      this.dateConfig.getOpenChanges().subscribe((open) => {
-        if (open) {
-          this.dateConfig.focus();
-        } else {
-          this.dateInput.nativeElement.click();
-          this.dateInput.nativeElement.select();
-        }
-      })
-    );
-
-    this.subscriptions.push(
-      this.dateRangeConfig.getOpenChanges().subscribe((open) => {
-        if (open) {
-          this.dateRangeConfig.focus();
-        } else {
-          this.dateRangeInput.nativeElement.click();
-          this.dateRangeInput.nativeElement.select();
-        }
-      })
-    );
-  }
-
-	public ngOnDestroy(): void {
-    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
-    this.subscriptions.length = 0;
-    this.cd.detach();
-  }
-
   public openCalendar(): void {
-    this.dateConfig.setOpen(true);
-    this.dateConfig.focus();
+
+    this.datePickerConfig.setValue(this.dateInput.nativeElement.value);
+    this.datePickerConfig.setOpen(true);
+    this.datePickerConfig.focus();
   }
 
   public toggleCalendarOpen(): void {
-    this.dateConfig.setOpen(!this.dateConfig.isOpen());
+
+    if (!this.datePickerConfig.isOpen()) {
+        this.datePickerConfig.setValue(this.dateInput.nativeElement.value);
+    }
+
+    this.datePickerConfig.setOpen(!this.datePickerConfig.isOpen());
   }
 
   public openCalendarRange(): void {
-    this.dateRangeConfig.setOpen(true);
-    this.dateRangeConfig.focus();
+
+    this.dateRangePickerConfig.setValue(this.dateRangeInput.nativeElement.value);
+    this.dateRangePickerConfig.setOpen(true);
+    this.dateRangePickerConfig.focus();
   }
 
 	public clearCalendar(): void {
 		this.dateInput.nativeElement.value = '';
 	}
 
-	public updateLocalization(value): void {
-		this.dateConfig.setLocalization(value);
-		this.dateRangeConfig.setLocalization(value);
-	}
-
 	public get CalendarType() {
-		return this.dateConfig.getCalendarType();
+		return this.datePickerConfig.getCalendarType();
 	}
 
 	public set CalendarType(value: ECalendarType) {
-		this.dateConfig.setCalendarType(1 * value);
-		this.dateRangeConfig.setCalendarType(1 * value);
+    this.datePickerConfig.setCalendarType(1 * value);
 	}
 	public get Localization() {
-		return this.dateConfig.getLocalization();
+		return this.datePickerConfig.getLocalization();
 	}
 
 	public set Localization(value: string) {
-		this.dateConfig.setLocalization(value);
-		this.dateRangeConfig.setLocalization(value);
+    this.datePickerConfig.setLocalization(value);
+    this.dateRangePickerConfig.setLocalization(value);
 	}
 
 	public get ConfirmLabel() {
-		return this.dateConfig.labels.confirmLabel;
+		return this.datePickerConfig.getLabels().confirmLabel;
 	}
 
 	public set ConfirmLabel(value: string) {
-		this.dateConfig.labels.confirmLabel = value;
-		this.dateRangeConfig.labels.confirmLabel = value;
+    const labels = this.datePickerConfig.getLabels();
+    labels.confirmLabel = value;
+    this.datePickerConfig.setLabels(labels);
+    this.dateRangePickerConfig.setLabels(labels);
 	}
 
 	public get FromLabel() {
-		return this.dateConfig.fromLabel;
+		return this.datePickerConfig.getLabels().fromLabel;
 	}
 
 	public set FromLabel(value: string) {
-		this.dateConfig.fromLabel = value;
-		this.dateRangeConfig.fromLabel = value;
+    const labels = this.datePickerConfig.getLabels();
+    labels.fromLabel = value;
+    this.datePickerConfig.setLabels(labels);
+    this.dateRangePickerConfig.setLabels(labels);
 	}
 	public get ToLabel() {
-		return this.dateConfig.toLabel;
+		return this.datePickerConfig.getLabels().toLabel;
 	}
 
 	public set ToLabel(value: string) {
-		this.dateConfig.toLabel = value;
-		this.dateRangeConfig.toLabel = value;
+    const labels = this.datePickerConfig.getLabels();
+    labels.toLabel = value;
+    this.datePickerConfig.setLabels(labels);
+    this.dateRangePickerConfig.setLabels(labels);
 	}
 
 	public get PrimaryColor() {
-		return this.dateConfig.theme.primaryColor;
+		return this.datePickerConfig.getTheme().primaryColor;
 	}
 
 	public set PrimaryColor(value: string) {
-		this.dateConfig.theme.primaryColor = value;
-		this.dateRangeConfig.theme.primaryColor = value;
+    const theme = this.datePickerConfig.getTheme();
+    theme.primaryColor = value;
+    this.datePickerConfig.setTheme(theme);
+    this.dateRangePickerConfig.setTheme(theme);
 	}
 
 	public get FontColor() {
-		return this.dateConfig.theme.fontColor;
+		return this.datePickerConfig.getTheme().fontColor;
 	}
 
 	public set FontColor(value: string) {
-		this.dateConfig.theme.fontColor = value;
-		this.dateRangeConfig.theme.fontColor = value;
+    const theme = this.datePickerConfig.getTheme();
+    theme.fontColor = value;
+    this.datePickerConfig.setTheme(theme);
+    this.dateRangePickerConfig.setTheme(theme);
 	}
 
-	public setCalendarDate(dateTime: DateTime): void {
-		this.dateInput.nativeElement.value = this.dateAdapter.toISOString(dateTime);
+	public setCalendarDate(dateTime: string): void {
+		this.dateInput.nativeElement.value = dateTime;
 	}
 
-	public setCalendarDateRange(dateRange: DateTime[]): void {
-		const dateFrom = this.dateAdapter.toISOString(dateRange[0]);
-		const dateTo = this.dateAdapter.toISOString(dateRange[1]);
-		this.dateRangeInput.nativeElement.value = dateFrom + '/' + dateTo;
+	public setCalendarDateRange(dateRange: string): void {
+		this.dateRangeInput.nativeElement.value = dateRange;
 	}
 
 	public focusInput(isOpen: boolean): void {
@@ -224,32 +201,45 @@ export class AppComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	private generateRandomDisabledDates(): void {
-		this.randomDisabledDates = Array(7)
+  public setDatePickerOpen(open: boolean): void {
+    if (!open) {
+      this.dateInput.nativeElement.click();
+      this.dateInput.nativeElement.select();
+    }
+  }
+
+  public setDateRangePickerOpen(open: boolean): void {
+    if (!open) {
+      this.dateRangeInput.nativeElement.click();
+      this.dateRangeInput.nativeElement.select();
+    }
+  }
+
+	private generateRandomDisabledDates(timezone: string): string[] {
+		return Array(7)
 			.fill(null)
 			.map(() => {
 				const rand = Math.floor(Math.random() * (15 - -15) + -15);
-				return this.dateAdapter.add(this.dateAdapter.today(this.dateConfig.getTimezone()), rand, 'days');
+				return this.dateAdapter.toISOString(this.dateAdapter.add(this.dateAdapter.today(timezone), rand, 'days'));
 			});
-
-		this.dateConfig.setDisabledDates(this.randomDisabledDates);
 	}
 
-	private setDisabledTimeRanges() {
-		this.dateConfig.addDisabledTimeRange({
-			startTime: { hour: 0, minute: 0 },
-			stopTime: { hour: 7, minute: 59 },
-		});
+	private getDisabledTimeRanges(): IDisabledTimeRange[] {
 
-		this.dateConfig.addDisabledTimeRange({
-			startTime: { hour: 14, minute: 0 },
-			stopTime: { hour: 16, minute: 59 },
-		});
+    const disabledTimeRanges: IDisabledTimeRange[] = [];
 
-		this.dateConfig.addDisabledTimeRange({
-			startTime: { hour: 21, minute: 0 },
-			stopTime: { hour: 23, minute: 59 },
-		});
+    disabledTimeRanges.push({
+      startTime: { hour: 0, minute: 0 },
+      stopTime: { hour: 7, minute: 59 },
+    },{
+      startTime: { hour: 14, minute: 0 },
+      stopTime: { hour: 16, minute: 59 },
+    },{
+      startTime: { hour: 21, minute: 0 },
+      stopTime: { hour: 23, minute: 59 },
+    });
+
+    return disabledTimeRanges;
 	}
 
 	/**
@@ -258,7 +248,7 @@ export class AppComponent implements OnInit, OnDestroy {
 	 */
 	private registerKeyNavigation(): void {
 		this.renderer.listen('document', 'keydown', (event: KeyboardEvent) => {
-			if (!this.dateConfig.isFocused()) {
+			if (!this.datePickerConfig.isFocused()) {
 				return;
 			}
 
@@ -273,33 +263,33 @@ export class AppComponent implements OnInit, OnDestroy {
 			}
 
 			if (event.key === "ArrowUp") {
-				this.dateConfig.navigateUp();
+				this.datePickerConfig.navigateUp();
 			}
 			if (event.key === "ArrowDown") {
-				this.dateConfig.navigateDown();
+				this.datePickerConfig.navigateDown();
 			}
 
 			if (event.key === "ArrowRight" && !event.shiftKey) {
-				this.dateConfig.navigateRight();
+				this.datePickerConfig.navigateRight();
 			}
 
 			if (event.key === "ArrowLeft" && !event.shiftKey) {
-				this.dateConfig.navigateLeft();
+				this.datePickerConfig.navigateLeft();
 			}
 
 			if (event.key === "Enter") {
-				this.dateConfig.confirm();
+				this.datePickerConfig.confirm();
 			}
 
 			if (event.key === "Escape") {
-				this.dateConfig.close();
+				this.datePickerConfig.close();
 			}
 
 			if (event.key === "PageDown") {
-				this.dateConfig.nextPage();
+				this.datePickerConfig.nextPage();
 			}
 			if (event.key === "PageUp") {
-				this.dateConfig.previousPage();
+				this.datePickerConfig.previousPage();
 			}
 		});
 	}
@@ -309,26 +299,16 @@ export class AppComponent implements OnInit, OnDestroy {
 	 */
 	private changePanelType(jump: number) {
 		const calendarKeys = Object.keys(ECalendarType).filter((val) => isNaN(parseInt(val)));
-		const currentIndex = calendarKeys.findIndex((type) => this.dateConfig.getCalendarType() === ECalendarType[type]);
+		const currentIndex =
+      calendarKeys.findIndex((type) =>
+        this.datePickerConfig.getCalendarType() === ECalendarType[type]);
 
 		if (currentIndex + jump < calendarKeys.length && currentIndex + jump >= 0) {
-			this.dateConfig.setOpen(false);
-			this.cd.detectChanges();
-			this.dateConfig.setCalendarType(ECalendarType[calendarKeys[currentIndex + jump]]);
-      this.dateConfig.setOpen(true);
-			this.cd.detectChanges();
+      this.datePickerConfig.setCalendarType(ECalendarType[calendarKeys[currentIndex + jump]]);
 		} else if (currentIndex + jump >= calendarKeys.length) {
-      this.dateConfig.setOpen(false);
-			this.cd.detectChanges();
-			this.dateConfig.setCalendarType(ECalendarType[calendarKeys[0]]);
-      this.dateConfig.setOpen(true);
-			this.cd.detectChanges();
+      this.datePickerConfig.setCalendarType(ECalendarType[calendarKeys[0]]);
 		} else {
-      this.dateConfig.setOpen(false);
-			this.cd.detectChanges();
-			this.dateConfig.setCalendarType(ECalendarType[calendarKeys[calendarKeys.length - 1]]);
-      this.dateConfig.setOpen(true);
-			this.cd.detectChanges();
+      this.datePickerConfig.setCalendarType(ECalendarType[calendarKeys[calendarKeys.length - 1]]);
 		}
 	}
 }

@@ -1,8 +1,8 @@
-import {DateTime} from '../date-time.class';
 import {DateTimePart, LCDatePickerAdapter} from '../lc-date-picker-adapter.class';
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import { IDisabledTimeRanges } from '../lc-date-picker-config-helper';
+import { EHourFormat } from '../enums';
+import { LCDatePickerControl } from '../lc-date-picker-control';
 
 @Injectable()
 export class TimePicker {
@@ -11,91 +11,63 @@ export class TimePicker {
     private readonly HOURS_IN_DAY_AMPM = 12;
     private readonly MINUTES_IN_HOUR = 60;
 
+    private control: LCDatePickerControl;
+
     private readonly calendarChanges: Subject<void> = new Subject();
 
-    private selectedDateTime: DateTime;
-    private use24HourFormat: boolean;
-    private readonly disabledTimeRanges: IDisabledTimeRanges[] = [];
-    private locale: string;
-    private timezone: string;
+    constructor(
+      private readonly dateAdapter: LCDatePickerAdapter,
+    ) {}
 
-    constructor(private readonly dateAdapter: LCDatePickerAdapter) {}
-
-    public getTimezone(): string {
-        return this.timezone;
-    }
-
-    public setTimezone(timezone: string): void {
-        this.timezone = timezone;
-    }
-
-    public setSelectedTime(dateTime: DateTime): void {
-        this.selectedDateTime = dateTime.clone();
-        this.updateTime(false);
-    }
-
-    public setDisabledTimeRanges(disabledTimeRanges: IDisabledTimeRanges[]): void {
-        disabledTimeRanges.forEach((val) => this.disabledTimeRanges.push({ ...val }));
-    }
+  public setControl(control: LCDatePickerControl): void {
+    this.control = control;
+  }
 
     public addHour(): void {
-        this.selectedDateTime =
+        this.control.setValue(
             this.dateAdapter.setParts(
-                this.selectedDateTime,
-                {hour: (this.selectedDateTime.getHour() + 1) % this.HOURS_IN_DAY}
-            );
+                this.control.getValue(),
+                {hour: (this.control.getValue().getHour() + 1) % this.HOURS_IN_DAY}
+            ));
         this.updateTime(false);
     }
 
     public subtractHour(): void {
-        this.selectedDateTime =
+        this.control.setValue(
             this.dateAdapter.setParts(
-                this.selectedDateTime,
-                {hour: (this.selectedDateTime.getHour() - 1 + this.HOURS_IN_DAY) % this.HOURS_IN_DAY}
-            );
+                this.control.getValue(),
+                {hour: (this.control.getValue().getHour() - 1 + this.HOURS_IN_DAY) % this.HOURS_IN_DAY}
+            ));
         this.updateTime(true);
     }
 
     public addMinute(): void {
-        this.selectedDateTime =
+        this.control.setValue(
             this.dateAdapter.setParts(
-                this.selectedDateTime,
-                {minute: (this.selectedDateTime.getMinute() + 1) % this.MINUTES_IN_HOUR}
-            );
+                this.control.getValue(),
+                {minute: (this.control.getValue().getMinute() + 1) % this.MINUTES_IN_HOUR}
+            ));
         this.updateTime(false);
     }
 
     public subtractMinute(): void {
-        this.selectedDateTime =
+        this.control.setValue(
             this.dateAdapter.setParts(
-                this.selectedDateTime,
-                {minute: (this.selectedDateTime.getMinute() - 1 + this.MINUTES_IN_HOUR) % this.MINUTES_IN_HOUR}
-            );
+                this.control.getValue(),
+                {minute: (this.control.getValue().getMinute() - 1 + this.MINUTES_IN_HOUR) % this.MINUTES_IN_HOUR}
+            ));
         this.updateTime(true);
-    }
-
-    public setTimeFormat(use24HourFormat: boolean): void {
-        this.use24HourFormat = use24HourFormat;
-        this.updateTime(!this.use24HourFormat);
-    }
-
-    public is24HourFormat(): boolean {
-        return this.use24HourFormat;
-    }
-
-    public getSelectedDateTime(): DateTime {
-        return this.dateAdapter.setParts(this.selectedDateTime, {year: 1900, month: 0, date: 1});
     }
 
     public updateTime(reverse: boolean): void {
 
         let updatedTime = false;
 
-        this.disabledTimeRanges.forEach(timeRange => {
+        this.control.getDisabledTimeRanges().forEach(timeRange => {
             const currentTime =
                 this.dateAdapter.setParts(
-                    this.selectedDateTime,
-                    {year: 1900, month: 0, date: 1, second: 0, millisecond: 0}
+                    this.control.getValue(),
+                    {second: 0, millisecond: 0}
                 );
 
             const minimumTime =
@@ -114,10 +86,10 @@ export class TimePicker {
             if (this.dateAdapter.isBetween(currentTime, minimumTime, maximumTime)) {
 
                 if (reverse) {
-                    this.selectedDateTime = this.dateAdapter.subtract(minimumTime, 1, 'minute');
+                    this.control.setValue(this.dateAdapter.subtract(minimumTime, 1, 'minute'));
                 }
                 else{
-                    this.selectedDateTime = this.dateAdapter.add(maximumTime, 1, 'minute');
+                    this.control.setValue(this.dateAdapter.add(maximumTime, 1, 'minute'));
                 }
                 updatedTime = true;
             }
@@ -133,25 +105,25 @@ export class TimePicker {
 
     public getFormattedHour(): string {
         return this.dateAdapter.formatDateTimePart(
-            this.selectedDateTime,
-            this.use24HourFormat ? DateTimePart.HOUR : DateTimePart.HOUR_AMPM,
-            this.locale);
+            this.control.getValue(),
+            this.control.getHourFormat() === EHourFormat.TWENTY_FOUR_HOUR ? DateTimePart.HOUR : DateTimePart.HOUR_AMPM,
+            this.control.getLocalization());
     }
 
     public getFormattedMinute(): string {
-        return this.dateAdapter.formatDateTimePart(this.selectedDateTime, DateTimePart.MINUTE, this.locale);
+        return this.dateAdapter.formatDateTimePart(
+          this.control.getValue(),
+          DateTimePart.MINUTE,
+          this.control.getLocalization()
+        );
     }
 
     public getFormattedAMPM(): string {
-        return this.dateAdapter.formatDateTimePart(this.selectedDateTime, DateTimePart.AMPM, this.locale);
-    }
-
-    public setLocale(locale: string): void {
-        this.locale = locale;
-    }
-
-    public getLocale(): string {
-        return this.locale;
+        return this.dateAdapter.formatDateTimePart(
+          this.control.getValue(),
+          DateTimePart.AMPM,
+          this.control.getLocalization()
+        );
     }
 
     public getCalendarChanges(): Observable<void> {
@@ -159,11 +131,11 @@ export class TimePicker {
     }
 
     public toggleMeridiem(): void {
-        this.selectedDateTime =
+        this.control.setValue(
             this.dateAdapter.setParts(
-                this.selectedDateTime,
-                {hour: (this.selectedDateTime.getHour() + this.HOURS_IN_DAY_AMPM) % this.HOURS_IN_DAY}
-            );
+                this.control.getValue(),
+                {hour: (this.control.getValue().getHour() + this.HOURS_IN_DAY_AMPM) % this.HOURS_IN_DAY}
+            ));
         this.updateTime(false);
     }
 }

@@ -9,7 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { fromEvent, Subscription } from 'rxjs';
-import { DatePickerConfig } from '../lc-date-picker-config-helper';
+import { LCDatePickerControl } from '../lc-date-picker-control';
 
 @Component({
     selector: 'lc-calendar-background',
@@ -21,11 +21,10 @@ export class LCCalendarBackgroundComponent implements OnInit, OnDestroy {
 
     private subscription: Subscription;
 
+    @Input() public control: LCDatePickerControl;
+
     @ViewChild('calendarBackground', { static: true })
     public calendarBackgroundElement: ElementRef<HTMLDivElement>;
-
-    @Input()
-    public config: DatePickerConfig;
 
     constructor(
         private readonly ngZone: NgZone,
@@ -46,7 +45,7 @@ export class LCCalendarBackgroundComponent implements OnInit, OnDestroy {
                 this.calendarBackgroundElement.nativeElement,
                 'click'
             ).subscribe(() => {
-                this.config.setOpen(false);
+                this.control.setOpen(false);
             });
     }
 }
