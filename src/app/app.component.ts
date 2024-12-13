@@ -71,9 +71,12 @@ export class AppComponent {
 
     const today = this.dateAdapter.today(timezone);
 
+    const dateRange =
+      this.dateAdapter.toISOString(today) + '/' + this.dateAdapter.toISOString(this.dateAdapter.add(today, 1, 'day'));
+
     const dateRangePickerConfiguration = {
       ...Object.assign(datePickerConfiguration),
-      value: this.dateAdapter.toISOString(today) + '/' + this.dateAdapter.toISOString(this.dateAdapter.add(today, 1, 'day')),
+      value: dateRange,
       calendarType: ECalendarType.DateRange
     };
 

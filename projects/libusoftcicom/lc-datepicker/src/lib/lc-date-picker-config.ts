@@ -5,15 +5,25 @@ import { Panel } from './base-date-picker.class';
 import { LCDatePickerAdapter } from './lc-date-picker-adapter.class';
 
 export class DatePickerConfig {
-  private control1: LCDatePickerControl;
-  private control2: LCDatePickerControl;
+  private readonly control1: LCDatePickerControl;
+  private readonly control2: LCDatePickerControl;
 
   constructor(
     private readonly config: IDatePickerConfiguration,
     dateAdapter: LCDatePickerAdapter
   ) {
-    this.control1 = new LCDatePickerControl(this.config, dateAdapter, this.config.calendarType === ECalendarType.DateRange ? DateType.FROM : DateType.REGULAR);
-    this.control2 = new LCDatePickerControl(this.config, dateAdapter, this.config.calendarType === ECalendarType.DateRange ? DateType.TO : DateType.REGULAR);
+    this.control1 =
+      new LCDatePickerControl(
+        this.config,
+        dateAdapter,
+        this.config.calendarType === ECalendarType.DateRange ? DateType.FROM : DateType.REGULAR
+      );
+    this.control2 =
+      new LCDatePickerControl(
+        this.config,
+        dateAdapter,
+        this.config.calendarType === ECalendarType.DateRange ? DateType.TO : DateType.REGULAR
+      );
   }
 
 
@@ -122,22 +132,19 @@ export class DatePickerConfig {
     if (this.control1.getCalendarType() === ECalendarType.DateRange) {
       if (value === null || value.trim() === '') {
         const today = this.control1.getAdapter().today(this.control1.getTimezone());
-        this.control1.setValue(today, true);
-        this.control2.setValue(this.control1.getAdapter().add(today, 1, 'day'), true);
+        this.control1.setValue(today, false);
+        this.control2.setValue(this.control1.getAdapter().add(today, 1, 'day'), false);
       }
       else {
         const dates = value.split('/');
         this.control1.setValue(this.control1.getAdapter().fromISOString(dates[0], this.control1.getTimezone()), true);
         this.control2.setValue(this.control1.getAdapter().fromISOString(dates[1], this.control2.getTimezone()), true);
       }
+    } else if (value === null || value.trim() === '') {
+      const today = this.control1.getAdapter().now(this.control1.getTimezone());
+      this.control1.setValue(today, false);
     } else {
-      if (value === null || value.trim() === '') {
-        const today = this.control1.getAdapter().now(this.control1.getTimezone());
-        this.control1.setValue(today, true);
-      }
-      else {
-        this.control1.setValue(this.control1.getAdapter().fromISOString(value, this.control1.getTimezone()), true);
-      }
+      this.control1.setValue(this.control1.getAdapter().fromISOString(value, this.control1.getTimezone()), true);
     }
   }
 
