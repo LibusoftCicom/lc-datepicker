@@ -1,8 +1,14 @@
 <div #timeSpinner class="time-spinner">
-    <div #timeDigit class="timeLabel">{{value}}</div>
+    <div #timeDigit class="timeLabel" [style.color]="valueColor">{{value}}</div>
     <div class="arrows">
-        <div #upArrowButton class="selectbtn"><i class="fa fa-caret-up fa-2x" aria-hidden="true"></i></div>
-        <div #downArrowButton class="selectbtn"><i class="fa fa-caret-down fa-2x" aria-hidden="true"></i></div>
+        <button type="button" #upArrowButton class="selectbtn" [style.color]="arrowColor"
+            [attr.aria-label]="'Increase ' + ariaLabel + ' ' + value">
+            <i class="fa fa-caret-up fa-2x" aria-hidden="true"></i>
+        </button>
+        <button type="button" #downArrowButton class="selectbtn" [style.color]="arrowColor"
+            [attr.aria-label]="'Decrease ' + ariaLabel + ' ' + value">
+            <i class="fa fa-caret-down fa-2x" aria-hidden="true"></i>
+        </button>
     </div>
 
 </div>

@@ -1,0 +1,145 @@
+:host {
+  --lc-datepicker-width: 224px;
+  --lc-datepicker-panel-height: 248px;
+  --lc-datepicker-font-family: 'Open Sans', Helvetica, sans-serif;
+  --lc-datepicker-font-size: 12px;
+  --lc-datepicker-primary-color: #4277cf;
+  --lc-datepicker-color: #4b5563;
+  --lc-datepicker-weekday-color: #7b8491;
+  --lc-datepicker-weekdays-background: #fff;
+  --lc-datepicker-surface: #fff;
+  --lc-datepicker-border-color: #e5e7eb;
+  --lc-datepicker-border: 1px solid var(--lc-datepicker-border-color);
+  --lc-datepicker-shadow: none;
+  --lc-datepicker-radius: 3px;
+  --lc-datepicker-header-background: #fff;
+  --lc-datepicker-weekdays-border: none;
+  --lc-datepicker-weekdays-height: 28px;
+  --lc-datepicker-day-button-width: 28px;
+  --lc-datepicker-cell-size: 28px;
+  --lc-datepicker-custom-header-padding: 0 0 8px;
+  --lc-datepicker-custom-header-height: 32px;
+  --lc-datepicker-header-font-weight: 600;
+  --lc-datepicker-selected-outline: none;
+  --lc-datepicker-selected-background: #dce8fa;
+  --lc-datepicker-range-selection-background: #f5f5f5;
+  --lc-datepicker-range-endpoint-background: var(--lc-datepicker-selected-background);
+  --lc-datepicker-range-hover-background: #e7e7e7;
+  --lc-datepicker-range-endpoint-hover-background: #dce8fa;
+  --lc-datepicker-range-band-display: block;
+  --lc-datepicker-cell-radius: 50%;
+  --lc-datepicker-today-background: #f0f2f5;
+  --lc-datepicker-hover-outline: none;
+  --lc-datepicker-hover-background: #edf3fc;
+  --lc-datepicker-focus-color: #4277cf;
+  --lc-datepicker-disabled-background: transparent;
+  --lc-datepicker-disabled-selected-background: #f7f7f7;
+  --lc-datepicker-disabled-color: #a1a5af;
+  --lc-datepicker-disabled-opacity: 1;
+  --lc-datepicker-disabled-cursor: not-allowed;
+  display: block;
+}
+h2 { font-size: 14px; margin: 0 0 16px; }
+h3 { font-size: 12px; margin: 0 0 8px; }
+.examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 20px;
+}
+.range-examples {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 475px), 1fr));
+}
+.example { min-width: 0; }
+.custom-single-example {
+  --lc-datepicker-width: 250px;
+  --lc-datepicker-overflow: hidden;
+  --lc-datepicker-grid-width: 100%;
+  --lc-datepicker-panel-padding: 12px;
+  --lc-datepicker-time-row-height: 52px;
+  --lc-datepicker-time-background: #fff;
+  --lc-datepicker-time-border-color: var(--lc-datepicker-border-color);
+  --lc-datepicker-time-label-width: auto;
+  --lc-datepicker-time-label-align: left;
+  --lc-datepicker-time-label-weight: 500;
+  --lc-datepicker-time-horizontal-padding: 12px;
+  --lc-datepicker-time-unit-width: 54px;
+  --lc-datepicker-time-divider-width: 8px;
+  --lc-datepicker-time-divider-font-size: 18px;
+  --lc-datepicker-time-empty-meridiem-display: none;
+  --lc-datepicker-time-spinner-gap: 4px;
+  --lc-datepicker-time-value-font-size: 18px;
+  --lc-datepicker-time-value-color: var(--lc-datepicker-primary-color);
+  --lc-datepicker-time-value-align: center;
+  --lc-datepicker-time-value-width: 34px;
+  --lc-datepicker-time-value-height: 32px;
+  --lc-datepicker-time-value-display: flex;
+  --lc-datepicker-time-value-border: 1px solid #c8cdd3;
+  --lc-datepicker-time-value-radius: 3px;
+  --lc-datepicker-time-value-background: #fff;
+  --lc-datepicker-time-arrow-width: 16px;
+  --lc-datepicker-time-arrow-padding: 0;
+  --lc-datepicker-time-arrow-icon-size: 12px;
+  --lc-datepicker-time-up-icon: '\f106';
+  --lc-datepicker-time-down-icon: '\f107';
+  --lc-datepicker-footer-button-flex: 1;
+  --lc-datepicker-footer-padding: 8px 12px;
+  --lc-datepicker-day-background: #fff;
+  --lc-datepicker-hover-background: #f5f5f5;
+  --lc-datepicker-selected-hover-background: #dce8fa;
+  --lc-datepicker-today-background: #f5f5f5;
+  --lc-datepicker-today-hover-background: #e7e7e7;
+  --lc-datepicker-today-marker-display: none;
+  --lc-datepicker-choice-color: #4b5563;
+  --lc-datepicker-choice-height: 28px;
+  --lc-datepicker-choice-width: calc(100% - 8px);
+  --lc-datepicker-choice-radius: 3px;
+  --lc-datepicker-choice-outline: none;
+  --lc-datepicker-choice-selected-background: #dce8fa;
+  --lc-datepicker-choice-hover-background: #f5f5f5;
+  --lc-datepicker-choice-today-background: transparent;
+  --lc-datepicker-choice-button-width: 100%;
+  --lc-datepicker-year-title-display: none;
+}
+.range-example {
+  position: relative;
+  container-type: inline-size;
+  --lc-datepicker-width: 224px;
+  --lc-datepicker-range-panel-padding: 12px;
+  --lc-datepicker-range-panel-width: calc(var(--lc-datepicker-width) + 24px);
+  --lc-datepicker-range-width: calc(2 * var(--lc-datepicker-range-panel-width) + 2px);
+  --lc-datepicker-range-border: 1px solid var(--lc-datepicker-border-color);
+  --lc-datepicker-range-divider: 1px solid var(--lc-datepicker-border-color);
+  --lc-datepicker-range-background: var(--lc-datepicker-surface);
+  --lc-datepicker-range-panel-shadow: none;
+  --lc-datepicker-range-panel-margin: 0;
+  --lc-datepicker-footer-padding: 8px 12px;
+  --lc-datepicker-footer-gap: 8px;
+  --lc-datepicker-footer-button-height: 28px;
+  --lc-datepicker-footer-button-width: 64px;
+}
+.range-example > lc-date-range-picker {
+  left: 0;
+  right: auto;
+}
+@container (max-width: 520px) {
+  .range-example > lc-date-range-picker {
+    --lc-datepicker-width: min(224px, calc(100vw - 98px));
+    --lc-datepicker-range-width: calc(var(--lc-datepicker-range-panel-width) + 2px);
+    --lc-datepicker-range-mobile-width: calc(var(--lc-datepicker-range-panel-width) + 2px);
+    --lc-datepicker-range-wrap: wrap;
+    --lc-datepicker-range-divider: none;
+    --lc-datepicker-range-stacked-divider: 1px solid var(--lc-datepicker-border-color);
+  }
+}
+.theme-palette { margin: 16px 0; }
+.palette-table-wrap { max-width: 100%; overflow-x: auto; }
+.palette-table code { white-space: nowrap; }
+.color-swatch { border: 1px solid #aab1ba; border-radius: 50%; display: block; height: 18px; width: 18px; }
+.picker-value { margin: 8px 0 0; overflow-wrap: anywhere; }
+.date-trigger { border: 1px solid #d9dde3; border-radius: 3px; padding: 7px 10px;
+  background: #fff; color: #364152; font-size: 12px; cursor: pointer;
+  max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+
+@media (max-width: 520px) {
+  .range-examples { grid-template-columns: minmax(0, 1fr); }
+}

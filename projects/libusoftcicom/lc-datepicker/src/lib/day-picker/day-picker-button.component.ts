@@ -1,17 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  Input,
-  NgZone,
-  OnDestroy,
-  OnInit,
-  Renderer2,
-  ViewChild
-} from '@angular/core';
-import { fromEvent, Subscription } from 'rxjs';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DayPicker } from './day-picker.class';
 import { ICalendarItem } from '../base-date-picker.class';
+import { DateTime } from '../date-time.class';
 import { LCDatePickerControl } from '../lc-date-picker-control';
 import { LCDatePickerAdapter } from '../lc-date-picker-adapter.class';
 import { ECalendarType } from '../enums';
@@ -19,87 +9,54 @@ import { ECalendarType } from '../enums';
 @Component({
   selector: 'lc-day-picker-button',
   templateUrl: 'day-picker-button.component.html',
-  styleUrls: ['./day-picker-button.component.style.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LCDayPickerButtonComponent implements OnInit, OnDestroy {
-
-  private subscription: Subscription;
+export class LCDayPickerButtonComponent implements OnInit {
 
   @Input() public item: ICalendarItem;
   @Input() public row: number;
   @Input() public column: number;
   @Input() public control: LCDatePickerControl;
-
-  @ViewChild('buttonContainer', { static: true })
-  public dayPickerButtonContainerElement: ElementRef<HTMLDivElement>;
-
-  @ViewChild('button', { static: true })
-  public dayPickerButtonElement: ElementRef<HTMLButtonElement>;
+  @Output() public selected = new EventEmitter<DateTime>();
+  @Output() public preview = new EventEmitter<DateTime | null>();
 
   constructor(
     private readonly datePicker: DayPicker,
-    private readonly ngZone: NgZone,
-    private readonly renderer: Renderer2,
     private readonly dateAdapter: LCDatePickerAdapter,
   ) {}
 
   public ngOnInit(): void {
     this.datePicker.setControl(this.control);
-    this.ngZone.runOutsideAngular(() => this.registerViewEvents());
-
-    this.setStyles();
-    this.setClasses();
   }
 
-  public ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
-
-  private registerViewEvents(): void {
-
-    this.subscription =
-      fromEvent<PointerEvent>(this.dayPickerButtonElement.nativeElement, 'click')
-        .subscribe(() => {
-            if (this.datePicker.getCalendarItem(this.row, this.column).value === null) {
-              return;
-            }
-
-            if (this.datePicker.getCalendarItem(this.row, this.column).disabled) {
-              return;
-            }
-
-            const newDate = this.dateAdapter.setParts(
-              this.control.getValue(),
-              { date: this.datePicker.getCalendarItem(this.row, this.column).value }
-            );
-
-            this.control.setValue(
-              newDate,
-              this.control.getCalendarType() === ECalendarType.Date
-            );
-
-            this.datePicker.setSelectedDate(newDate);
-          }
-        );
-  }
-
-  private setStyles(): void {
-    this.renderer
-      .setStyle(this.dayPickerButtonElement.nativeElement, 'color', this.control.getTheme().fontColor);
-  }
-
-  private setClasses() {
-    if (this.item?.active) {
-      this.dayPickerButtonContainerElement.nativeElement.classList.add('active');
+  public selectItem(): void {
+    const item = this.datePicker.getCalendarItem(this.row, this.column);
+    if (item.value === null || item.disabled) {
+      return;
     }
 
-    if (this.item?.disabled) {
-      this.dayPickerButtonContainerElement.nativeElement.classList.add('disabled');
-    }
+    const newDate = item.dateTime ?? this.dateAdapter.setParts(
+      this.control.getValue(),
+      { date: item.value }
+    );
 
-    if (this.item?.current) {
-      this.dayPickerButtonContainerElement.nativeElement.classList.add('current');
+    this.control.setValue(
+      newDate,
+      this.control.getCalendarType() === ECalendarType.Date && this.control.shouldConfirmSelection()
+    );
+    this.selected.emit(newDate);
+    this.datePicker.setSelectedDate(newDate);
+  }
+
+  public previewItem(): void {
+    const item = this.datePicker.getCalendarItem(this.row, this.column);
+    if (item.dateTime && !item.disabled) {
+      this.preview.emit(item.dateTime);
     }
   }
+
+  public clearPreview(): void {
+    this.preview.emit(null);
+  }
+
 }

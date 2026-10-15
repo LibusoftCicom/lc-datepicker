@@ -1,111 +1,48 @@
-button {
-  width: 29px;
-  height: 100%;
-  background: transparent;
-  box-sizing: border-box;
-  cursor: pointer;
-  display: inline-block;
-  line-height: 14px;
-  text-align: center;
-  border: none;
-  outline: none;
-}
-
-.monthCal td,
-.monthsCal td,
-.yearsCal td {
-  min-width: 30px;
-  padding: 5px 0;
-  border: 1px solid #e4e4e4;
-
-}
-
 table {
   width: 100%;
-  height: 40px;
+  height: var(--lc-datepicker-time-row-height, 40px);
   border-collapse: collapse;
   border: none;
   box-sizing: border-box;
-  background: white;
+  background: var(--lc-datepicker-surface, white);
   overflow: hidden;
-}
-
-.dateTimeToggle {
-  width: 220px;
-  height: 20px;
-  background: #e4e4e4;
-  border-top: 1px solid #e4e4e4;
-}
-
-.dateTimeToggle button {
-  width: 50%;
-  height: 100%;
-  float: left;
-  background: transparent;
-}
-
-.dateTimeToggle button.active {
-  background: white;
-}
-
-.dateTimeToggle :first-child button {
-  border-right: 1px solid #efefef;
-}
-
-.confirmDate {
-  width: 220px;
-  height: 20px;
-  background: #efefef;
-}
-
-.confirmDate button {
-  width: 100%;
-  height: 100%;
-  border-top: 1px solid #efefef;
-}
-
-thead tr {
-  height: 25px;
-  border-bottom: 1px solid #efefef;
-}
-
-tr.days {
-  height: 25px;
-}
-
-tr.days td {
-  border: none;
-}
-
-td.active {
-  background: rgb(230, 232, 234);
 }
 
 tbody td {
   text-align: center;
 }
 
-
-.selectbtn{
-    cursor: pointer;
-    font-size: 10px;
-    width: 18px;
-    padding: 0px 5px;
-    color: #5e666f;
+.divider {
+  width: var(--lc-datepicker-time-divider-width, 10px);
+  font-size: var(--lc-datepicker-time-divider-font-size, xx-large);
 }
 
-.timeLabel{
-  font-size: x-large;
-  text-align: right;
-  width: 30px;
-  line-height: 1;
+tbody td.clockCell {
+  width: var(--lc-datepicker-time-label-width, 35px);
+  padding-left: var(--lc-datepicker-time-horizontal-padding, 0);
+  text-align: var(--lc-datepicker-time-label-align, center);
 }
 
-.divider{
-  width: 10px;
-  font-size: xx-large;
+.timeCaption {
+  font-size: var(--lc-datepicker-font-size, 12px);
+  font-weight: var(--lc-datepicker-time-label-weight, 600);
 }
 
-.clockCell{
-  width: 35px;
+.timeValueCell {
+  width: var(--lc-datepicker-time-unit-width, auto);
+}
+
+.minuteCell {
+  padding-right: var(--lc-datepicker-time-horizontal-padding, 0);
+}
+
+.emptyMeridiem {
+  display: var(--lc-datepicker-time-empty-meridiem-display, table-cell);
+}
+
+tr {
+  display: var(--lc-datepicker-time-row-display, table-row);
+  align-items: center;
+  justify-content: center;
+  min-height: var(--lc-datepicker-time-row-height, 40px);
 }

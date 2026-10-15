@@ -1,0 +1,215 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.calendar-cell {
+  height: var(--lc-datepicker-choice-height, 100%);
+  width: var(--lc-datepicker-choice-width, auto);
+  margin: 0 auto;
+  border-radius: var(--lc-datepicker-choice-radius, 0);
+}
+
+.day-cell {
+  position: relative;
+  height: var(--lc-datepicker-cell-size, 100%);
+  width: var(--lc-datepicker-cell-size, auto);
+  background: var(--lc-datepicker-day-background, transparent);
+  border-radius: var(--lc-datepicker-cell-radius, 0);
+}
+
+.day-cell.active {
+  outline: var(--lc-datepicker-selected-outline, 1px solid #5e666f);
+  background: var(--lc-datepicker-selected-background, transparent);
+}
+
+.calendar-cell.disabled {
+  background: var(--lc-datepicker-disabled-background, rgba(234, 234, 234, 0.05));
+  opacity: var(--lc-datepicker-disabled-opacity, 1);
+}
+
+.day-cell.current {
+  background: var(--lc-datepicker-today-background, rgba(94, 102, 111, 0.05));
+}
+
+.day-cell.active.current {
+  background: var(--lc-datepicker-selected-background, var(--lc-datepicker-today-background, rgba(94, 102, 111, 0.05)));
+}
+
+.day-cell.in-range,
+.day-cell.range-preview {
+  background: var(--lc-datepicker-range-selection-background, var(--lc-datepicker-selected-background, rgba(94, 102, 111, 0.12)));
+}
+
+.day-cell.range-start,
+.day-cell.range-end {
+  background: var(--lc-datepicker-range-endpoint-background, var(--lc-datepicker-selected-background, rgba(94, 102, 111, 0.3)));
+}
+
+.calendar-cell.disabled button {
+  cursor: var(--lc-datepicker-disabled-cursor, default);
+}
+
+.day-cell:not(.disabled):hover {
+  outline: var(--lc-datepicker-hover-outline, 1px solid #5e666f);
+  background: var(--lc-datepicker-hover-background, transparent);
+}
+
+.day-cell.active:not(.disabled):hover {
+  background: var(--lc-datepicker-selected-hover-background, var(--lc-datepicker-hover-background, transparent));
+}
+
+.day-cell.current:not(.active):not(.disabled):hover {
+  background: var(--lc-datepicker-today-hover-background, var(--lc-datepicker-hover-background, transparent));
+}
+
+.day-cell.in-range:not(.disabled):hover,
+.day-cell.range-preview:not(.disabled):hover {
+  background: var(--lc-datepicker-range-hover-background, var(--lc-datepicker-range-selection-background, var(--lc-datepicker-selected-background, rgba(94, 102, 111, 0.12))));
+}
+
+.day-cell.range-start:not(.disabled):hover,
+.day-cell.range-end:not(.disabled):hover {
+  background: var(--lc-datepicker-range-endpoint-hover-background, var(--lc-datepicker-range-endpoint-background, var(--lc-datepicker-selected-background, rgba(94, 102, 111, 0.3))));
+}
+
+.day-cell.current::after {
+  content: '';
+  display: var(--lc-datepicker-today-marker-display, none);
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  left: calc(50% - 1.5px);
+  bottom: 2px;
+  border-radius: 50%;
+  background: var(--lc-datepicker-today-marker-color, #4277cf);
+  pointer-events: none;
+}
+
+.day-cell.disabled.current::after {
+  background: var(--lc-datepicker-disabled-color, #a1a5af);
+}
+
+.day-cell.has-events::after {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  left: calc(50% - 1.5px);
+  bottom: 2px;
+  border-radius: 50%;
+  background: var(--lc-datepicker-event-marker-color, #4277cf);
+  pointer-events: none;
+}
+
+.day-cell.has-events.disabled::after {
+  background: var(--lc-datepicker-event-marker-disabled-color, var(--lc-datepicker-disabled-color, #a1a5af));
+}
+
+.day-cell.disabled.active {
+  background: var(--lc-datepicker-disabled-selected-background, var(--lc-datepicker-selected-background, transparent));
+}
+
+.day-cell.disabled.current:not(.active) {
+  background: var(--lc-datepicker-disabled-selected-background, var(--lc-datepicker-today-background, rgba(94, 102, 111, 0.05)));
+}
+
+.day-cell.disabled.range-start,
+.day-cell.disabled.range-end {
+  background: var(--lc-datepicker-disabled-selected-background, var(--lc-datepicker-range-endpoint-background, transparent));
+}
+
+.day-cell.outside-month button {
+  color: var(--lc-datepicker-outside-color, var(--lc-datepicker-disabled-color, #a1a5af));
+}
+
+.month-cell.active {
+  outline: var(--lc-datepicker-choice-outline, 1px solid #5e666f);
+  background: var(--lc-datepicker-choice-selected-background, transparent);
+}
+
+.month-cell.current {
+  background: var(--lc-datepicker-choice-today-background, rgba(94, 102, 111, 0.05));
+}
+
+.month-cell.active.current {
+  background: var(--lc-datepicker-choice-selected-background, rgba(94, 102, 111, 0.05));
+}
+
+.month-cell.active:not(.disabled):hover {
+  background: var(--lc-datepicker-choice-selected-background, #efefef);
+}
+
+.month-cell.disabled.active {
+  background: var(--lc-datepicker-disabled-selected-background, var(--lc-datepicker-choice-selected-background, rgba(234, 234, 234, 0.05)));
+}
+
+.month-cell.disabled.current:not(.active) {
+  background: var(--lc-datepicker-disabled-selected-background, var(--lc-datepicker-choice-today-background, rgba(94, 102, 111, 0.05)));
+}
+
+.month-cell:not(.disabled):hover {
+  background: var(--lc-datepicker-choice-hover-background, #efefef);
+  outline: var(--lc-datepicker-choice-outline, 1px solid #5e666f);
+}
+
+.year-cell.current {
+  background: var(--lc-datepicker-choice-today-background, rgba(94, 102, 111, 0.05));
+}
+
+.year-cell.active {
+  background: var(--lc-datepicker-choice-selected-background, transparent);
+}
+
+.year-cell.active.current {
+  background: var(--lc-datepicker-choice-selected-background, rgba(94, 102, 111, 0.05));
+}
+
+.year-cell:not(.disabled):not(.active):hover {
+  background: var(--lc-datepicker-choice-hover-background, transparent);
+}
+
+.year-cell.disabled.active {
+  background: var(--lc-datepicker-disabled-selected-background, var(--lc-datepicker-choice-selected-background, rgba(234, 234, 234, 0.05)));
+}
+
+.year-cell.disabled.current:not(.active) {
+  background: var(--lc-datepicker-disabled-selected-background, var(--lc-datepicker-choice-today-background, rgba(94, 102, 111, 0.05)));
+}
+
+.year-cell.active,
+.year-cell:not(.disabled):hover {
+  outline: var(--lc-datepicker-choice-outline, 1px solid #5e666f);
+}
+
+button {
+  width: var(--lc-datepicker-choice-button-width, 29px);
+  height: 100%;
+  background: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 14px;
+  text-align: center;
+  border: none;
+  outline: none;
+}
+
+.day-cell button {
+  width: var(--lc-datepicker-day-button-width, 28px);
+}
+
+.year-cell button {
+  width: var(--lc-datepicker-choice-button-width, 32px);
+  padding: 0;
+}
+
+.month-cell button {
+  text-transform: capitalize;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--lc-datepicker-focus-color, #5e666f);
+  outline-offset: -2px;
+}

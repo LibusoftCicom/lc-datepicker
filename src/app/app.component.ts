@@ -1,4 +1,4 @@
-import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import {
   DatePickerConfig,
   ECalendarType,
@@ -18,8 +18,12 @@ export class AppComponent {
 	public year = new Date().getFullYear();
 	public datePickerConfig: DatePickerConfig;
 	public dateRangePickerConfig: DatePickerConfig;
+  public dateEventPreviewConfig: DatePickerConfig;
+	public dateEventPreviewOpen: boolean;
+	public dateEventPreviewValue: string;
 
 	public inputDate: string;
+	public keyboardNavigationEnabled = false;
 
 	@ViewChild('dateInput', { static: true })
 	public dateInput: ElementRef;
@@ -28,7 +32,6 @@ export class AppComponent {
 	public dateRangeInput: ElementRef;
 
 	constructor(
-		private readonly renderer: Renderer2,
 		private readonly dateAdapter: LCDatePickerAdapter,
 	) {
 
@@ -61,13 +64,23 @@ export class AppComponent {
       timezone,
       minimumDate: minDate,
       maximumDate: maxDate,
-      disabledDates: this.generateRandomDisabledDates(timezone),
+      disabledDates: this.generateDemoDisabledDates(timezone),
       disabledTimeRanges: this.getDisabledTimeRanges(),
       labels: { confirmLabel: 'OK', fromLabel: 'From', toLabel: 'To' },
       theme: { primaryColor: '#5e666f', fontColor: '#5e666f' }
     };
 
     this.datePickerConfig = new DatePickerConfig(datePickerConfiguration, this.dateAdapter);
+    this.dateEventPreviewValue = this.inputDate;
+    this.dateEventPreviewConfig = new DatePickerConfig({
+      value: this.inputDate,
+      calendarType: ECalendarType.Date,
+      localization: 'hr',
+      timezone,
+      dateEvents: [],
+      theme: { primaryColor: '#5e666f', fontColor: '#5e666f' }
+    }, this.dateAdapter);
+    this.dateEventPreviewOpen = this.dateEventPreviewConfig.isOpen();
 
     const today = this.dateAdapter.today(timezone);
 
@@ -77,12 +90,15 @@ export class AppComponent {
     const dateRangePickerConfiguration = {
       ...Object.assign(datePickerConfiguration),
       value: dateRange,
-      calendarType: ECalendarType.DateRange
+      calendarType: ECalendarType.DateRange,
+      minimumDate: '',
+      maximumDate: '',
+      disabledDates: [],
+      disabledTimeRanges: []
     };
 
     this.dateRangePickerConfig = new DatePickerConfig(dateRangePickerConfiguration, this.dateAdapter);
 
-		this.registerKeyNavigation();
 	}
 
   public openCalendar(): void {
@@ -190,6 +206,15 @@ export class AppComponent {
 		this.dateRangeInput.nativeElement.value = dateRange;
 	}
 
+  public setDateEventPreviewValue(value: string): void {
+    this.dateEventPreviewValue = value;
+  }
+
+  public toggleDateEventPreview(): void {
+    this.dateEventPreviewOpen = !this.dateEventPreviewOpen;
+    this.dateEventPreviewConfig.setOpen(this.dateEventPreviewOpen);
+  }
+
 	public focusInput(isOpen: boolean): void {
 		if (!isOpen) {
 			this.dateInput.nativeElement.click();
@@ -218,13 +243,12 @@ export class AppComponent {
     }
   }
 
-	private generateRandomDisabledDates(timezone: string): string[] {
-		return Array(7)
-			.fill(null)
-			.map(() => {
-				const rand = Math.floor(Math.random() * (15 - -15) + -15);
-				return this.dateAdapter.toISOString(this.dateAdapter.add(this.dateAdapter.today(timezone), rand, 'days'));
-			});
+	private generateDemoDisabledDates(timezone: string): string[] {
+		const offsets = [-15, -10, -5, 5, 10, 15, 20];
+		const today = this.dateAdapter.today(timezone);
+		return offsets.map(offset =>
+			this.dateAdapter.toISOString(this.dateAdapter.add(today, offset, 'days'))
+		);
 	}
 
 	private getDisabledTimeRanges(): IDisabledTimeRange[] {
@@ -245,56 +269,46 @@ export class AppComponent {
     return disabledTimeRanges;
 	}
 
-	/**
-	 * demo implementation
-	 * keyboard navigation
-	 */
-	private registerKeyNavigation(): void {
-		this.renderer.listen('document', 'keydown', (event: KeyboardEvent) => {
-			if (!this.datePickerConfig.isFocused()) {
+	public onDatePickerKeydown(event: KeyboardEvent): void {
+		if (!this.keyboardNavigationEnabled || !this.datePickerConfig.isOpen() ||
+			!this.datePickerConfig.isFocused() || event.defaultPrevented ||
+			event.ctrlKey || event.altKey || event.metaKey) {
+			return;
+		}
+
+		let action: () => void;
+		switch (event.key) {
+			case 'ArrowUp':
+				action = () => this.datePickerConfig.navigateUp();
+				break;
+			case 'ArrowDown':
+				action = () => this.datePickerConfig.navigateDown();
+				break;
+			case 'ArrowRight':
+				action = event.shiftKey ? () => this.changePanelType(1) : () => this.datePickerConfig.navigateRight();
+				break;
+			case 'ArrowLeft':
+				action = event.shiftKey ? () => this.changePanelType(-1) : () => this.datePickerConfig.navigateLeft();
+				break;
+			case 'Enter':
+				action = () => this.datePickerConfig.confirm();
+				break;
+			case 'Escape':
+				action = () => this.datePickerConfig.close();
+				break;
+			case 'PageDown':
+				action = () => this.datePickerConfig.nextPage();
+				break;
+			case 'PageUp':
+				action = () => this.datePickerConfig.previousPage();
+				break;
+			default:
 				return;
-			}
+		}
 
-			event.preventDefault();
-
-			if (event.key === "ArrowRight" && event.shiftKey) {
-				this.changePanelType(1);
-			}
-
-			if (event.key === "ArrowLeft" && event.shiftKey) {
-				this.changePanelType(-1);
-			}
-
-			if (event.key === "ArrowUp") {
-				this.datePickerConfig.navigateUp();
-			}
-			if (event.key === "ArrowDown") {
-				this.datePickerConfig.navigateDown();
-			}
-
-			if (event.key === "ArrowRight" && !event.shiftKey) {
-				this.datePickerConfig.navigateRight();
-			}
-
-			if (event.key === "ArrowLeft" && !event.shiftKey) {
-				this.datePickerConfig.navigateLeft();
-			}
-
-			if (event.key === "Enter") {
-				this.datePickerConfig.confirm();
-			}
-
-			if (event.key === "Escape") {
-				this.datePickerConfig.close();
-			}
-
-			if (event.key === "PageDown") {
-				this.datePickerConfig.nextPage();
-			}
-			if (event.key === "PageUp") {
-				this.datePickerConfig.previousPage();
-			}
-		});
+		event.preventDefault();
+		event.stopPropagation();
+		action();
 	}
 
 	/**

@@ -11,10 +11,20 @@ button {
   outline: none;
 }
 
+button:focus-visible {
+  outline: 2px solid var(--lc-datepicker-focus-color, #ffffff);
+  outline-offset: -3px;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
 .confirmDate {
   width: 100%;
   height: 20px;
-  background: #5e666f;
+  background: var(--lc-datepicker-primary-color, #5e666f);
   box-shadow: rgba(0, 0, 0, 0.156863) 0px 1px 1px 0, rgba(0, 0, 0, 0.26) 0 -1px 1px 0;
   box-sizing: border-box;
 }
@@ -22,8 +32,8 @@ button {
 .confirmDate button {
   width: 100%;
   height: 100%;
-  border-top: 1px solid #efefef;
-  color: #e0e0e0;
+  border-top: 1px solid var(--lc-datepicker-border-color, #efefef);
+  color: var(--lc-datepicker-header-color, #e0e0e0);
   font-weight: bold;
   font-size: 12px;
 }

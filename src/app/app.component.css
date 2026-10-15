@@ -1,17 +1,320 @@
 
 code {
+    display: inline;
+}
+
+pre code,
+code.small-text {
     display: block;
     white-space: pre-wrap;
     font-size: 12px;
     line-height: 1.4;
 }
 
+.skip-link {
+    position: absolute;
+    left: 12px;
+    top: -48px;
+    z-index: 1100;
+    padding: 8px 12px;
+    background: #fff;
+    color: #1f2937;
+}
+
+.skip-link:focus {
+    top: 8px;
+}
+
+.site-header {
+    background: #748086;
+    color: #fff;
+}
+
+.site-header > .container {
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.site-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.site-brand:hover,
+.site-brand:focus {
+    color: #fff;
+    text-decoration: none;
+}
+
+.site-brand img {
+    height: 35px;
+    width: auto;
+}
+
+.site-github {
+    color: #fff;
+    font-weight: 600;
+}
+
+.site-github:hover,
+.site-github:focus {
+    color: #fff;
+}
+
+.page-intro {
+    padding: 36px 0 28px;
+}
+
+.page-intro h1 {
+    max-width: 760px;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
+}
+
+.page-intro > p:not(.eyebrow) {
+    max-width: 720px;
+    font-size: 18px;
+    color: #52606b;
+}
+
+.eyebrow {
+    margin-bottom: 8px;
+    color: #4277cf;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.intro-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.demo-navigation {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    margin: 0 -15px 24px;
+    padding: 8px 15px;
+    overflow-x: auto;
+    border: 1px solid #dfe4e8;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, .97);
+    box-shadow: 0 2px 6px rgba(31, 41, 55, .08);
+    scrollbar-width: thin;
+}
+
+.demo-navigation a {
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    border-radius: 4px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.demo-navigation a:hover,
+.demo-navigation a:focus {
+    background: #edf3fc;
+    color: #245ca6;
+    text-decoration: none;
+}
+
+#description,
+#getting-started,
+#installation,
+#datepicker-demo,
+#playground,
+#custom-examples-title,
+#api-reference,
+#css-theming,
+#navigation,
+#contributing {
+    scroll-margin-top: 72px;
+}
+
+.demo-section-title {
+    margin-top: 32px;
+}
+
+.demo-section-description {
+    max-width: 800px;
+    color: #52606b;
+}
+
+#playground > .row > div,
+#api-reference > .card {
+    scroll-margin-top: 72px;
+}
+
+.card-header {
+    scroll-margin-top: 72px;
+}
 
 select,
 input {
     font-size: 12px;
 }
 
-#installation li {
+.installation-guide {
+    color: #303940;
+}
+
+.installation-steps {
+    margin: 24px 0;
+    padding-left: 28px;
+}
+
+.installation-steps > li {
+    padding-left: 12px;
+    margin-bottom: 28px;
+}
+
+.installation-steps > li::marker {
+    color: #245ca6;
+    font-weight: 700;
+}
+
+.installation-guide h4 {
     margin-bottom: 10px;
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.installation-guide p {
+    max-width: 80ch;
+    line-height: 1.65;
+}
+
+.installation-guide code {
+    padding: 2px 5px;
+    border-radius: 3px;
+    background: #eef1f3;
+    color: #303940;
+}
+
+.installation-code-label {
+    margin-top: 16px;
+    padding: 8px 16px;
+    border: 1px solid #dce1e5;
+    border-bottom: 0;
+    border-radius: 4px 4px 0 0;
+    background: #e9edef;
+    color: #47545d;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.installation-guide pre {
+    max-width: 100%;
+    margin: 0 0 16px;
+    padding: 16px;
+    overflow-x: auto;
+    border: 1px solid #dce1e5;
+    border-radius: 4px;
+    background: #f6f8f9;
+    tab-size: 2;
+}
+
+.installation-code-label + pre {
+    border-radius: 0 0 4px 4px;
+}
+
+.installation-guide pre code {
+    display: block;
+    padding: 0;
+    background: transparent;
+    color: #25313a;
+    font-family: Consolas, 'Liberation Mono', monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    white-space: pre;
+    overflow-wrap: normal;
+}
+
+.installation-extra {
+    padding: 16px 0;
+    border-top: 1px solid #dce1e5;
+    border-bottom: 1px solid #dce1e5;
+}
+
+.installation-extra summary {
+    color: #245ca6;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.installation-extra[open] summary {
+    margin-bottom: 16px;
+}
+
+.installation-extra summary:focus-visible {
+    outline: 2px solid #245ca6;
+    outline-offset: 4px;
+}
+
+.installation-reference {
+    margin: 20px 0 0;
+}
+
+.standard-event-preview {
+    border-top: 1px solid #e5e7eb;
+    margin-top: 20px;
+    min-height: 300px;
+    position: relative;
+    padding-top: 16px;
+}
+
+@media (max-width: 520px) {
+    .site-header > .container {
+        min-height: 52px;
+    }
+
+    .page-intro {
+        padding: 28px 0 20px;
+    }
+
+    .page-intro > p:not(.eyebrow) {
+        font-size: 16px;
+    }
+
+    .demo-navigation {
+        margin-bottom: 18px;
+    }
+
+    .installation-steps {
+        padding-left: 20px;
+    }
+
+    .installation-steps > li {
+        padding-left: 4px;
+    }
+
+    .installation-guide pre {
+        padding: 12px;
+    }
+
+    .installation-guide p code {
+        overflow-wrap: anywhere;
+    }
+
+    .card-header {
+        overflow-wrap: anywhere;
+    }
+
+    .standard-event-preview lc-datepicker {
+        left: 0;
+    }
 }

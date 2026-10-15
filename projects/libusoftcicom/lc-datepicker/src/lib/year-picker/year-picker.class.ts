@@ -7,8 +7,13 @@ import { Observable, Subject } from 'rxjs';
 @Injectable()
 export class YearPicker extends BaseDatePicker {
 
-	public readonly YEARS_PER_CALENDAR = 25;
-	public readonly YEARS_PER_ROW = 5;
+	public get YEARS_PER_CALENDAR(): number {
+    return this.YEARS_PER_ROW * 5;
+  }
+
+	public get YEARS_PER_ROW(): number {
+    return this.control?.getViewOptions().yearColumns ?? 5;
+  }
 
   public selectedChanged: Subject<ICalendarItem> = new EventEmitter<ICalendarItem>();
 
@@ -50,8 +55,7 @@ export class YearPicker extends BaseDatePicker {
 
     const currentYear = (this.control.getValue() as DateTime).getYear();
 
-		const minYear =
-      currentYear - currentYear % this.YEARS_PER_CALENDAR;
+		const minYear = this.pageStart(currentYear);
 		const maxYear = minYear + this.YEARS_PER_CALENDAR;
 
 		let yearsRow: ICalendarItem[] = [];
@@ -75,8 +79,8 @@ export class YearPicker extends BaseDatePicker {
 		// i.e. the year in the top left corner of the calendar.
 		// This year is then used to prevent the user from going past the screen with the maximum date.
 		const minCalendarYear =
-      this.control.getMaxDate().getYear() - this.control.getMaxDate().getYear() % this.YEARS_PER_CALENDAR;
-		if (this.control.getValue().getYear() >= minCalendarYear) {
+      this.pageStart(this.control.getMaxDate().getYear());
+		if (this.pageStart(this.control.getValue().getYear()) >= minCalendarYear) {
 			return;
 		}
 
@@ -91,8 +95,8 @@ export class YearPicker extends BaseDatePicker {
 		// i.e. the year in the top left corner of the calendar.
 		// This year is then used to prevent the user from going past the screen with the minimum date.
 		const minCalendarYear =
-      this.control.getMinDate().getYear() - this.control.getMinDate().getYear() % this.YEARS_PER_CALENDAR;
-		if (this.control.getValue().getYear() < minCalendarYear + this.YEARS_PER_CALENDAR) {
+      this.pageStart(this.control.getMinDate().getYear());
+		if (this.pageStart(this.control.getValue().getYear()) <= minCalendarYear) {
 			return;
 		}
 
@@ -180,6 +184,11 @@ export class YearPicker extends BaseDatePicker {
       this.control.getMaxDate() &&
       this.dateAdapter.isAfter(date, this.dateAdapter.getEndOfYear(this.control.getMaxDate()))
     );
+	}
+
+	private pageStart(year: number): number {
+		const anchor = this.control.getViewOptions().yearPageAnchor ?? 0;
+		return anchor + Math.floor((year - anchor) / this.YEARS_PER_CALENDAR) * this.YEARS_PER_CALENDAR;
 	}
 
 	private createCalendarItem(i: number): ICalendarItem {

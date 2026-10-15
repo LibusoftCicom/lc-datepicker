@@ -2,6 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: var(--lc-datepicker-time-spinner-gap, 0);
 }
 
 .arrows {
@@ -14,14 +15,41 @@
 .selectbtn {
   cursor: pointer;
   font-size: 10px;
-  width: 18px;
-  padding: 0px 5px;
-  color: #5e666f;
+  width: var(--lc-datepicker-time-arrow-width, 18px);
+  padding: var(--lc-datepicker-time-arrow-padding, 0px 5px);
+  line-height: 1;
+  background: transparent;
+  border: 0;
+}
+
+.selectbtn:focus-visible {
+  outline: 2px solid var(--lc-datepicker-focus-color, #5e666f);
+  outline-offset: -2px;
 }
 
 .timeLabel {
-  font-size: x-large;
-  text-align: right;
-  width: 30px;
+  box-sizing: border-box;
+  font-size: var(--lc-datepicker-time-value-font-size, x-large);
+  text-align: var(--lc-datepicker-time-value-align, right);
+  width: var(--lc-datepicker-time-value-width, 30px);
+  height: var(--lc-datepicker-time-value-height, auto);
+  display: var(--lc-datepicker-time-value-display, block);
+  align-items: center;
+  justify-content: center;
+  border: var(--lc-datepicker-time-value-border, none);
+  border-radius: var(--lc-datepicker-time-value-radius, 0);
+  background: var(--lc-datepicker-time-value-background, transparent);
   line-height: 1;
+}
+
+.selectbtn .fa {
+  font-size: var(--lc-datepicker-time-arrow-icon-size, 2em);
+}
+
+.selectbtn:first-child .fa::before {
+  content: var(--lc-datepicker-time-up-icon, '\f0d8');
+}
+
+.selectbtn:last-child .fa::before {
+  content: var(--lc-datepicker-time-down-icon, '\f0d7');
 }

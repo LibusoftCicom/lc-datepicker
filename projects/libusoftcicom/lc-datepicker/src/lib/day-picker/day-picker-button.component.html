@@ -1,4 +1,8 @@
-<div #buttonContainer>
-    <button type="button" #button>{{ item?.value }}</button>
-</div>
-
+<lc-calendar-cell
+  [control]="control"
+  [item]="item"
+  kind="day"
+  (hover)="previewItem()"
+  (hoverEnd)="clearPreview()"
+  (selection)="selectItem()">
+</lc-calendar-cell>

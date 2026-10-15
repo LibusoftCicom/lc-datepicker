@@ -6,6 +6,8 @@ import { ECalendarType, IDatePickerConfiguration, LCDatePickerControl } from './
 import { LCDatePickerAdapter } from '../lc-date-picker-adapter.class';
 import { LCYearPickerButtonComponent } from './year-picker-button.component';
 import { LuxonDateAdapterService } from '../../../../../../src/app/luxon-date-adapter.service';
+import { LCCalendarCellComponent } from '../calendar-cell/calendar-cell.component';
+import { LCCalendarGridComponent } from '../calendar-grid/calendar-grid.component';
 
 describe('LCYearPickerComponent', () => {
     let component: LCYearPickerComponent;
@@ -16,7 +18,9 @@ describe('LCYearPickerComponent', () => {
         TestBed.configureTestingModule({
             declarations: [
                 LCYearPickerComponent,
-                LCYearPickerButtonComponent
+                LCYearPickerButtonComponent,
+                LCCalendarCellComponent,
+                LCCalendarGridComponent
             ],
             providers: [{
                 provide: LCDatePickerAdapter,

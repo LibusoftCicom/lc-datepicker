@@ -1,3 +1,5 @@
 <div class="confirmDate">
-    <button type="button" #confirmButton>{{ this.control.getLabels().confirmLabel }}</button>
+    <button type="button" #confirmButton [disabled]="confirmDisabled">
+        {{ this.control.getLabels().confirmLabel }}
+    </button>
 </div>

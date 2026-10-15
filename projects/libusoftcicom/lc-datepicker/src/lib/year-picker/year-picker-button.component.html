@@ -1,3 +1,6 @@
-<div #buttonContainer>
-    <button type="button" #yearPickerButton>{{item.value}}</button>
-</div>
+<lc-calendar-cell
+  [control]="control"
+  [item]="item"
+  kind="year"
+  (selection)="selectItem()">
+</lc-calendar-cell>

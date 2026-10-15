@@ -1,7 +1,7 @@
 import {DateTime} from './date-time.class';
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import { LCDatePickerControl } from './lc-date-picker-control';
+import { IDatePickerEvent, LCDatePickerControl } from './lc-date-picker-control';
 
 export interface ICalendarItem {
     value: number;
@@ -9,6 +9,13 @@ export interface ICalendarItem {
     active?: boolean;
     disabled?: boolean;
     current?: boolean;
+    outsideMonth?: boolean;
+    dateTime?: DateTime;
+    rangeStart?: boolean;
+    rangeEnd?: boolean;
+    inRange?: boolean;
+    rangePreview?: boolean;
+    events?: IDatePickerEvent[];
 }
 
 const ITimeUnits = [

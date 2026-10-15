@@ -1,7 +1,7 @@
 import { Panel } from './base-date-picker.class';
 import { DateTime } from './date-time.class';
 import { DateType, ECalendarNavigation, ECalendarType, EHourFormat } from './enums';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { LCDatePickerAdapter } from './lc-date-picker-adapter.class';
 
 export interface ITime {
@@ -18,6 +18,7 @@ export interface ILabels {
   confirmLabel?: string;
   fromLabel?: string;
   toLabel?: string;
+  timeLabel?: string;
 }
 
 export interface IColorTheme {
@@ -30,6 +31,21 @@ export interface IDateTimeRange {
   dateTimeTo: DateTime;
 }
 
+export interface IDatePickerEvent {
+  date: string;
+  label: string;
+  description?: string;
+  metadata?: Readonly<Record<string, unknown>>;
+}
+
+export interface IDatePickerViewOptions {
+  showAdjacentDays?: boolean;
+  compactWeekdays?: boolean;
+  compactTime?: boolean;
+  yearColumns?: 4 | 5;
+  yearPageAnchor?: number;
+}
+
 export interface IDatePickerConfiguration {
   value: string;
   calendarType?: ECalendarType;
@@ -40,9 +56,14 @@ export interface IDatePickerConfiguration {
   minimumDate?: string;
   maximumDate?: string;
   disabledDates?: string[];
+  dateEvents?: IDatePickerEvent[];
   disabledTimeRanges?: IDisabledTimeRange[];
   timezone?: string;
   open?: boolean;
+  selectionMode?: 'immediate' | 'explicit';
+  rangeSelectionMode?: 'independent' | 'linked';
+  rangeNavigationMode?: 'independent' | 'synchronized';
+  view?: IDatePickerViewOptions;
 }
 
 export class LCDatePickerControl {
@@ -54,12 +75,16 @@ export class LCDatePickerControl {
   private value: DateTime | IDateTimeRange;
   private minimumDate: DateTime;
   private maximumDate: DateTime;
+  private rangeSelectionComplete = true;
+  private readonly rangeSelectionChanged = new BehaviorSubject<boolean>(true);
 
   private readonly panelChanged: Subject<Panel> = new Subject();
   private readonly openChanged: Subject<boolean> = new Subject();
   private readonly navigationChanged: Subject<ECalendarNavigation> = new Subject();
   private readonly valueChanged: Subject<DateTime> = new Subject();
   private readonly resetChanged: Subject<void> = new Subject();
+  private readonly dateEventsChanged = new Subject<IDatePickerEvent[]>();
+  private readonly dateEventsByDay = new Map<string, IDatePickerEvent[]>();
 
   private readonly defaultMinDate: DateTime = new DateTime(
     1900,
@@ -109,11 +134,17 @@ export class LCDatePickerControl {
       minimumDate: config.minimumDate ?? '',
       maximumDate: config.maximumDate ?? '',
       disabledDates: config.disabledDates ? [...config.disabledDates] : [],
+      dateEvents: config.dateEvents ? config.dateEvents.map(event => ({ ...event })) : [],
       disabledTimeRanges,
       timezone: config.timezone ?? 'UTC',
       open: config.open ?? false,
+      selectionMode: config.selectionMode ?? 'immediate',
+      rangeSelectionMode: config.rangeSelectionMode ?? 'independent',
+      rangeNavigationMode: config.rangeNavigationMode ?? 'independent',
+      view: config.view ? { ...config.view } : undefined,
     };
 
+    this.indexDateEvents();
     this.setPanelFromCalendarType(this.datePickerConfiguration.calendarType);
 
     this.initializeValue();
@@ -133,6 +164,69 @@ export class LCDatePickerControl {
 
   public getAdapter(): LCDatePickerAdapter {
     return this.dateAdapter;
+  }
+
+  public getViewOptions(): Readonly<IDatePickerViewOptions> {
+    return this.datePickerConfiguration.view ?? {};
+  }
+
+  public getDateEvents(): IDatePickerEvent[] {
+    return this.datePickerConfiguration.dateEvents.map(event => ({ ...event }));
+  }
+
+  public setDateEvents(events: IDatePickerEvent[]): void {
+    this.datePickerConfiguration.dateEvents = events.map(event => ({ ...event }));
+    this.indexDateEvents();
+    this.dateEventsChanged.next(this.getDateEvents());
+  }
+
+  public getDateEventsChanges(): Observable<IDatePickerEvent[]> {
+    return this.dateEventsChanged.asObservable();
+  }
+
+  public getDateEventsForDay(date: DateTime): IDatePickerEvent[] {
+    return (this.dateEventsByDay.get(this.dateEventKey(date)) ?? []).map(event => ({ ...event }));
+  }
+
+  private indexDateEvents(): void {
+    this.dateEventsByDay.clear();
+    this.datePickerConfiguration.dateEvents.forEach(event => {
+      const key = /^\d{4}-\d{2}-\d{2}$/.test(event.date)
+        ? event.date
+        : this.dateEventKey(this.dateAdapter.fromISOString(event.date, this.getTimezone()));
+      const events = this.dateEventsByDay.get(key) ?? [];
+      events.push({ ...event });
+      this.dateEventsByDay.set(key, events);
+    });
+  }
+
+  private dateEventKey(date: DateTime): string {
+    return `${date.getYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
+  public shouldConfirmSelection(): boolean {
+    return this.datePickerConfiguration.selectionMode !== 'explicit';
+  }
+
+  public isLinkedRangeSelection(): boolean {
+    return this.getCalendarType() === ECalendarType.Date &&
+      this.datePickerConfiguration.rangeSelectionMode === 'linked';
+  }
+
+  /** Indicates whether the current linked-range draft is ready to confirm. */
+  public isRangeSelectionComplete(): boolean {
+    return this.rangeSelectionComplete;
+  }
+
+  /** @internal */
+  public setRangeSelectionComplete(complete: boolean): void {
+    this.rangeSelectionComplete = complete;
+    this.rangeSelectionChanged.next(complete);
+  }
+
+  /** Emits when linked-range confirmation becomes available or unavailable. */
+  public getRangeSelectionChanges(): Observable<boolean> {
+    return this.rangeSelectionChanged.asObservable();
   }
 
   public setValue(value: DateTime, shouldEmit: boolean = false): void {
@@ -341,6 +435,7 @@ export class LCDatePickerControl {
   }
 
   public reset(): void {
+    console.log('reset');
     switch (this.getCalendarType()) {
       case ECalendarType.Date:
         this.setValue(this.dateAdapter.today(this.getTimezone()), true);

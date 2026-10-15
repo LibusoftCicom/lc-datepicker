@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {DateTimePart, LCDatePickerAdapter, DateTime, ITimeUnit} from '@libusoftcicom/lc-datepicker';
 import moment from 'moment';
+import 'moment/locale/en-gb';
 import 'moment/locale/hr';
 import 'moment/locale/fr';
 import 'moment/locale/de';

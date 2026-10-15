@@ -1,0 +1,66 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Verify linked picker compatibility",
+			"type": "shell",
+			"command": "node.exe",
+			"args": [
+				"node_modules/@angular/cli/bin/ng.js",
+				"test",
+				"lc-datepicker-library",
+				"--watch=false",
+				"--progress=false",
+				"--browsers=ChromeNoSandboxHeadless",
+				"--include=projects/libusoftcicom/lc-datepicker/src/lib/lc-datepicker/custom-views.spec.ts",
+				"--include=projects/libusoftcicom/lc-datepicker/src/lib/lc-date-range-picker/lc-date-range-picker.component.spec.ts"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "Verify all library tests",
+			"type": "shell",
+			"command": "node.exe",
+			"args": [
+				"node_modules/@angular/cli/bin/ng.js",
+				"test",
+				"lc-datepicker-library",
+				"--watch=false",
+				"--progress=false",
+				"--browsers=ChromeNoSandboxHeadless"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "Serve date event demo",
+			"type": "shell",
+			"command": "node.exe",
+			"args": [
+				"node_modules/@angular/cli/bin/ng.js",
+				"serve",
+				"--host=127.0.0.1",
+				"--port=4201"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Build date event demo",
+			"type": "shell",
+			"command": "node.exe",
+			"args": [
+				"node_modules/@angular/cli/bin/ng.js",
+				"build",
+				"--configuration=production",
+				"--output-path=dist/date-event-demo"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

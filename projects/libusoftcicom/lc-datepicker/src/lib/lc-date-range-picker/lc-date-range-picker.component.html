@@ -1,14 +1,69 @@
-<div [ngSwitch]="activePanelFrom" class="calendar" *ngIf="opened">
-    <lc-header [headerLabel]="fromControl.getLabels().fromLabel" [backgroundColor]="fromControl.getTheme().primaryColor"></lc-header>
-    <lc-year-picker *ngSwitchCase="3" [control]="fromControl"></lc-year-picker>
-    <lc-month-picker *ngSwitchCase="2" [control]="fromControl"></lc-month-picker>
-    <lc-day-picker *ngSwitchCase="1" [control]="fromControl"></lc-day-picker>
+@if (opened && !linkedRange) {
+<div class="rangePicker">
+    <div class="body">
+        <div class="calendar">
+            @if (showRangeLabels) {
+            <div class="dateRangeLabel"
+                [style.background]="'var(--lc-datepicker-header-background, ' + fromControl.getTheme().primaryColor + ')'">
+                {{ fromControl.getLabels().fromLabel }}
+            </div>
+            }
+            <lc-active-calendar-panel [panel]="activePanelFrom" [control]="fromControl"></lc-active-calendar-panel>
+        </div>
+
+        <div class="calendar">
+            @if (showRangeLabels) {
+            <div class="dateRangeLabel"
+                [style.background]="'var(--lc-datepicker-header-background, ' + toControl.getTheme().primaryColor + ')'">
+                {{ toControl.getLabels().toLabel }}
+            </div>
+            }
+            <lc-active-calendar-panel [panel]="activePanelTo" [control]="toControl"></lc-active-calendar-panel>
+        </div>
+    </div>
+    <ng-container lc-date-picker-footer [control]="fromControl"
+        (confirm)="confirm()" (cancel)="setOpen(false)" (clear)="clear()"></ng-container>
 </div>
-<div [ngSwitch]="activePanelTo" class="calendar" *ngIf="opened">
-    <lc-header [headerLabel]="toControl.getLabels().toLabel" [backgroundColor]="toControl.getTheme().primaryColor"></lc-header>
-    <lc-year-picker *ngSwitchCase="3" [control]="toControl"></lc-year-picker>
-    <lc-month-picker *ngSwitchCase="2" [control]="toControl"></lc-month-picker>
-    <lc-day-picker *ngSwitchCase="1" [control]="toControl"></lc-day-picker>
+}
+
+@if (opened && linkedRange) {
+<div class="rangePicker linkedRangePicker">
+    <div class="body">
+        <div class="calendar">
+            @if (showRangeLabels) {
+            <div class="dateRangeLabel"
+                [style.background]="'var(--lc-datepicker-header-background, ' + fromControl.getTheme().primaryColor + ')'">
+                {{ fromControl.getLabels().fromLabel }}
+            </div>
+            }
+            <lc-day-picker
+                [control]="linkedFromControl"
+                (dateSelected)="onLinkedDateSelected($event)"
+                (datePreview)="onLinkedDatePreview($event)"
+                (monthViewed)="onLeftMonthViewed($event)">
+            </lc-day-picker>
+        </div>
+
+        <div class="calendar">
+            @if (showRangeLabels) {
+            <div class="dateRangeLabel"
+                [style.background]="'var(--lc-datepicker-header-background, ' + toControl.getTheme().primaryColor + ')'">
+                {{ toControl.getLabels().toLabel }}
+            </div>
+            }
+            <lc-day-picker
+                [control]="linkedToControl"
+                (dateSelected)="onLinkedDateSelected($event)"
+                (datePreview)="onLinkedDatePreview($event)"
+                (monthViewed)="onRightMonthViewed($event)">
+            </lc-day-picker>
+        </div>
+    </div>
+    <ng-container lc-date-picker-footer [control]="fromControl"
+        (confirm)="confirm()" (cancel)="setOpen(false)" (clear)="clear()"></ng-container>
 </div>
-<lc-confirm-button *ngIf="opened" [control]="fromControl" (confirmed)="confirm()"></lc-confirm-button>
-<lc-calendar-background *ngIf="opened" [control]="fromControl"></lc-calendar-background>
+}
+
+@if (opened) {
+<lc-calendar-background [control]="fromControl"></lc-calendar-background>
+}

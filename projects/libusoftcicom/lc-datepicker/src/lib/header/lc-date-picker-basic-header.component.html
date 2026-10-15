@@ -1,0 +1,42 @@
+<tr>
+    <th [attr.colspan]="colspanSize()">
+        <div class="selectbtn">
+            @if (type === Panel.Day || type === Panel.Year) {
+                <button type="button" #previousButton
+                    [attr.aria-label]="type === Panel.Day ? 'Previous month' : 'Previous years'">
+                    <i class="fa fa-caret-left fa-lg" aria-hidden="true"></i>
+                </button>
+            } @else {
+                &nbsp;
+            }
+        </div>
+
+        <button type="button" #reset class="selectbtn" aria-label="Reset date">
+            <i class="fa fa-home" aria-hidden="true"></i>
+        </button>
+
+        <button type="button" #monthPanel class="selectbtn monthlabel" aria-label="Choose month">
+            @if (type === Panel.Day) {
+                {{ formattedMonth() }}
+            } @else {
+                &nbsp;
+            }
+        </button>
+
+        @if (type !== Panel.Year) {
+        <button type="button" #yearPanel class="selectbtn yearlabel" aria-label="Choose year">
+            {{ formattedYear() }}
+        </button>
+        }
+
+        @if (type === Panel.Day || type === Panel.Year) {
+        <div class="selectbtn pullRight">
+            <button type="button" #nextButton
+                [attr.aria-label]="type === Panel.Day ? 'Next month' : 'Next years'">
+                <i class="fa fa-caret-right fa-lg" aria-hidden="true"></i>
+            </button>
+        </div>
+        }
+
+    </th>
+</tr>

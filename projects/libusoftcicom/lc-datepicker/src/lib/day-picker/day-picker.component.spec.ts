@@ -6,6 +6,8 @@ import { LuxonDateAdapterService } from '../../../../../../src/app/luxon-date-ad
 import { ECalendarType } from '../enums';
 import { LCDayPickerButtonComponent } from './day-picker-button.component';
 import { IDatePickerConfiguration, LCDatePickerControl } from '../lc-date-picker-control';
+import { LCCalendarCellComponent } from '../calendar-cell/calendar-cell.component';
+import { LCCalendarGridComponent } from '../calendar-grid/calendar-grid.component';
 
 describe('LCDayPickerComponent', () => {
     let component: LCDayPickerComponent;
@@ -17,6 +19,8 @@ describe('LCDayPickerComponent', () => {
             declarations: [
                 LCDayPickerComponent,
                 LCDayPickerButtonComponent,
+                LCCalendarCellComponent,
+                LCCalendarGridComponent,
             ],
             providers: [{provide: LCDatePickerAdapter, useClass: LuxonDateAdapterService}]
         })

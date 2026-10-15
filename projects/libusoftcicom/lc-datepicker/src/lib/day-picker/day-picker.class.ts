@@ -49,7 +49,9 @@ export class DayPicker extends BaseDatePicker {
   }
 
   public getShortDaysOfWeek(): string[] {
-    return this.daysOfWeek;
+    return this.control.getViewOptions().compactWeekdays
+      ? this.daysOfWeek.map(day => day.slice(0, 2))
+      : this.daysOfWeek;
   }
 
   public initializeDaysOfWeek(): void {
@@ -65,6 +67,24 @@ export class DayPicker extends BaseDatePicker {
     const difference =
       this.dateAdapter.getWeekday(monthStartDate) -
       this.dateAdapter.getFirstDayOfWeek(this.control.getLocalization());
+    if (this.control.getViewOptions().showAdjacentDays) {
+      const gridStart = this.dateAdapter.subtract(monthStartDate, (difference + this.DAYS_IN_WEEK) % this.DAYS_IN_WEEK, 'day');
+      for (let rowIndex = 0; rowIndex < 6; rowIndex++) {
+        const row: ICalendarItem[] = [];
+        for (let columnIndex = 0; columnIndex < this.DAYS_IN_WEEK; columnIndex++) {
+          const item = this.createCalendarItem(gridStart, rowIndex * this.DAYS_IN_WEEK + columnIndex + 1);
+          item.dateTime = this.dateAdapter.add(gridStart, rowIndex * this.DAYS_IN_WEEK + columnIndex, 'day');
+          item.outsideMonth = item.dateTime.getMonth() !== monthStartDate.getMonth();
+          if (item.outsideMonth) {
+            item.disabled = true;
+            item.active = false;
+          }
+          row.push(item);
+        }
+        monthArray.push(row);
+      }
+      return monthArray;
+    }
     const offset = difference > 0 ? difference : difference + this.DAYS_IN_WEEK;
 
     let week: ICalendarItem[] =
@@ -155,8 +175,8 @@ export class DayPicker extends BaseDatePicker {
 
     return this.control.getDisabledDates()
       .some(disabledDate =>
-        this.dateAdapter.isSame(
-          this.dateAdapter.setParts(date, {hour: 0, minute: 0, second: 0, millisecond: 0}),
+        this.sameDay(
+          date,
           this.dateAdapter.fromISOString(disabledDate, this.control.getTimezone())
         )
       );
@@ -183,7 +203,7 @@ export class DayPicker extends BaseDatePicker {
 
 
     while (this.control.getDisabledDates().some(disabledDate =>
-      this.dateAdapter.isSame(date, this.dateAdapter.fromISOString(disabledDate, this.control.getTimezone())))) {
+      this.sameDay(date, this.dateAdapter.fromISOString(disabledDate, this.control.getTimezone())))) {
       date = this.dateAdapter.add(date, 1, 'day');
     }
 
@@ -197,22 +217,28 @@ export class DayPicker extends BaseDatePicker {
   }
 
   private createCalendarItem(monthStartDate: DateTime, date: number): ICalendarItem {
-    const item: ICalendarItem = {value: date};
-
     const dateTime = this.dateAdapter.add(monthStartDate, date - 1, 'days');
+    const item: ICalendarItem = {
+      value: dateTime.getDate(), dateTime,
+      events: this.control.getDateEventsForDay(dateTime)
+    };
 
     if (this.isDateDisabled(dateTime)) {
       item.disabled = true;
     }
 
-    if (this.dateAdapter.isSame(dateTime, this.dateAdapter.today(this.control.getTimezone()))) {
+    if (this.sameDay(dateTime, this.dateAdapter.today(this.control.getTimezone()))) {
       item.current = true;
     }
 
-    if (this.dateAdapter.isSame(dateTime, this.control.getValue())) {
+    if (this.sameDay(dateTime, this.control.getValue())) {
       item.active = true;
     }
 
     return item;
+  }
+
+  private sameDay(first: DateTime, second: DateTime): boolean {
+    return first.getYear() === second.getYear() && first.getMonth() === second.getMonth() && first.getDate() === second.getDate();
   }
 }

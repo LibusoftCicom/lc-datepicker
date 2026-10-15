@@ -6,30 +6,42 @@ import {
   ElementRef,
   EventEmitter,
   HostBinding,
+  inject,
   Input,
   OnDestroy,
   OnInit,
-  Output
+  Output,
+  QueryList,
+  ViewChildren
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Panel } from '../base-date-picker.class';
 import { DateType, ECalendarNavigation, ECalendarType } from '../enums';
-import { IColorTheme, ILabels, LCDatePickerControl } from '../lc-date-picker-control';
+import { IColorTheme, IDatePickerConfiguration, ILabels, LCDatePickerControl } from '../lc-date-picker-control';
 import { DatePickerConfig } from '../lc-date-picker-config';
+import { DATE_PICKER_HEADER } from '../header/header-provider.class';
+import { LcDatePickerBasicHeaderComponent } from '../header/lc-date-picker-basic-header.component';
+import { DatePickerPopoverBehavior } from '../popover-behavior';
+import { DateTime } from '../date-time.class';
+import { LCDayPickerComponent } from '../day-picker/day-picker.component';
 
 @Component({
   selector: 'lc-date-range-picker',
   templateUrl: 'lc-date-range-picker.component.html',
   styleUrls: ['./lc-date-range-picker.component.style.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
+  protected readonly showRangeLabels = inject(DATE_PICKER_HEADER) === LcDatePickerBasicHeaderComponent;
   protected activePanelFrom: Panel;
   protected activePanelTo: Panel;
   protected opened: boolean;
   protected fromControl: LCDatePickerControl;
   protected toControl: LCDatePickerControl;
+  protected linkedRange = false;
+  protected linkedFromControl: LCDatePickerControl;
+  protected linkedToControl: LCDatePickerControl;
 
   @HostBinding('style.margin-top')
   public componentMargin;
@@ -41,19 +53,33 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
   @Output() public dateChange: EventEmitter<string> = new EventEmitter<string>();
   @Output() public openedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
+  @ViewChildren(LCDayPickerComponent)
+  private readonly linkedDayPickers: QueryList<LCDayPickerComponent>;
+
   private readonly subscriptions: Subscription[] = [];
+  private popoverBehavior: DatePickerPopoverBehavior;
+  private linkedFromMonth: DateTime;
+  private linkedToMonth: DateTime;
+  private synchronizingMonths = false;
+  private pendingRangeStart: DateTime | null;
+  private rangePreview: DateTime | null;
+  private linkedRangeComplete = true;
 
   constructor(
     private readonly cd: ChangeDetectorRef,
-    private readonly _elementRef: ElementRef,
-  ) {
+    private readonly _elementRef: ElementRef) {
   }
 
   public ngOnInit(): void {
 
     this.fromControl = this.config.getControl(DateType.FROM);
     this.toControl = this.config.getControl(DateType.TO);
+    this.linkedRange = this.config.isLinkedRangeSelection();
     this.config.setHostElement(this._elementRef.nativeElement);
+    this.popoverBehavior = new DatePickerPopoverBehavior(this._elementRef.nativeElement);
+    if (this.linkedRange) {
+      this.initializeLinkedCalendars();
+    }
     this.initCalendar();
     this.setupSubscriptions();
 
@@ -61,7 +87,10 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
   }
 
   public ngAfterViewInit(): void {
-
+    if (this.linkedRange) {
+      this.syncLinkedCalendars();
+      this.subscriptions.push(this.linkedDayPickers.changes.subscribe(() => this.syncLinkedCalendars()));
+    }
     this.cd.detectChanges();
   }
 
@@ -73,7 +102,18 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
   }
 
   public confirm(): void {
+    if (this.linkedRange && !this.linkedRangeComplete) {
+      return;
+    }
+
+    this.config.commitSelection();
     this.dateChange.emit(this.config.getValue());
+    this.setOpen(false);
+  }
+
+  public clear(): void {
+    this.config.setValue(null);
+    this.dateChange.emit('');
     this.setOpen(false);
   }
 
@@ -91,6 +131,11 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
 
   public setLocalization(localization: string): void {
     this.config.setLocalization(localization);
+    if (this.linkedRange) {
+      this.linkedFromControl.setLocalization(localization);
+      this.linkedToControl.setLocalization(localization);
+      this.refreshLinkedCalendarsView();
+    }
   }
 
   public getLabels(): ILabels {
@@ -107,6 +152,11 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
 
   public setTheme(theme: IColorTheme): void {
     this.config.setTheme(theme);
+    if (this.linkedRange) {
+      this.linkedFromControl.setTheme(theme);
+      this.linkedToControl.setTheme(theme);
+      this.refreshLinkedCalendarsView();
+    }
   }
 
   public getTimezone(): string {
@@ -119,6 +169,11 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
 
   public setDisabledDates(dates: string[]): void {
     this.config.setDisabledDates(dates);
+    if (this.linkedRange) {
+      this.linkedFromControl.setDisabledDates(dates);
+      this.linkedToControl.setDisabledDates(dates);
+      this.refreshLinkedCalendarsView();
+    }
   }
 
   public isFocused(): boolean {
@@ -129,16 +184,12 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
     this.config.focus();
   }
 
-  private getActivePanel(dateType: DateType): Panel {
-    return this.config.getPanel(dateType);
-  }
-
   private initCalendar(): void {
 
     this.activePanelFrom = this.config.getPanel(DateType.FROM);
     this.activePanelTo = this.config.getPanel(DateType.TO);
 
-    this._elementRef.nativeElement.focus();
+    this.popoverBehavior.focus();
   }
 
   private navigation(dir: ECalendarNavigation): void {
@@ -151,6 +202,12 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private setupSubscriptions() {
+    if (this.linkedRange) {
+      this.subscriptions.push(this.fromControl.getDateEventsChanges().subscribe(events => {
+        this.linkedFromControl.setDateEvents(events);
+        this.linkedToControl.setDateEvents(events);
+      }));
+    }
 
     this.subscriptions.push(
       this.config.getOpenChanges()
@@ -158,10 +215,18 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
           this.opened = open;
 
           if (this.opened) {
-            this.setCalendarPosition();
+            if (this.linkedRange) {
+              this.resetLinkedDraft();
+            }
+          } else if (this.linkedRange) {
+            this.resetLinkedDraft();
           }
 
           this.cd.detectChanges();
+          if (this.opened) {
+            this.setCalendarPosition();
+            this.cd.detectChanges();
+          }
           this.openedChange.emit(this.opened);
         })
     );
@@ -181,44 +246,198 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
         }
 
         this.cd.detectChanges();
+        if (this.opened) {
+          this.setCalendarPosition();
+          this.cd.detectChanges();
+        }
       })
     );
   }
 
   private setCalendarPosition(): void {
-    const windowHeight = window.innerHeight;
-    const componentPosition = this._elementRef.nativeElement.parentNode.getBoundingClientRect();
-    this.componentMargin =
-      (windowHeight - componentPosition.top > this.calendarSize(this.config.getCalendarType()))
-        ? 0
-        : this.calendarSize(this.config.getCalendarType()) * -1 + 'px';
+    this.componentMargin = this.popoverBehavior.getMarginTop();
   }
 
-  private calendarSize(type: ECalendarType): number {
-    let height = 32;
-    if (
-      this.config.getCalendarType() === ECalendarType.Time ||
-      this.config.getCalendarType() === ECalendarType.DateTime
-    ) {
-      height += 20;
+  protected onLinkedDateSelected(date: DateTime): void {
+    const adapter = this.fromControl.getAdapter();
+    if (!this.pendingRangeStart || this.linkedRangeComplete) {
+      this.pendingRangeStart = date.clone();
+      this.rangePreview = null;
+      this.linkedRangeComplete = false;
+      this.config.setRangeSelectionComplete(false);
+    } else {
+      const [start, end] = adapter.isBefore(date, this.pendingRangeStart)
+        ? [date, this.pendingRangeStart]
+        : [this.pendingRangeStart, date];
+      this.fromControl.setValue(start, false);
+      this.toControl.setValue(end, false);
+      this.pendingRangeStart = null;
+      this.rangePreview = null;
+      this.linkedRangeComplete = true;
+      this.config.setRangeSelectionComplete(true);
     }
-    switch (type) {
-      case ECalendarType.DateTime: {
-        height += 280;
-        break;
-      }
-      case ECalendarType.Date:
-      case ECalendarType.DateRange:
-      case ECalendarType.MonthYear:
-      case ECalendarType.Year: {
-        height += 240;
-        break;
-      }
-      case ECalendarType.Time: {
-        height += 140;
-        break;
-      }
+
+    this.refreshLinkedRangeState();
+  }
+
+  protected onLinkedDatePreview(date: DateTime | null): void {
+    if (!this.pendingRangeStart || this.linkedRangeComplete) {
+      return;
     }
-    return height;
+
+    this.rangePreview = date;
+    this.refreshLinkedRangeState();
+  }
+
+  protected onLeftMonthViewed(date: DateTime): void {
+    this.synchronizeOtherMonth(date, true);
+  }
+
+  protected onRightMonthViewed(date: DateTime): void {
+    this.synchronizeOtherMonth(date, false);
+  }
+
+  private initializeLinkedCalendars(): void {
+    this.linkedFromControl = this.createLinkedCalendarControl(
+      this.fromControl,
+      this.fromControl.getValue()
+    );
+    this.linkedToControl = this.createLinkedCalendarControl(
+      this.toControl,
+      this.toControl.getValue()
+    );
+    this.resetLinkedDraft();
+  }
+
+  private createLinkedCalendarControl(
+    source: LCDatePickerControl,
+    value: DateTime,
+  ): LCDatePickerControl {
+    const adapter = source.getAdapter();
+    const configuration: IDatePickerConfiguration = {
+      value: adapter.toISOString(value),
+      calendarType: ECalendarType.Date,
+      theme: source.getTheme(),
+      labels: source.getLabels(),
+      localization: source.getLocalization(),
+      minimumDate: adapter.toISOString(source.getMinDate()),
+      maximumDate: adapter.toISOString(source.getMaxDate()),
+      disabledDates: source.getDisabledDates(),
+      dateEvents: source.getDateEvents(),
+      timezone: source.getTimezone(),
+      view: {
+        showAdjacentDays: true,
+        compactWeekdays: source.getViewOptions().compactWeekdays
+      },
+    };
+    return new LCDatePickerControl(configuration, adapter);
+  }
+
+  private resetLinkedDraft(): void {
+    if (!this.linkedRange) {
+      return;
+    }
+
+    this.pendingRangeStart = null;
+    this.rangePreview = null;
+    this.linkedRangeComplete = true;
+    this.config.setRangeSelectionComplete(true);
+    this.syncLinkedCalendarConfiguration();
+    this.linkedFromControl.setValue(this.fromControl.getValue());
+    this.linkedToControl.setValue(this.toControl.getValue());
+    this.syncLinkedCalendars();
+    this.refreshLinkedRangeState();
+  }
+
+  private synchronizeOtherMonth(date: DateTime, leftChanged: boolean): void {
+    if (!this.config.isSynchronizedRangeNavigation() || this.synchronizingMonths) {
+      return;
+    }
+
+    const adapter = this.fromControl.getAdapter();
+    const month = adapter.getStartOfMonth(date);
+    const previousMonth = leftChanged ? this.linkedFromMonth : this.linkedToMonth;
+    const targetPicker = leftChanged ? this.linkedDayPickers?.toArray()[1] : this.linkedDayPickers?.toArray()[0];
+    if (!previousMonth || !targetPicker) {
+      return;
+    }
+
+    const monthDelta =
+      (month.getYear() - previousMonth.getYear()) * 12 +
+      month.getMonth() - previousMonth.getMonth();
+    if (leftChanged) {
+      this.linkedFromMonth = month;
+    } else {
+      this.linkedToMonth = month;
+    }
+    if (monthDelta === 0) {
+      return;
+    }
+
+    this.synchronizingMonths = true;
+    try {
+      targetPicker.setVisibleDate(adapter.add(
+        targetPicker.control.getValue(),
+        monthDelta,
+        'month'
+      ));
+    } finally {
+      this.synchronizingMonths = false;
+    }
+    const targetMonth = adapter.getStartOfMonth(targetPicker.control.getValue());
+    if (leftChanged) {
+      this.linkedToMonth = targetMonth;
+    } else {
+      this.linkedFromMonth = targetMonth;
+    }
+    this.refreshLinkedRangeState();
+  }
+
+  private syncLinkedCalendars(): void {
+    if (!this.linkedDayPickers || this.linkedDayPickers.length !== 2) {
+      return;
+    }
+
+    const dayPickers = this.linkedDayPickers.toArray();
+    const adapter = this.fromControl.getAdapter();
+    this.synchronizingMonths = true;
+    try {
+      dayPickers[0].setVisibleDate(this.linkedFromControl.getValue());
+      dayPickers[1].setVisibleDate(this.linkedToControl.getValue());
+    } finally {
+      this.synchronizingMonths = false;
+    }
+    this.linkedFromMonth = adapter.getStartOfMonth(dayPickers[0].control.getValue());
+    this.linkedToMonth = adapter.getStartOfMonth(dayPickers[1].control.getValue());
+    this.refreshLinkedRangeState();
+  }
+
+  private refreshLinkedRangeState(): void {
+    if (!this.linkedDayPickers || this.linkedDayPickers.length !== 2) {
+      return;
+    }
+
+    const start = this.linkedRangeComplete ? this.fromControl.getValue() : this.pendingRangeStart;
+    const end = this.linkedRangeComplete ? this.toControl.getValue() : null;
+    this.linkedDayPickers.forEach(dayPicker => dayPicker.setRangeState(start, end, this.rangePreview));
+  }
+
+  private syncLinkedCalendarConfiguration(): void {
+    const controls: Array<[LCDatePickerControl, LCDatePickerControl]> = [
+      [this.linkedFromControl, this.fromControl],
+      [this.linkedToControl, this.toControl]
+    ];
+    controls.forEach(([linked, source]) => {
+      linked.setTheme(source.getTheme());
+      linked.setLocalization(source.getLocalization());
+      linked.setDisabledDates(source.getDisabledDates());
+      linked.setMinDate(source.getMinDate());
+      linked.setMaxDate(source.getMaxDate());
+    });
+    this.refreshLinkedCalendarsView();
+  }
+
+  private refreshLinkedCalendarsView(): void {
+    this.linkedDayPickers?.forEach(dayPicker => dayPicker.refreshCalendar());
   }
 }

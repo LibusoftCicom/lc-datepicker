@@ -6,10 +6,12 @@ import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { MomentDateAdapterService } from './moment-date-adapter.service';
+import { CustomDatepickerDemoComponent } from './custom-datepicker/custom-datepicker-demo.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    CustomDatepickerDemoComponent
   ],
   imports: [
     BrowserModule,

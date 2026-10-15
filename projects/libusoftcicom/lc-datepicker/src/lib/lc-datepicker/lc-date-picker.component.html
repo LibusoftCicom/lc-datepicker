@@ -1,12 +1,29 @@
-<div [ngSwitch]="activePanel" class="calendar" *ngIf="opened">
-    <lc-year-picker *ngSwitchCase="3" [control]="control"></lc-year-picker>
-    <lc-month-picker *ngSwitchCase="2" [control]="control"></lc-month-picker>
-    <lc-day-picker *ngSwitchCase="1" [control]="control"></lc-day-picker>
-    <lc-time-picker *ngSwitchCase="0" [control]="control"></lc-time-picker>
+@if (opened) {
+<div class="calendar">
+    @if (linkedControl && activePanel === Panel.Day) {
+    <lc-day-picker
+        #linkedDayPicker
+        [control]="linkedControl"
+        (dateSelected)="selectRangeDate($event)"
+        (datePreview)="previewRangeDate($event)">
+    </lc-day-picker>
+    } @else {
+    <lc-active-calendar-panel
+        [panel]="activePanel"
+        [control]="linkedControl || control"
+        [includeTimePanel]="true"
+        [compactTime]="control.getViewOptions().compactTime"
+        [showTimeLabel]="false">
+    </lc-active-calendar-panel>
+    }
 
-    <div class="dateTimeToggle" *ngIf="calendarType === ECalendarType.DateTime">
+    @if (calendarType === ECalendarType.DateTime) {
+    <div class="dateTimeToggle">
         <lc-time-picker-compact [control]="control"></lc-time-picker-compact>
     </div>
-    <lc-confirm-button *ngIf="calendarType <= 1" [control]="control" (confirmed)="confirm()"></lc-confirm-button>
+    }
+    <ng-container lc-date-picker-footer [control]="control"
+        (confirm)="confirm()" (cancel)="config.setOpen(false)" (clear)="clear()"></ng-container>
 </div>
-<lc-calendar-background *ngIf="opened" [control]="control"></lc-calendar-background>
+<lc-calendar-background [control]="control"></lc-calendar-background>
+}

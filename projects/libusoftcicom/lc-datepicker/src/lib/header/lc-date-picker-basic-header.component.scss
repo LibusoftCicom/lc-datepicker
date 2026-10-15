@@ -1,0 +1,84 @@
+button {
+  width: 28px;
+  color: currentColor;
+  background: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 14px;
+  text-align: center;
+  border: none;
+  padding: 0;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--lc-datepicker-focus-color, currentColor);
+  outline-offset: -2px;
+}
+
+.dateRangeLabel {
+  text-align: center;
+  color: var(--lc-datepicker-header-color, #e0e0e0);
+  font-weight: bold;
+}
+
+tr {
+  height: var(--lc-datepicker-header-height, 25px);
+  color: var(--lc-datepicker-header-color, aliceblue);
+}
+
+
+
+.selectbtn {
+    cursor: pointer;
+    color: var(--lc-datepicker-header-color, #e0e0e0);
+    float: left;
+    width: 30px;
+
+    &:hover {
+      color: var(--lc-datepicker-header-hover-color, #fbfbfb);
+    }
+}
+
+th {
+
+  &[colspan="7"] {
+    .selectbtn {
+      cursor: pointer;
+      color: var(--lc-datepicker-header-color, #e0e0e0);
+      float: left;
+      width: 28px;
+      text-align: center;
+    }
+
+    .selectbtn.pullRight {
+      float: right;
+    }
+  }
+
+  .selectbtn.monthlabel {
+    width: 80px;
+  }
+
+  .selectbtn.yearlabel {
+    width: 50px;
+  }
+
+  button {
+    color: var(--lc-datepicker-header-color, aliceblue);
+  }
+
+  .selectbtn.monthlabel button,
+  .selectbtn.yearlabel button {
+    width: 100%;
+  }
+}
+
+.pullRight {
+  float: right;
+}
+
+.selectbtn .fa-lg {
+  font-size: 1.5em;
+  line-height: 0;
+}

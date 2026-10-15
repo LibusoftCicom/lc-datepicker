@@ -1,0 +1,22 @@
+@switch (panel) {
+  @case (Panel.Year) {
+    <lc-year-picker [control]="control"></lc-year-picker>
+  }
+  @case (Panel.Month) {
+    <lc-month-picker [control]="control"></lc-month-picker>
+  }
+  @case (Panel.Day) {
+    <lc-day-picker [control]="control"></lc-day-picker>
+  }
+  @case (Panel.Time) {
+    @if (includeTimePanel) {
+      @if (compactTime) {
+        <div class="timeOnly">
+        <lc-time-picker-compact [control]="control" [showLabel]="showTimeLabel"></lc-time-picker-compact>
+        </div>
+      } @else {
+        <lc-time-picker [control]="control"></lc-time-picker>
+      }
+    }
+  }
+}

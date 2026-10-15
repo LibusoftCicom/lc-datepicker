@@ -3,18 +3,18 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ElementRef, Input,
+  Input,
   NgZone,
   OnDestroy,
   OnInit,
-  Renderer2,
   ViewChild
 } from '@angular/core';
 import { LCDatePickerControl } from '../lc-date-picker-control';
 import { fromEvent, Subscription } from 'rxjs';
-import { ICalendarItem } from '../base-date-picker.class';
+import { ICalendarItem, Panel } from '../base-date-picker.class';
 import { YearPicker } from './year-picker.class';
 import { ECalendarNavigation } from '../enums';
+import { LCCalendarGridComponent } from '../calendar-grid/calendar-grid.component';
 
 @Component({
   selector: 'lc-year-picker',
@@ -29,25 +29,15 @@ export class LCYearPickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private readonly subscriptions: Subscription[] = [];
 
-  @Input() public control: LCDatePickerControl;
+  @Input() public control!: LCDatePickerControl;
 
-  @ViewChild('yearPicker', { static: true })
-  public yearPickerElement: ElementRef<HTMLTableElement>;
-
-  @ViewChild('previousYearsButton', { static: true })
-  public previousYearsButtonElement: ElementRef<HTMLButtonElement>;
-
-  @ViewChild('nextYearsButton', { static: true })
-  public nextYearsButtonElement: ElementRef<HTMLButtonElement>;
-
-  @ViewChild('reset', { static: true })
-  public resetElement: ElementRef<HTMLDivElement>;
+  @ViewChild(LCCalendarGridComponent, { static: true })
+  public calendarGrid!: LCCalendarGridComponent;
 
   constructor(
     private readonly cd: ChangeDetectorRef,
     private readonly datePicker: YearPicker,
     private readonly ngZone: NgZone,
-    private readonly renderer: Renderer2,
   ) {}
 
   public ngOnInit(): void {
@@ -57,15 +47,12 @@ export class LCYearPickerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public ngAfterViewInit(): void {
-    this.setStyles();
-
     this.ngZone.runOutsideAngular(() => this.registerViewEvents());
   }
 
   public ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
     this.subscriptions.length = 0;
-
     this.cd.detach();
   }
 
@@ -96,7 +83,6 @@ export class LCYearPickerComponent implements OnInit, AfterViewInit, OnDestroy {
       this.datePicker.getCalendarChanges().subscribe(() => {
         this.calendarData = this.datePicker.getCalendarData();
         this.cd.detectChanges();
-        this.setStyles();
       })
     );
   }
@@ -135,34 +121,10 @@ export class LCYearPickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private registerViewEvents(): void {
     this.subscriptions.push(
-      fromEvent<WheelEvent>(this.yearPickerElement.nativeElement, 'wheel')
+      fromEvent<WheelEvent>(this.calendarGrid.tableElement.nativeElement, 'wheel')
         .subscribe((event) => this.yearScroll(event))
     );
-
-    this.subscriptions.push(
-      fromEvent<PointerEvent>(this.previousYearsButtonElement.nativeElement, 'click')
-        .subscribe(() => {
-          this.previousYears();
-          this.control.focus();
-        })
-    );
-
-    this.subscriptions.push(
-      fromEvent<PointerEvent>(this.nextYearsButtonElement.nativeElement, 'click')
-        .subscribe(() =>{
-          this.nextYears();
-          this.control.focus();
-        })
-    );
-
-    this.subscriptions.push(
-      fromEvent<PointerEvent>(this.resetElement.nativeElement, 'click')
-        .subscribe(() => this.control.reset())
-    );
   }
 
-  private setStyles(): void {
-    this.renderer
-      .setStyle(this.yearPickerElement.nativeElement.tHead, 'background', this.control.getTheme().primaryColor);
-  }
+  public readonly yearPanel = Panel.Year;
 }

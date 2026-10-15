@@ -3,11 +3,10 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ElementRef, Input,
+  Input,
   NgZone,
   OnDestroy,
   OnInit,
-  Renderer2,
   ViewChild
 } from '@angular/core';
 import { LCDatePickerControl } from './../lc-date-picker-control';
@@ -15,7 +14,7 @@ import { fromEvent, Subscription } from 'rxjs';
 import { ICalendarItem, Panel } from '../base-date-picker.class';
 import { MonthPicker } from './month-picker.class';
 import { ECalendarNavigation } from '../enums';
-import { DateTimePart, LCDatePickerAdapter } from '../lc-date-picker-adapter.class';
+import { LCCalendarGridComponent } from '../calendar-grid/calendar-grid.component';
 
 @Component({
   selector: 'lc-month-picker',
@@ -26,28 +25,19 @@ import { DateTimePart, LCDatePickerAdapter } from '../lc-date-picker-adapter.cla
 })
 export class LCMonthPickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  public formattedYear: string;
   public calendarData: ICalendarItem[][];
 
   private readonly subscriptions: Subscription[] = [];
 
   @Input() public control: LCDatePickerControl;
 
-  @ViewChild('monthPicker', { static: true })
-  public monthPickerElement: ElementRef<HTMLTableElement>;
-
-  @ViewChild('reset', { static: true })
-  public resetElement: ElementRef<HTMLDivElement>;
-
-  @ViewChild('yearPanel', { static: true })
-  public yearPanelElement: ElementRef<HTMLDivElement>;
+  @ViewChild(LCCalendarGridComponent, { static: true })
+  public calendarGrid: LCCalendarGridComponent;
 
   constructor(
     private readonly cd: ChangeDetectorRef,
     private readonly datePicker: MonthPicker,
-    private readonly ngZone: NgZone,
-    private readonly renderer: Renderer2,
-    private readonly dateAdapter: LCDatePickerAdapter,
+    private readonly ngZone: NgZone
   ) {}
 
   public ngOnInit(): void {
@@ -59,9 +49,6 @@ export class LCMonthPickerComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   public ngAfterViewInit(): void {
-
-    this.setStyles();
-
     this.ngZone.runOutsideAngular(() => this.registerViewEvents());
   }
 
@@ -91,14 +78,6 @@ export class LCMonthPickerComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  public switchPanels(panel: Panel): void {
-    this.control.setPanel(panel);
-  }
-
-  public resetDate(): void {
-    this.control.reset();
-  }
-
   private setupSubscriptions(): void {
     this.subscriptions.push(this.control.getNavigationChanges().subscribe(dir => this.navigate(dir)));
     this.subscriptions.push(this.datePicker.getCalendarChanges().subscribe(() => this.updateTemplate()));
@@ -106,16 +85,7 @@ export class LCMonthPickerComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private updateTemplate(): void {
     this.calendarData = this.datePicker.getCalendarData();
-    this.formattedYear =
-      this.dateAdapter.formatDateTimePart(
-        this.control.getValue(),
-        DateTimePart.YEAR,
-        this.control.getLocalization()
-      );
-
     this.cd.detectChanges();
-
-    this.setStyles();
   }
 
   private navigate(dir: ECalendarNavigation): void {
@@ -143,23 +113,10 @@ export class LCMonthPickerComponent implements OnInit, AfterViewInit, OnDestroy 
   private registerViewEvents() {
 
     this.subscriptions.push(
-      fromEvent<WheelEvent>(this.monthPickerElement.nativeElement, 'wheel')
+      fromEvent<WheelEvent>(this.calendarGrid.tableElement.nativeElement, 'wheel')
         .subscribe((event) => this.monthScroll(event))
     );
-
-    this.subscriptions.push(
-      fromEvent<PointerEvent>(this.resetElement.nativeElement, 'click')
-        .subscribe(() => this.resetDate())
-    );
-
-    this.subscriptions.push(
-      fromEvent<PointerEvent>(this.yearPanelElement.nativeElement, 'click')
-        .subscribe(() => this.switchPanels(Panel.Year))
-    );
   }
 
-  private setStyles(): void {
-    this.renderer
-      .setStyle(this.monthPickerElement.nativeElement.tHead, 'background', this.control.getTheme().primaryColor);
-  }
+  public readonly monthPanel = Panel.Month;
 }

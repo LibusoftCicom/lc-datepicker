@@ -1,11 +1,18 @@
-<table #timePicker class="timePicker" aria-describedby="a control for choosing time">
-    <tbody>
+<table #timePicker class="timePicker" [attr.aria-label]="control.getLabels().timeLabel || 'Choose time'">
+    <tbody [style.color]="panelTextColor">
         <tr>
+            @if (showLabel) {
             <td class="clockCell">
-                <i class="fa fa-clock-o fa-2x" aria-hidden="true"></i>
+                @if (control.getLabels().timeLabel) {
+                    <span class="timeCaption">{{ control.getLabels().timeLabel }}</span>
+                } @else {
+                    <i class="fa fa-clock-o fa-2x" aria-hidden="true"></i>
+                }
             </td>
-            <td>
+            }
+            <td class="timeValueCell">
                 <lc-time-spinner-compact
+                  ariaLabel="hour"
                   [value]="formattedHour"
                   [control]="control"
                   (incremented)="addHour()"
@@ -14,8 +21,9 @@
                 </lc-time-spinner-compact>
             </td>
                 <td class="divider">:</td>
-            <td>
+            <td class="timeValueCell minuteCell">
                 <lc-time-spinner-compact
+                  ariaLabel="minute"
                   [value]="formattedMinute"
                   [control]="control"
                   (incremented)="addMinute()"
@@ -23,15 +31,17 @@
                   (scrolled)="minuteScroll($event)">
                 </lc-time-spinner-compact>
             </td>
-            <td>
+            <td class="meridiemCell" [class.emptyMeridiem]="hourFormat !== EHourFormat.TWELVE_HOUR">
+                                @if (hourFormat === EHourFormat.TWELVE_HOUR) {
                 <lc-time-spinner-compact
-                  *ngIf="hourFormat === EHourFormat.TWELVE_HOUR"
+                  ariaLabel="AM/PM"
                   [value]="formattedAMPM"
                   [control]="control"
                   (incremented)="toggleMeridiem()"
                   (decremented)="toggleMeridiem()"
                   (scrolled)="scrollMeridiem($event)">
                 </lc-time-spinner-compact>
+                                }
             </td>
         </tr>
     </tbody>

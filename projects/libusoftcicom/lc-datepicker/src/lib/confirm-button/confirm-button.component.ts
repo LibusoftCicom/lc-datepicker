@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ChangeDetectorRef,
   ElementRef,
   EventEmitter, Input,
   NgZone,
@@ -21,7 +22,8 @@ import { LCDatePickerControl } from '../lc-date-picker-control';
 })
 export class LCConfirmButtonComponent implements OnInit, OnDestroy {
 
-  private subscription: Subscription;
+  private readonly subscriptions = new Subscription();
+  public confirmDisabled = false;
 
   @Input() public control: LCDatePickerControl;
 
@@ -31,33 +33,43 @@ export class LCConfirmButtonComponent implements OnInit, OnDestroy {
   public confirmButtonElement: ElementRef<HTMLButtonElement>;
 
   constructor(
+    private readonly cd: ChangeDetectorRef,
     private readonly ngZone: NgZone,
     private readonly renderer: Renderer2,
   ) {}
 
   public ngOnInit(): void {
+    this.subscriptions.add(this.control.getRangeSelectionChanges().subscribe(complete => {
+      this.confirmDisabled = !complete;
+      this.cd.markForCheck();
+    }));
     this.ngZone.runOutsideAngular(() => this.registerViewEvents());
     this.setStyles();
   }
 
   public ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.subscriptions.unsubscribe();
   }
 
   private registerViewEvents(): void {
 
-    this.subscription =
+    this.subscriptions.add(
       fromEvent<PointerEvent>(this.confirmButtonElement.nativeElement, 'click')
         .subscribe(() => {
+          if (!this.control.isRangeSelectionComplete()) {
+            return;
+          }
+
           this.control.setValue(
             this.control.getValue(),
             true
           );
           this.confirmed.emit();
-        });
+        })
+    );
   }
 
   private setStyles(): void {
-    this.renderer.setStyle(this.confirmButtonElement.nativeElement, 'background', this.control.getTheme().primaryColor);
+    this.renderer.setStyle(this.confirmButtonElement.nativeElement, 'background', `var(--lc-datepicker-primary-color, ${this.control.getTheme().primaryColor})`);
   }
 }

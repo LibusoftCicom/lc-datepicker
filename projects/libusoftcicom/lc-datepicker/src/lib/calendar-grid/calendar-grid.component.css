@@ -1,0 +1,88 @@
+:host {
+  display: block;
+}
+
+table {
+  width: var(--lc-datepicker-grid-width, var(--lc-datepicker-width, 220px));
+  height: var(--lc-datepicker-panel-height, 220px);
+  border-collapse: collapse;
+  border: none;
+  box-sizing: border-box;
+  background: var(--lc-datepicker-surface, white);
+}
+
+table.dayPicker {
+  text-transform: capitalize;
+}
+
+.monthsCal {
+  display: table;
+}
+
+td {
+  text-align: center;
+}
+
+.dayPicker td {
+  outline: 1px solid transparent;
+  width: 32px;
+  position: relative;
+  isolation: isolate;
+}
+
+.dayPicker td.range-band::before {
+  content: '';
+  display: var(--lc-datepicker-range-band-display, none);
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  top: 50%;
+  transform: translateY(-50%);
+  height: var(--lc-datepicker-cell-size, 28px);
+  left: 0;
+  right: 0;
+  background: var(--lc-datepicker-range-selection-background, rgba(94, 102, 111, 0.12));
+}
+
+.dayPicker td.range-band-start::before {
+  left: calc(50% - var(--lc-datepicker-cell-size, 28px) / 2);
+  border-top-left-radius: var(--lc-datepicker-cell-size, 28px);
+  border-bottom-left-radius: var(--lc-datepicker-cell-size, 28px);
+}
+
+.dayPicker td.range-band-end::before {
+  right: calc(50% - var(--lc-datepicker-cell-size, 28px) / 2);
+  border-top-right-radius: var(--lc-datepicker-cell-size, 28px);
+  border-bottom-right-radius: var(--lc-datepicker-cell-size, 28px);
+}
+
+.dayPicker td:hover {
+  background: var(--lc-datepicker-surface, white);
+  cursor: default;
+}
+
+.dayPicker td.dayName,
+.dayPicker td.dayName:hover {
+  background: var(--lc-datepicker-surface, white);
+  outline: none;
+}
+
+.monthsCal td,
+.yearsCal td {
+  min-width: 30px;
+  padding: 0;
+}
+
+.yearsCal td {
+  outline: 1px solid transparent;
+}
+
+tr.days {
+  height: var(--lc-datepicker-weekdays-height, 25px);
+  border-bottom: var(--lc-datepicker-weekdays-border, 1px solid #d8d8d8);
+  background: var(--lc-datepicker-weekdays-background, aliceblue);
+}
+
+tr.days td {
+  border: none;
+}

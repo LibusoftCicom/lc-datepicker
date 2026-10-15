@@ -6,6 +6,8 @@ import { ECalendarType, LCDatePickerControl } from './../lc-date-picker.module';
 import { LCMonthPickerButtonComponent } from './month-picker-button.component';
 import { LCDatePickerAdapter } from '../lc-date-picker-adapter.class';
 import { LuxonDateAdapterService } from '../../../../../../src/app/luxon-date-adapter.service';
+import { LCCalendarCellComponent } from '../calendar-cell/calendar-cell.component';
+import { LCCalendarGridComponent } from '../calendar-grid/calendar-grid.component';
 
 describe('LCMonthPickerComponent', () => {
   let component: LCMonthPickerComponent;
@@ -17,6 +19,8 @@ describe('LCMonthPickerComponent', () => {
       declarations: [
         LCMonthPickerComponent,
         LCMonthPickerButtonComponent,
+        LCCalendarCellComponent,
+        LCCalendarGridComponent,
       ],
       providers: [{
         provide: LCDatePickerAdapter,

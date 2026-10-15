@@ -1,4 +1,4 @@
-import { IColorTheme, IDatePickerConfiguration, ILabels, LCDatePickerControl } from './lc-date-picker-control';
+import { IColorTheme, IDatePickerConfiguration, IDatePickerEvent, ILabels, LCDatePickerControl } from './lc-date-picker-control';
 import { DateType, ECalendarNavigation, ECalendarType } from './enums';
 import { map, merge, Observable } from 'rxjs';
 import { Panel } from './base-date-picker.class';
@@ -7,23 +7,28 @@ import { LCDatePickerAdapter } from './lc-date-picker-adapter.class';
 export class DatePickerConfig {
   private readonly control1: LCDatePickerControl;
   private readonly control2: LCDatePickerControl;
+  private confirmedValue: string;
 
   constructor(
     private readonly config: IDatePickerConfiguration,
     dateAdapter: LCDatePickerAdapter
   ) {
+    const singleLinkedRange = this.config.rangeSelectionMode === 'linked' &&
+      (this.config.calendarType ?? ECalendarType.Date) === ECalendarType.Date;
+    const [start, end] = (this.config.value ?? '').split('/');
     this.control1 =
       new LCDatePickerControl(
-        this.config,
+        singleLinkedRange ? { ...this.config, value: start } : this.config,
         dateAdapter,
         this.config.calendarType === ECalendarType.DateRange ? DateType.FROM : DateType.REGULAR
       );
     this.control2 =
       new LCDatePickerControl(
-        this.config,
+        singleLinkedRange ? { ...this.config, value: end || start } : this.config,
         dateAdapter,
         this.config.calendarType === ECalendarType.DateRange ? DateType.TO : DateType.REGULAR
       );
+    this.confirmedValue = this.getValue();
   }
 
 
@@ -106,6 +111,15 @@ export class DatePickerConfig {
    * @param {boolean} open - whether the datepicker should be open or closed.
    */
   public setOpen(open: boolean): void {
+    if (open && !this.control1.isOpen()) {
+      this.confirmedValue = this.getValue();
+    } else if (
+      !open &&
+      (this.config.selectionMode === 'explicit' || this.isLinkedRangeSelection())
+    ) {
+      this.restoreConfirmedValue();
+    }
+
     this.control1.setOpen(open);
     this.control2.setOpen(open, false);
   }
@@ -116,7 +130,7 @@ export class DatePickerConfig {
    * @return ISO 8601 formatted string representing the selected date.
    */
   public getValue(): string {
-    if (this.control1.getCalendarType() === ECalendarType.DateRange) {
+    if (this.hasRangeValue()) {
       return this.control1.getAdapter().toISOString(this.control1.getValue()) + '/' + this.control1.getAdapter().toISOString(this.control2.getValue());
     }
 
@@ -129,22 +143,46 @@ export class DatePickerConfig {
    * @param {string} value - the ISO 8601 formatted string representing the new date.
    */
   public setValue(value: string): void {
-    if (this.control1.getCalendarType() === ECalendarType.DateRange) {
-      if (value === null || value.trim() === '') {
+    const isEmpty = value === null || value.trim() === '';
+    const isRange = this.hasRangeValue();
+    const transactionalSelection =
+      this.config.selectionMode === 'explicit' || this.isLinkedRangeSelection();
+    if (transactionalSelection && !isEmpty) {
+      const adapter = this.control1.getAdapter();
+      if (isRange) {
+        const [from, end] = value.split('/');
+        const to = end || from;
+        this.confirmedValue =
+          adapter.toISOString(adapter.fromISOString(from, this.control1.getTimezone())) + '/' +
+          adapter.toISOString(adapter.fromISOString(to, this.control2.getTimezone()));
+      } else {
+        this.confirmedValue = adapter.toISOString(
+          adapter.fromISOString(value, this.control1.getTimezone())
+        );
+      }
+    }
+
+    if (isRange) {
+      if (isEmpty) {
         const today = this.control1.getAdapter().today(this.control1.getTimezone());
         this.control1.setValue(today, false);
         this.control2.setValue(this.control1.getAdapter().add(today, 1, 'day'), false);
       }
       else {
         const dates = value.split('/');
-        this.control1.setValue(this.control1.getAdapter().fromISOString(dates[0], this.control1.getTimezone()), true);
-        this.control2.setValue(this.control1.getAdapter().fromISOString(dates[1], this.control2.getTimezone()), true);
+        const singleLinkedRange = this.isLinkedRangeSelection() && this.getCalendarType() === ECalendarType.Date;
+        this.control1.setValue(this.control1.getAdapter().fromISOString(dates[0], this.control1.getTimezone()), !singleLinkedRange);
+        this.control2.setValue(this.control1.getAdapter().fromISOString(dates[1] || dates[0], this.control2.getTimezone()), !singleLinkedRange);
       }
-    } else if (value === null || value.trim() === '') {
+    } else if (isEmpty) {
       const today = this.control1.getAdapter().now(this.control1.getTimezone());
       this.control1.setValue(today, false);
     } else {
       this.control1.setValue(this.control1.getAdapter().fromISOString(value, this.control1.getTimezone()), true);
+    }
+
+    if (transactionalSelection && isEmpty) {
+      this.confirmedValue = this.getValue();
     }
   }
 
@@ -164,6 +202,22 @@ export class DatePickerConfig {
    */
   public getCalendarType(): ECalendarType {
     return this.control1.getCalendarType();
+  }
+
+  /** @internal */
+  public isLinkedRangeSelection(): boolean {
+    return this.config.rangeSelectionMode === 'linked';
+  }
+
+  /** @internal */
+  public isSynchronizedRangeNavigation(): boolean {
+    return this.config.rangeNavigationMode === 'synchronized';
+  }
+
+  /** @internal */
+  public setRangeSelectionComplete(complete: boolean): void {
+    this.control1.setRangeSelectionComplete(complete);
+    this.control2.setRangeSelectionComplete(complete);
   }
 
   /**
@@ -303,6 +357,15 @@ export class DatePickerConfig {
     this.control2.setDisabledDates(dates);
   }
 
+  public getDateEvents(): IDatePickerEvent[] {
+    return this.control1.getDateEvents();
+  }
+
+  public setDateEvents(events: IDatePickerEvent[]): void {
+    this.control1.setDateEvents(events);
+    this.control2.setDateEvents(events);
+  }
+
   /**
    * Is the datepicker focused.
    *
@@ -358,8 +421,17 @@ export class DatePickerConfig {
    * Closes the datepicker and emit the currently selected date.
    */
   public confirm(): void {
+    if (this.isLinkedRangeSelection() && !this.control1.isRangeSelectionComplete()) {
+      return;
+    }
+    this.commitSelection();
     this.control1.confirm();
     this.control2.confirm();
+  }
+
+  /** @internal */
+  public commitSelection(): void {
+    this.confirmedValue = this.getValue();
   }
 
   /**
@@ -374,5 +446,30 @@ export class DatePickerConfig {
    */
   public previousPage(): void {
     this.control1.previousPage();
+  }
+
+  private hasRangeValue(): boolean {
+    return this.getCalendarType() === ECalendarType.DateRange ||
+      (this.getCalendarType() === ECalendarType.Date && this.isLinkedRangeSelection());
+  }
+
+  private restoreConfirmedValue(): void {
+    if (this.hasRangeValue()) {
+      const [from, to] = this.confirmedValue.split('/');
+      this.control1.setValue(
+        this.control1.getAdapter().fromISOString(from, this.control1.getTimezone()),
+        false
+      );
+      this.control2.setValue(
+        this.control2.getAdapter().fromISOString(to, this.control2.getTimezone()),
+        false
+      );
+      return;
+    }
+
+    this.control1.setValue(
+      this.control1.getAdapter().fromISOString(this.confirmedValue, this.control1.getTimezone()),
+      false
+    );
   }
 }

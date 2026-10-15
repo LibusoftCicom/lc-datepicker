@@ -1,0 +1,81 @@
+<section aria-labelledby="custom-datepicker-title">
+
+  <section class="picker-examples" aria-labelledby="custom-picker-examples-title">
+    <h3 id="custom-picker-examples-title">Single DatePicker and linked DateRange</h3>
+    <div class="examples range-examples">
+      <article class="example custom-single-example">
+        <h4>Single DatePicker</h4>
+        <p class="picker-value">Selected: <code>{{ singleDateValue }}</code></p>
+        <button
+          type="button"
+          class="date-trigger"
+          [attr.aria-expanded]="singleDateConfig.isOpen()"
+          (click)="toggle(singleDateConfig)">
+          {{ singleDateValue }}
+        </button>
+        <lc-datepicker
+          [config]="singleDateConfig"
+          (dateChange)="singleDateValue = $event">
+        </lc-datepicker>
+      </article>
+
+      <article class="example range-example">
+        <h4>Linked DateRange</h4>
+        <p class="picker-value">Selected: <code>{{ linkedRangeValue }}</code></p>
+        <button
+          type="button"
+          class="date-trigger"
+          [attr.aria-expanded]="linkedRangeConfig.isOpen()"
+          (click)="toggle(linkedRangeConfig)">
+          {{ linkedRangeValue }}
+        </button>
+        <lc-date-range-picker
+          [config]="linkedRangeConfig"
+          (dateChange)="linkedRangeValue = $event">
+        </lc-date-range-picker>
+      </article>
+    </div>
+  </section>
+
+  <section id="css-theming" class="theme-palette" aria-labelledby="theme-palette-title">
+    <h3 id="theme-palette-title">Custom theme color tokens</h3>
+    <p>Values are from the local custom theme above; fallback values are from the library styles.</p>
+    <p>
+      Set these properties on a wrapper around the picker to theme only that instance. They inherit
+      through the Angular component hosts; the existing <code>theme</code> config remains the fallback.
+    </p>
+    <div class="palette-table-wrap">
+      <table class="table table-sm palette-table">
+        <thead>
+          <tr><th scope="col">Swatch</th><th scope="col">CSS variable</th><th scope="col">Theme value</th><th scope="col">Library fallback</th><th scope="col">Purpose</th></tr>
+        </thead>
+        <tbody>
+          @for (color of colorPalette; track color.token) {
+          <tr>
+            <td><span class="color-swatch" [style.backgroundColor]="color.value" aria-hidden="true"></span></td>
+            <td><code>{{ color.token }}</code></td>
+            <td>{{ color.value }}</td>
+            <td>{{ color.fallback }}</td>
+            <td>{{ color.purpose }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <details>
+      <summary>Example: scope a CSS theme to one picker</summary>
+      <pre><code>.booking-calendar &#123;
+  --lc-datepicker-primary-color: #245ca6;
+  --lc-datepicker-color: #273449;
+  --lc-datepicker-surface: #fff;
+  --lc-datepicker-selected-background: #d9e8ff;
+  --lc-datepicker-range-selection-background: #eef4fc;
+  --lc-datepicker-range-endpoint-background: #245ca6;
+&#125;</code></pre>
+      <pre><code>&lt;div class="booking-calendar"&gt;
+  &lt;lc-datepicker [config]="datePickerConfig"&gt;&lt;/lc-datepicker&gt;
+&lt;/div&gt;</code></pre>
+    </details>
+  </section>
+
+</section>

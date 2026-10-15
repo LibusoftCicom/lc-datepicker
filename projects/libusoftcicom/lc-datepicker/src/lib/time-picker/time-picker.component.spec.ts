@@ -55,6 +55,7 @@ describe('LCTimePickerComponent', () => {
       component.control.setHourFormat(EHourFormat.TWELVE_HOUR);
       component.setTimeFormat();
       expect(component.hourFormat).toBe(EHourFormat.TWELVE_HOUR);
+      expect(fixture.nativeElement.querySelector('tbody').style.color).toBe('rgb(94, 102, 111)');
   });
 
   it('should check 24h format', () => {

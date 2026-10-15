@@ -20,3 +20,12 @@ body{
 img {
     height: 35px;
 }
+
+app-custom-datepicker-demo #css-theming {
+    scroll-margin-top: 72px;
+}
+
+app-custom-datepicker-demo pre {
+    max-width: 100%;
+    overflow-x: auto;
+}

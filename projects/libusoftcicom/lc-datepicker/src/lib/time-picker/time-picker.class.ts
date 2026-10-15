@@ -24,6 +24,13 @@ export class TimePicker {
   }
 
     public addHour(): void {
+        console.log('addHour');
+        console.log('current hour:', this.control.getValue().getHour());
+        console.log('next hour:', this.dateAdapter.setParts(
+                this.control.getValue(),
+                {hour: (this.control.getValue().getHour() + 1) % this.HOURS_IN_DAY}
+            ));
+
         this.control.setValue(
             this.dateAdapter.setParts(
                 this.control.getValue(),
@@ -83,6 +90,10 @@ export class TimePicker {
                 });
 
 
+                // nakon promjene vrijednosti ulazi u ovaj blok ako je trenutno vrijeme unutar onemogućenog raspona
+                // currentTime  day30 hour:21 millisecond: 0minute: 59month: 8second: 0timezone: "Europe/Zagreb"year: 2026
+                // minimumTime day30hour: 21 millisecond: 0minute: 0month: 8second: 0timezone: "Europe/Zagreb"year: 2026
+                // maximumTime  date: 30hour: 23millisecond: 0minute: 59month: 8second: 0timezone: "Europe/Zagreb"year: 2026
             if (this.dateAdapter.isBetween(currentTime, minimumTime, maximumTime)) {
 
                 if (reverse) {

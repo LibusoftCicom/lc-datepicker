@@ -3,21 +3,22 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ElementRef,
+  EventEmitter,
   Input,
   NgZone,
   OnDestroy,
   OnInit,
-  QueryList,
-  Renderer2,
+  Output,
   ViewChild,
-  ViewChildren
 } from '@angular/core';
 import { fromEvent, Subscription } from 'rxjs';
 import { DayPicker } from './day-picker.class';
 import { ICalendarItem, Panel } from '../base-date-picker.class';
 import { ECalendarNavigation, ECalendarType } from '../enums';
 import { LCDatePickerControl } from '../lc-date-picker-control';
+import { LCDatePickerAdapter } from '../lc-date-picker-adapter.class';
+import { LCCalendarGridComponent } from '../calendar-grid/calendar-grid.component';
+import { DateTime } from '../date-time.class';
 
 @Component({
   selector: 'lc-day-picker',
@@ -28,44 +29,30 @@ import { LCDatePickerControl } from '../lc-date-picker-control';
 })
 export class LCDayPickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  public formattedMonth: string;
-  public formattedYear: string;
   public shortDaysOfWeek: string[];
   public calendarData: ICalendarItem[][];
 
+  @Output() public dateSelected = new EventEmitter<DateTime>();
+  @Output() public datePreview = new EventEmitter<DateTime | null>();
+  @Output() public monthViewed = new EventEmitter<DateTime>();
+
   private readonly subscriptions: Subscription[] = [];
+  private rangeStart: DateTime | null;
+  private rangeEnd: DateTime | null;
+  private rangePreview: DateTime | null;
+  private linkedRange = false;
+  private lastViewedMonth: string;
 
-  @Input() public control: LCDatePickerControl;
+  @Input() public control!: LCDatePickerControl;
 
-  @ViewChild('dayPicker', { static: true })
-  public dayPickerElement: ElementRef<HTMLTableElement>;
-
-  @ViewChild('previousMonthButton', { static: true })
-  public previousMonthButtonElement: ElementRef<HTMLButtonElement>;
-
-  @ViewChild('nextMonthButton', { static: true })
-  public nextMonthButtonElement: ElementRef<HTMLButtonElement>;
-
-  @ViewChild('reset', { static: true })
-  public resetElement: ElementRef<HTMLDivElement>;
-
-  @ViewChild('monthPanel', { static: true })
-  public monthPanelElement: ElementRef<HTMLDivElement>;
-
-  @ViewChild('yearPanel', { static: true })
-  public yearPanelElement: ElementRef<HTMLDivElement>;
-
-  @ViewChildren('itemButtons', { read: ElementRef })
-  public itemButtonElements: QueryList<ElementRef>;
-
-  @ViewChildren('daysOfWeek', { read: ElementRef })
-  public daysOfWeekElements: QueryList<ElementRef>;
+  @ViewChild(LCCalendarGridComponent, { static: true })
+  public calendarGrid!: LCCalendarGridComponent;
 
   constructor(
     private readonly cd: ChangeDetectorRef,
     private readonly datePicker: DayPicker,
     private readonly ngZone: NgZone,
-    private readonly renderer: Renderer2,
+    private readonly dateAdapter: LCDatePickerAdapter,
   ) {}
 
   public ngOnInit(): void {
@@ -77,8 +64,6 @@ export class LCDayPickerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public ngAfterViewInit(): void {
-
-    this.setStyles();
 
     this.ngZone.runOutsideAngular(() => this.registerViewEvents());
   }
@@ -92,6 +77,25 @@ export class LCDayPickerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public getDayPicker(): DayPicker {
     return this.datePicker;
+  }
+
+  public setVisibleDate(date: DateTime): void {
+    this.control.setValue(date, false);
+    this.datePicker.setSelectedDate(date);
+  }
+
+  public refreshCalendar(): void {
+    this.datePicker.initializeDaysOfWeek();
+    this.datePicker.setSelectedDate(this.control.getValue());
+  }
+
+  public setRangeState(start: DateTime | null, end: DateTime | null, preview: DateTime | null): void {
+    this.linkedRange = true;
+    this.rangeStart = start;
+    this.rangeEnd = end;
+    this.rangePreview = preview;
+    this.applyRangeState();
+    this.cd.markForCheck();
   }
 
   public nextMonth(): void {
@@ -113,20 +117,21 @@ export class LCDayPickerComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  public switchPanels(panel: Panel): void {
-    this.control.setPanel(panel);
-  }
-
   public resetDate(): void {
     this.control.reset();
   }
 
   private setupSubscriptions(): void {
+    this.subscriptions.push(this.control.getDateEventsChanges().subscribe(() => this.refreshCalendar()));
     this.subscriptions.push(this.control.getNavigationChanges().subscribe((dir) => this.navigate(dir)));
 
-    this.subscriptions.push(this.datePicker.getCalendarChanges().subscribe(() => this.updateTemplate()));
+    this.subscriptions.push(this.datePicker.getCalendarChanges().subscribe(() => {
+      this.updateTemplate();
+      this.emitMonthChange();
+    }));
     this.subscriptions.push(this.control.getResetChanges().subscribe(() => {
       if (
+        this.control.getCalendarType() === ECalendarType.Date ||
         this.control.getCalendarType() === ECalendarType.DateTime ||
         this.control.getCalendarType() === ECalendarType.DateRange
       ) {
@@ -139,12 +144,60 @@ export class LCDayPickerComponent implements OnInit, AfterViewInit, OnDestroy {
   private updateTemplate(): void {
     this.shortDaysOfWeek = this.datePicker.getShortDaysOfWeek();
     this.calendarData = this.datePicker.getCalendarData();
-    this.formattedMonth = this.datePicker.getFormattedMonth();
-    this.formattedYear = this.datePicker.getFormattedYear();
-
+    this.applyRangeState();
     this.cd.detectChanges();
+  }
 
-    this.setStyles();
+  private applyRangeState(): void {
+    if (!this.linkedRange || !this.calendarData) {
+      return;
+    }
+
+    const start = this.rangeStart;
+    const rangeEnd = this.rangeEnd;
+    const preview = this.rangePreview;
+    const end = rangeEnd ?? preview;
+    this.calendarData = this.calendarData.map(row => row.map(item => {
+      if (!item?.dateTime) {
+        return item;
+      }
+
+      return {
+        ...item,
+        active: false,
+        rangeStart: this.sameDay(item.dateTime, start),
+        rangeEnd: !!rangeEnd && this.sameDay(item.dateTime, rangeEnd),
+        inRange: !!start && !!end &&
+          !this.sameDay(item.dateTime, start) &&
+          !this.sameDay(item.dateTime, end) &&
+          this.isBetween(item.dateTime, start, end),
+        rangePreview: !!preview && !!start &&
+          (this.sameDay(item.dateTime, preview) || this.isBetween(item.dateTime, start, preview))
+      };
+    }));
+  }
+
+  private emitMonthChange(): void {
+    const value = this.control.getValue();
+    const monthKey = `${value.getYear()}-${value.getMonth()}`;
+    if (this.lastViewedMonth !== undefined && this.lastViewedMonth !== monthKey) {
+      this.monthViewed.emit(value);
+    }
+    this.lastViewedMonth = monthKey;
+  }
+
+  private sameDay(first: DateTime | null, second: DateTime | null): boolean {
+    return !!first && !!second &&
+      first.getYear() === second.getYear() &&
+      first.getMonth() === second.getMonth() &&
+      first.getDate() === second.getDate();
+  }
+
+  private isBetween(date: DateTime, first: DateTime, second: DateTime): boolean {
+    const low = this.dateAdapter.isBefore(first, second) ? first : second;
+    const high = low === first ? second : first;
+    return this.dateAdapter.isAfter(date, low) &&
+      this.dateAdapter.isBefore(date, high);
   }
 
   private navigate(dir: ECalendarNavigation): void {
@@ -185,54 +238,11 @@ export class LCDayPickerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private registerViewEvents(): void {
-
     this.subscriptions.push(
-      fromEvent<WheelEvent>(this.dayPickerElement.nativeElement, 'wheel')
+      fromEvent<WheelEvent>(this.calendarGrid.tableElement.nativeElement, 'wheel')
         .subscribe((event) => this.monthScroll(event))
     );
-
-    this.subscriptions.push(
-      fromEvent<PointerEvent>(this.previousMonthButtonElement.nativeElement, 'click')
-        .subscribe(() => {
-          this.previousMonth();
-          this.control.focus();
-        })
-    );
-
-    this.subscriptions.push(
-      fromEvent<PointerEvent>(this.nextMonthButtonElement.nativeElement, 'click')
-        .subscribe(() =>{
-          this.nextMonth();
-          this.control.focus();
-        })
-    );
-
-    this.subscriptions.push(
-      fromEvent<PointerEvent>(this.resetElement.nativeElement, 'click')
-        .subscribe(() => this.resetDate())
-    );
-
-    this.subscriptions.push(
-      fromEvent<PointerEvent>(this.monthPanelElement.nativeElement, 'click')
-        .subscribe(() => this.switchPanels(Panel.Month))
-    );
-
-    this.subscriptions.push(
-      fromEvent<PointerEvent>(this.yearPanelElement.nativeElement, 'click')
-        .subscribe(() => this.switchPanels(Panel.Year))
-    );
   }
 
-  private setStyles(): void {
-    this.renderer
-      .setStyle(this.dayPickerElement.nativeElement.tHead, 'background', this.control.getTheme().primaryColor);
-
-    this.daysOfWeekElements.forEach((e) =>
-      this.renderer.setStyle(e.nativeElement, 'color', this.control.getTheme().fontColor)
-    );
-
-    this.itemButtonElements.forEach((e) =>
-      this.renderer.setStyle(e.nativeElement, 'color', this.control.getTheme().fontColor)
-    );
-  }
+  public readonly dayPanel = Panel.Day;
 }

@@ -1,0 +1,40 @@
+<table
+  #calendarTable
+  [class.dayPicker]="kind === 'day'"
+  [class.monthsCal]="kind === 'month'"
+  [class.yearsCal]="kind === 'year'"
+  [attr.aria-label]="kind === 'day' ? 'Choose date' : kind === 'month' ? 'Choose month' : 'Choose year'">
+  <thead lc-date-picker-header [type]="headerType" [control]="control"></thead>
+  <tbody>
+    @if (kind === 'day') {
+      <tr class="days">
+        @for (label of weekdayLabels; track $index) {
+          <td class="dayName">
+            <span [style.color]="weekdayColor">{{ label }}</span>
+          </td>
+        }
+      </tr>
+    }
+    @for (row of rows; track $index; let rowIndex = $index) {
+      <tr>
+        @for (item of row; track $index; let columnIndex = $index) {
+          <td
+            [class.range-band]="isRangeCell(item)"
+            [class.range-band-start]="isRangeBoundary(row, columnIndex, -1)"
+            [class.range-band-end]="isRangeBoundary(row, columnIndex, 1)">
+            @if (item || kind !== 'day') {
+              <ng-container
+                [ngTemplateOutlet]="cellTemplate"
+                [ngTemplateOutletContext]="{
+                  $implicit: item,
+                  rowIndex: rowIndex,
+                  columnIndex: columnIndex
+                }">
+              </ng-container>
+            }
+          </td>
+        }
+      </tr>
+    }
+  </tbody>
+</table>

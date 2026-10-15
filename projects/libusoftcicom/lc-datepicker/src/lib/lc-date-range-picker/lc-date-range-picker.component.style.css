@@ -2,7 +2,7 @@
   position: absolute;
   color: black;
   background: transparent;
-  font-family: open_sans-n4, open_sans, Helvetica, Arial, sans-serif;
+  font-family: var(--lc-datepicker-font-family, open_sans-n4, open_sans, Helvetica, Arial, sans-serif);
   font-size: 0;
   z-index: 101;
   -webkit-touch-callout: none; /* iOS Safari */
@@ -13,7 +13,36 @@
   user-select: none; /* Non-prefixed version, currently*/
   outline: none;
   line-height: 0;
-  width: 440px;
+  width: var(--lc-datepicker-range-width, calc(2 * var(--lc-datepicker-width, 220px)));
+}
+
+.rangePicker {
+  box-sizing: border-box;
+  border: var(--lc-datepicker-range-border, none);
+  border-radius: var(--lc-datepicker-radius, 0);
+  background: var(--lc-datepicker-range-background, transparent);
+  box-shadow: var(--lc-datepicker-range-shadow, none);
+}
+
+.body {
+  display: flex;
+  flex-wrap: var(--lc-datepicker-range-wrap, nowrap);
+}
+
+@media (max-width: 520px) {
+  :host {
+    width: var(--lc-datepicker-range-mobile-width,
+      var(--lc-datepicker-range-panel-width, var(--lc-datepicker-width, 220px)));
+  }
+
+  .body {
+    flex-wrap: var(--lc-datepicker-range-wrap, wrap);
+  }
+
+  .calendar + .calendar::before {
+    border-left: none;
+    border-top: var(--lc-datepicker-range-stacked-divider, none);
+  }
 }
 
 :host.displayDown {
@@ -24,141 +53,39 @@
   bottom: 20px;
 }
 
-button {
-  height: 100%;
-  background: transparent;
-  box-sizing: border-box;
-  cursor: pointer;
-  display: inline-block;
-  line-height: 14px;
-  text-align: center;
-  border: none;
-  outline: none;
-}
-
-.monthCal td,
-.monthsCal td,
-.yearsCal td,
-.dateRangePicker td {
-  min-width: 30px;
-  padding: 5px 0;
-  border: 1px solid #e4e4e4;
-}
-
-td:hover {
-  background: #efefef;
+:host:focus-visible {
+  outline: 2px solid var(--lc-datepicker-focus-color, #5e666f);
+  outline-offset: 2px;
 }
 
 .calendar {
-  box-shadow: rgba(0, 0, 0, 0.156863) 0px 1px 1px 0, rgba(0, 0, 0, 0.26) 0 -1px 1px 0;
+  position: relative;
+  box-shadow: var(--lc-datepicker-range-panel-shadow, 0 1px 1px #00000028, 0 -1px 1px #00000042);
   box-sizing: border-box;
   display: inline-block;
-  font-size: 12px;
+  flex-shrink: 0;
+  font-size: var(--lc-datepicker-font-size, 12px);
   line-height: 14px;
-  margin: 5px 0 0;
-  width: 220px;
+  margin: var(--lc-datepicker-range-panel-margin, 5px 0 0);
+  padding: var(--lc-datepicker-range-panel-padding, 0);
+  width: var(--lc-datepicker-range-panel-width, var(--lc-datepicker-width, 220px));
 }
 
-table {
-  width: 220px;
-  height: calc(100% - 36px);
-  border-collapse: collapse;
-  border: none;
-  box-sizing: border-box;
-  display: table;
+.calendar + .calendar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-left: var(--lc-datepicker-range-divider, none);
+  border-top: var(--lc-datepicker-range-stacked-divider, none);
+  pointer-events: none;
 }
 
-.dateTimeToggle {
-  width: 220px;
-  height: 41px;
-  background: #e4e4e4;
-  border-top: 1px solid #e4e4e4;
-}
-
-.dateTimeToggle button {
-  width: 50%;
-  height: 100%;
-  float: left;
-  background: transparent;
-}
-
-.dateTimeToggle button.active {
-  background: white;
-}
-
-.dateTimeToggle :first-child button {
-  border-right: 1px solid #efefef;
-}
-
-.dateRangeLabel .confirmDate {
-  box-shadow: rgba(0, 0, 0, 0.156863) 0px 1px 1px 0, rgba(0, 0, 0, 0.26) 0 -1px 1px 0;
-  width: 220px;
-  height: 20px;
-  background: #5e666f;
-}
-
-.confirmDate {
-  font-size: 12px;
-  width: auto;
-}
-
-.confirmDate button {
-  width: 100%;
-  height: 100%;
-  border-top: 1px solid #efefef;
-  color: #ececec;
-  padding: 2px;
-  font-weight: 500;
-  font-size: 1.1em;
+.linkedRangePicker .calendar {
+  height: auto;
 }
 
 .dateRangeLabel {
   text-align: center;
-  color: #e0e0e0;
+  color: var(--lc-datepicker-header-color, #e0e0e0);
   font-weight: bold;
-}
-thead tr {
-  height: 25px;
-  background: #efefef;
-}
-
-tr.days {
-  height: 25px;
-  width: 32px;
-}
-
-tr.days td {
-  border: none;
-}
-
-td.active {
-  background: rgb(230, 232, 234);
-}
-
-.selectbtn {
-  cursor: pointer;
-}
-
-.rotateUp {
-  transform: rotate(-90deg);
-}
-.rotateDown {
-  transform: rotate(90deg);
-}
-
-.calendarBackground {
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  background: transparent;
-  z-index: -10;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-
-:host ::ng-deep .fa-lg {
-  font-size: 1.5em;
-  line-height: 0em;
 }

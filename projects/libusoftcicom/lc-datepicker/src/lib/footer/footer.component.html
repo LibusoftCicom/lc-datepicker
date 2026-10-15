@@ -1,0 +1,5 @@
+@if (control(); as pickerControl) {
+    @if (shouldShowConfirmButton(pickerControl)) {
+        <lc-confirm-button [control]="pickerControl" (confirmed)="confirm.emit()"></lc-confirm-button>
+    }
+}

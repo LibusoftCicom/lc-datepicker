@@ -1,38 +1,39 @@
-<nav class="navbar navbar-toggleable-md navbar-inverse fixed-top">
-  <button
-    class="navbar-toggler navbar-toggler-right"
-    type="button"
-    data-toggle="collapse"
-    data-target="#navbarsExampleDefault"
-    aria-controls="navbarsExampleDefault"
-    aria-expanded="false"
-    aria-label="Toggle navigation"
-  >
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <a href="http://www.spi.hr" target="_blank"><img src="./assets/logo.png" alt="Libusoft Cicom logo"/></a>
-  <a class="navbar-brand" href="#">LC DatePicker</a>
-</nav>
-
-<!-- Main jumbotron for a primary marketing message or call to action -->
-<div class="jumbotron">
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="site-header">
   <div class="container">
-    <h1 class="display-3">LC DatePicker</h1>
-    <p>Angular date time picker component</p>
-    <a
-      href="https://github.com/LibusoftCicom/lc-datepicker"
-      class="btn btn-primary btn-lg active"
-      role="button"
-      aria-pressed="true"
-    >GitHub</a
-    >
+    <a class="site-brand" href="#description">
+      <img src="./assets/logo.png" alt="" />
+      <span>LC DatePicker</span>
+    </a>
+    <a class="site-github" href="https://github.com/LibusoftCicom/lc-datepicker">GitHub</a>
   </div>
-</div>
+</header>
 
-<div class="container">
+<main id="main-content" class="container">
+  <section class="page-intro" aria-labelledby="page-title">
+    <p class="eyebrow">Angular date and time picker</p>
+    <h1 id="page-title">Try it. Configure it. Make it yours.</h1>
+    <p>Start with the backward-compatible picker, then explore optional range behavior, custom views and themes.</p>
+    <div class="intro-actions">
+      <a class="btn btn-primary" href="#datepicker-demo">Try the default picker</a>
+      <a class="btn btn-outline-secondary" href="#custom-examples-title">Explore custom examples</a>
+    </div>
+  </section>
+
+  <nav class="demo-navigation" aria-label="Page sections">
+    <a href="#description">Overview</a>
+    <a href="#getting-started">Getting started</a>
+    <a href="#installation">Installation</a>
+    <a href="#datepicker-demo">Default picker</a>
+    <a href="#custom-examples-title">Custom examples</a>
+    <a href="#css-theming">CSS styling</a>
+    <a href="#api-reference">Configuration &amp; API</a>
+    <a href="#contributing">Contributing</a>
+  </nav>
+
   <div class="row">
     <div class="col-lg-12">
-      <div class="card">
+      <div class="card" id="description">
         <h3 class="card-header">Description</h3>
         <div class="card-block">
           <p class="card-text">A pure Angular date and time picker component.</p>
@@ -52,7 +53,7 @@
   </div>
   <div class="row">
     <div class="col-lg-12">
-      <div class="card">
+      <div class="card" id="getting-started">
         <h3 class="card-header">Getting Started</h3>
         <div class="card-block">
           <p class="card-text"></p>
@@ -71,147 +72,139 @@
     <div class="col-lg-12">
       <div class="card" id="installation">
         <h3 class="card-header">Installation</h3>
-        <div class="card-block">
-          <p>To install this component to an external project, follow the procedure:</p>
-          <p class="card-text"></p>
-          <ol>
-            <li><code>npm install &#64;libusoftcicom/lc-datepicker</code></li>
+        <div class="card-block installation-guide">
+          <p>Add LC DatePicker to an existing Angular application in four steps.</p>
+          <ol class="installation-steps">
             <li>
-              <p>Skip this if SystemJS is not used as module loader</p>
-              <code
-              >System.config(&#123;<br />
-                paths: &#123;<br />
-                'npm:': 'node_modules/'<br />
-                &#125;,<br />
-                map: &#123;<br />
-                '&#64;libusoftcicom/lc-datepicker' : 'npm:&#64;libusoftcicom/lc-datepicker/bundles/lc-datepicker.umd'<br />
-                &#125; &#125;)</code
-              >
+              <h4>Install the package</h4>
+              <pre aria-label="Terminal command"><code ngNonBindable>npm install &#64;libusoftcicom/lc-datepicker</code></pre>
             </li>
             <li>
-              <code>
-                import &#123;LcDatePickerModule&#125; from '&#64;libusoftcicom/lc-datepicker';
-                <br />
+              <h4>Register the module and a date adapter</h4>
+              <p>Add these entries to your existing module. The adapter is an application service, not a library export.
+                Use the demo's <a href="https://github.com/LibusoftCicom/lc-datepicker/blob/master/src/app/moment-date-adapter.service.ts">Moment adapter</a>
+                (requires <code>moment</code> and <code>moment-timezone</code>) or
+                <a href="https://github.com/LibusoftCicom/lc-datepicker/blob/master/src/app/luxon-date-adapter.service.ts">Luxon adapter</a>
+                (requires <code>luxon</code>), or implement <code>LCDatePickerAdapter</code> yourself.</p>
+              <div class="installation-code-label">app.module.ts &middot; module additions</div>
+              <pre aria-label="Module registration"><code ngNonBindable>import &#123; LcDatePickerModule &#125; from '&#64;libusoftcicom/lc-datepicker';
+import &#123; MomentDateAdapterService &#125; from './moment-date-adapter.service';
 
-                &#64;NgModule(&#123;<br />
-                declarations: [<br />
-                ...<br />
-                ],<br />
-                imports: [<br />
-                ...<br />
-                LcDatePickerModule.withImplementation(&#123;adapter: LuxonDateAdapterService&#125;)<br />
-                // or LcDatePickerModule.withImplementation(&#123;adapter: MomentDateAdapterService&#125;)<br />
-                // It is also possible to extend LCDatePickerAdapter and implement the adapter using a different library.<br />
-                ],<br />
-                providers: [<br />
-                ...<br />
-                ],<br />
-                bootstrap: [...] &#125;)<br />
-                export class AppModule &#123;&#125;
-              </code>
+
+  ...
+  imports: [
+    ...
+    LcDatePickerModule.withImplementation(&#123; adapter: LuxonDateAdapterService &#125;)
+    // or LcDatePickerModule.withImplementation(&#123; adapter: MomentDateAdapterService &#125;)
+    // It is also possible to extend LCDatePickerAdapter and implement the adapter using a different library.
+  ],
+  providers: [ ... ]
+</code></pre>
             </li>
             <li>
-              <code>
-                import &#123;DatePickerConfig, ECalendarType&#125; from '&#64;libusoftcicom/lc-datepicker';
-                <br />
+              <h4>Create a configuration</h4>
+              <p>The value is an ISO 8601 string. Other settings are optional and keep their defaults when omitted.</p>
+              <div class="installation-code-label">app.component.ts</div>
+              <pre aria-label="Component configuration"><code ngNonBindable>import &#123; Component &#125; from '&#64;angular/core';
+import &#123;
+  DatePickerConfig,
+  ECalendarType,
+  LCDatePickerAdapter
+&#125; from '&#64;libusoftcicom/lc-datepicker';
 
-                &#64;Component(&#123;<br />
-                ...<br />
-                &#125;)<br />
-                export class AppComponent &#123;<br />
+&#64;Component(&#123;
+  selector: 'app-root',
+  templateUrl: './app.component.html'
+&#125;)
+export class AppComponent &#123;
+  public selectedDate: string;
+  public datePickerConfig: DatePickerConfig;
 
-                &nbsp;public inputDate: DateTime;<br />
-                &nbsp;public datePickerConfig: DatePickerConfig;<br />
-                &nbsp;public dateRangePickerConfig: DatePickerConfig;<br />
-                <br />
-                &nbsp;constructor(<br />
-                &nbsp;&nbsp;private readonly dateAdapter: LCDatePickerAdapter,<br />
-                &nbsp;&nbsp;...<br />
-                &nbsp;) &#123;<br />
-                &nbsp;&nbsp;const timezone = 'Europe/Zagreb';<br />
-                &nbsp;&nbsp;// For dates use ISO 8601 formatted strings, e.g. 2024-09-12T22:00:00.000Z<br />
-                &nbsp;&nbsp;// For LCDateRangePickerComponent separate the first and second date using /,<br />
-                &nbsp;&nbsp;// e.g. 2024-09-12T22:00:00.000Z/2024-09-13T22:00:00.000Z<br />
-                &nbsp;&nbsp;this.inputDate = this.dateAdapter.toISOString(this.dateAdapter.now(timezone));<br />
-                &nbsp;&nbsp;// configuration is optional, except for the value.<br />
-                &nbsp;&nbsp;// Other properties will be given default values.<br />
-                &nbsp;&nbsp;const datePickerConfiguration: IDatePickerConfiguration = &#123;<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;value: this.inputDate,<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;calendarType: ECalendarType.Date,<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;localization: 'hr',<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;hourFormat: EHourFormat.TWENTY_FOUR_HOUR,<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;timezone: timezone,<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;minimumDate: minDate,<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;maximumDate: maxDate,<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;disabledDates: [<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2024-09-12T22:00:00.000Z<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// ...<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;],<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;disabledTimeRanges: [<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#123;startTime: &#123;hour: 0, minute: 0&#125;, stopTime: &#123;hour: 7, minute: 59&#125;&#125;<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// ...<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;]<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;labels: &#123; confirmLabel: 'OK', fromLabel: 'From', toLabel: 'To' &#125;,<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;theme: &#123; primaryColor: '#5e666f', fontColor: '#5e666f' &#125;<br />
-                &nbsp;&nbsp;&#125;;<br />
-                &nbsp;&nbsp;this.datePickerConfig = new DatePickerConfig(datePickerConfiguration, this.dateAdapter);<br />
-                <br />
-                &nbsp;&nbsp;const today = this.dateAdapter.today(timezone);<br />
-                <br />
-                &nbsp;&nbsp;const dateRangePickerConfiguration = &#123;<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;...Object.assign(datePickerConfiguration),<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;value: this.dateAdapter.toISOString(today) + '/' + this.dateAdapter.toISOString(this.dateAdapter.add(today, 1, 'day')),<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;calendarType: ECalendarType.DateRange<br />
-                &nbsp;&nbsp;&#125;;<br />
-                <br />
-                &nbsp;&nbsp;this.dateRangePickerConfig = new DatePickerConfig(dateRangePickerConfiguration, this.dateAdapter);<br />
-                &nbsp;&nbsp;...<br />
-                &nbsp;&#125;<br />
-                <br />
-                &nbsp;public setCalendarDate(dateTime: string): void &#123;<br />
-                &nbsp;&nbsp;this.dateInput.nativeElement.value = dateTime;<br />
-                &nbsp;&#125;<br />
-                <br />
-                &nbsp;public setDatePickerOpen(open: boolean): void &#123;<br />
-                &nbsp;&nbsp;if (!open) &#123;<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;this.dateInput.nativeElement.click();<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;this.dateInput.nativeElement.select();<br />
-                &nbsp;&nbsp;&#125;<br />
-                &nbsp;&#125;<br />
-              </code>
+  constructor(private readonly dateAdapter: LCDatePickerAdapter) &#123;
+    const timezone = 'Europe/Zagreb';
+    this.selectedDate = this.dateAdapter.toISOString(
+      this.dateAdapter.now(timezone)
+    );
+
+    this.datePickerConfig = new DatePickerConfig(&#123;
+      value: this.selectedDate,
+      calendarType: ECalendarType.Date,
+      localization: 'hr',
+      timezone
+    &#125;, this.dateAdapter);
+  &#125;
+&#125;</code></pre>
             </li>
             <li>
-              <p>Use the following snippet inside your template for date picker:</p>
-              <code>
-                &lt;lc-datepicker<br/>
-                &nbsp;&nbsp;[config]="datePickerConfig"<br/>
-                &nbsp;&nbsp;(openedChange)="setDatePickerOpen($event)"<br/>
-                &nbsp;&nbsp;(dateChange)="setCalendarDate($event)"&gt;<br/>
-                &lt;/lc-datepicker&gt;
-              </code>
-              <p>Use the following snippet inside your template for date range picker:</p>
-              <code>
-                &lt;lc-date-range-picker<br />
-                &nbsp;&nbsp;[config]="config"<br />
-                &nbsp;&nbsp;(openedChange)="setDateRangePickerOpen($event)"<br />
-                &nbsp;&nbsp;(dateChange)="setCalendarDateRange($event)"&gt;<br />
-                &lt;/lc-date-range-picker&gt;
-              </code>
+              <h4>Add the picker to your template</h4>
+              <p>Open the calendar with a button and store the selected value with <code>dateChange</code>.</p>
+              <div class="installation-code-label">app.component.html</div>
+              <pre aria-label="Date picker template">
+                <code ngNonBindable>&lt;p&gt;Selected date: &#123;&#123; selectedDate &#125;&#125;&lt;/p&gt;
+&lt;button type="button" (click)="datePickerConfig.setOpen(true)"&gt;
+  Choose date
+&lt;/button&gt;
+
+&lt;lc-datepicker
+   [config]="datePickerConfig"
+   (openedChange)="setDatePickerOpen($event)"
+   (dateChange)="setCalendarDate($event)"&gt; 
+ &lt;/lc-datepicker&gt;</code></pre>
             </li>
           </ol>
+          <details class="installation-extra">
+            <summary>Optional: use a date range picker</summary>
+            <p>Add a <code>dateRangePickerConfig: DatePickerConfig</code> property to your component and
+              initialize it in the constructor. Separate the start and end ISO values with <code>/</code>.</p>
+            <div class="installation-code-label">app.component.ts &middot; constructor addition</div>
+            <pre aria-label="Date range configuration"><code ngNonBindable>const today = this.dateAdapter.today(timezone);
+const tomorrow = this.dateAdapter.add(today, 1, 'day');
+
+this.dateRangePickerConfig = new DatePickerConfig(&#123;
+  value: this.dateAdapter.toISOString(today)
+    + '/' + this.dateAdapter.toISOString(tomorrow),
+  calendarType: ECalendarType.DateRange,
+  timezone
+&#125;, this.dateAdapter);</code></pre>
+            <div class="installation-code-label">app.component.html</div>
+            <pre aria-label="Date range template"><code ngNonBindable>&lt;button type="button" (click)="dateRangePickerConfig.setOpen(true)"&gt;
+  Choose date range
+&lt;/button&gt;
+
+&lt;lc-date-range-picker
+   [config]="config"
+   (openedChange)="setDateRangePickerOpen($event)"
+   (dateChange)="setCalendarDateRange($event)"&gt;
+ &lt;/lc-date-range-picker&gt;</code></pre>
+          </details>
+          <p class="installation-reference">Need date limits, disabled times, labels or themes?
+            See the <a href="#api-reference">configuration and API reference</a>.</p>
         </div>
       </div>
       <br />
     </div>
   </div>
+
+  <h2 class="demo-section-title" id="playground">1. Start with picker</h2>
+
+  <p class="demo-section-description">
+    This is the default and independent range behavior,
+    with live controls for localization, calendar type and theme.
+  </p>
+
   <!-- Example row of columns -->
   <div class="row">
     <div class="col-lg-3">
-      <div class="card">
+      <div class="card" id="datepicker-demo">
         <div class="card-header">
-          DatePicker
+          Single DatePicker and independent DateRange
         </div>
-        <div class="card-block">
+        <div class="card-block" (keydown)="onDatePickerKeydown($event)">
+          <h3>Single date picker</h3>
+          <label class="form-check-label d-block mb-3">
+            <input type="checkbox" [(ngModel)]="keyboardNavigationEnabled" />
+            Keyboard navigation
+          </label>
           <blockquote class="card-blockquote"></blockquote>
           <div class="input-group">
             <input type="text" class="form-control" #dateInput />
@@ -228,6 +221,7 @@
           </lc-datepicker>
         </div>
         <div class="card-block">
+          <h3>Independent date range</h3>
           <blockquote class="card-blockquote"></blockquote>
           <div class="input-group">
             <input type="text" class="form-control" #dateRangeInput />
@@ -248,9 +242,10 @@
     <div class="col-lg-6">
       <div class="card">
         <div class="card-header">
-          Config Options
+          Configure the default pickers
         </div>
         <div class="card-block">
+          <p>Locale, labels and theme are shared with the range picker; calendar type changes the single picker only.</p>
           <div class="form-group">
             <blockquote class="card-blockquote col-12">
               <b>Localization:</b>
@@ -259,7 +254,8 @@
             </blockquote>
           </div>
           <div class="form-group">
-            <select class="form-control col-sm-12" id="inlineFormCustomSelect" [(ngModel)]="Localization">
+            <label for="default-localization">Localization</label>
+            <select class="form-control col-sm-12" id="default-localization" [(ngModel)]="Localization">
               <option selected value="en">English</option>
               <option value="fr">French</option>
               <option value="de">German</option>
@@ -278,7 +274,8 @@
             </blockquote>
           </div>
           <div class="form-group">
-            <select class="form-control col-sm-12" id="inlineFormCustomSelect" [(ngModel)]="CalendarType">
+            <label for="default-calendar-type">Calendar type</label>
+            <select class="form-control col-sm-12" id="default-calendar-type" [(ngModel)]="CalendarType">
               <option [attr.value]="0">Time picker</option>
               <option [attr.value]="1">DateTime picker</option>
               <option selected [attr.value]="2">Date picker</option>
@@ -296,7 +293,9 @@
             </blockquote>
           </div>
           <div class="form-group">
-            <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="ConfirmLabel" />
+            <label for="default-confirm-label">Confirm label</label>
+            <input id="default-confirm-label" type="text" class="form-control col-sm-12 col-lg-12"
+              [(ngModel)]="ConfirmLabel" />
           </div>
           <hr />
 
@@ -308,7 +307,9 @@
             </blockquote>
           </div>
           <div class="form-group">
-            <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="FromLabel" />
+            <label for="default-from-label">From label</label>
+            <input id="default-from-label" type="text" class="form-control col-sm-12 col-lg-12"
+              [(ngModel)]="FromLabel" />
           </div>
           <hr />
 
@@ -320,7 +321,9 @@
             </blockquote>
           </div>
           <div class="form-group">
-            <input type="text" class="form-control col-sm-12 col-lg-12" [(ngModel)]="ToLabel" />
+            <label for="default-to-label">To label</label>
+            <input id="default-to-label" type="text" class="form-control col-sm-12 col-lg-12"
+              [(ngModel)]="ToLabel" />
           </div>
           <hr />
 
@@ -344,9 +347,10 @@
     <div class="col-lg-3">
       <div class="card">
         <div class="card-header">
-          Methods
+          Single DatePicker actions
         </div>
-        <div class="card-block">
+        <div class="card-block" id="default-picker-actions">
+          <p>Toggle or clear the single-date picker.</p>
           <blockquote class="card-blockquote"></blockquote>
           <button type="button" class="btn btn-secondary btn-block" (click)="toggleCalendarOpen()">Toggle</button>
           <button type="button" class="btn btn-secondary btn-block" (click)="clearCalendar()">Clear</button>
@@ -355,30 +359,48 @@
     </div>
   </div>
 
-  <div class="card mt-4">
+  <section class="card mt-4" aria-labelledby="custom-examples-title">
+    <h2 class="card-header" id="custom-examples-title">2. Explore custom and opt-in examples</h2>
+    <div class="card-block">
+      <app-custom-datepicker-demo>
+      </app-custom-datepicker-demo>
+    </div>
+  </section>
+
+  <h2 id="api-reference" class="demo-section-title">3. Configuration and API reference</h2>
+  <p class="demo-section-description">
+    Use these options when creating a <code>DatePickerConfig</code>. All values are optional except
+    <code>value</code>; omitted options keep their documented defaults.
+  </p>
+  <div class="card mt-4" id="configuration-properties">
     <h3 class="card-header">IDatePickerConfiguration properties</h3>
     <div class="card-block">
-      <p class="card-text"></p>
+      <p class="card-text">Options passed to the picker configuration:</p>
       <ul>
-        <li>value: string;</li>
-        <li>calendarType?: ECalendarType</li>
-        <li>theme?: IColorTheme</li>
-        <li>fontColor: string</li>
-        <li>labels?: ILabels</li>
-        <li>hourFormat?: EHourFormat</li>
-        <li>localization?: string</li>
-        <li>minimumDate?: string</li>
-        <li>maximumDate?: string</li>
-        <li>disabledDates?: string[]</li>
-        <li>disabledTimeRanges?: IDisabledTimeRange[]</li>
-        <li>timezone?: string</li>
-        <li>open?: boolean</li>
+        <li><code>value: string</code> — ISO date/time, or <code>start/end</code> for a date range (required).</li>
+        <li><code>calendarType?: ECalendarType</code> — Time, DateTime, Date, MonthYear, Year or DateRange.</li>
+        <li><code>theme?: IColorTheme</code> — fallback primary and font colors.</li>
+        <li><code>labels?: ILabels</code> — confirm, From/To and optional time labels.</li>
+        <li><code>hourFormat?: EHourFormat</code> — 12-hour or 24-hour time display.</li>
+        <li><code>localization?: string</code> — locale used for date and weekday labels.</li>
+        <li><code>minimumDate?: string</code>, <code>maximumDate?: string</code> — selectable date bounds.</li>
+        <li><code>disabledDates?: string[]</code> — dates that cannot be selected.</li>
+        <li><code>disabledTimeRanges?: IDisabledTimeRange[]</code> — time intervals that cannot be selected.</li>
+        <li><code>dateEvents?: IDatePickerEvent[]</code> — event markers and accessible descriptions; not restrictions.</li>
+        <li><code>timezone?: string</code> — timezone used to interpret and format dates.</li>
+        <li><code>open?: boolean</code> — initial open state.</li>
+        <li><code>selectionMode?: 'immediate' | 'explicit'</code> — commit each selection or wait for confirmation.</li>
+        <li><code>rangeSelectionMode?: 'independent' | 'linked'</code> — independent endpoints or a shared two-click range.</li>
+        <li><code>rangeNavigationMode?: 'independent' | 'synchronized'</code> — how linked range panels navigate together.</li>
+        <li><code>view?: IDatePickerViewOptions</code> — opt-in layout for adjacent days, compact labels/time, and year grid.</li>
+        <li><code>view.yearColumns?: 4 | 5</code> — number of columns in the year grid.</li>
+        <li><code>view.yearPageAnchor?: number</code> — first year in the displayed year group.</li>
       </ul>
     </div>
   </div>
   <br />
 
-  <div class="card">
+  <div class="card" id="disabled-time-ranges">
     <h3 class="card-header">Define allowed/disabled time ranges:</h3>
     <div class="card-block">
       <div class="form-group">
@@ -415,7 +437,7 @@
   </div>
   <br />
 
-  <div class="card">
+  <div class="card" id="navigation">
     <h3 class="card-header">Navigation</h3>
     <div class="card-block">
       <div class="form-group">
@@ -459,7 +481,7 @@
   </div>
   <br />
 
-  <div class="card">
+  <div class="card" id="contributing">
     <h3 class="card-header">Contributing</h3>
     <div class="card-block">
       <p class="card-text">
@@ -475,5 +497,4 @@
   <footer>
     <p>&copy; Libusoft Cicom {{ year }}</p>
   </footer>
-</div>
-<!-- /container -->
+</main>

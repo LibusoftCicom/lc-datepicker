@@ -7,9 +7,17 @@
 
 .selectbtn {
   cursor: pointer;
-  color: #5e666f;
   width: 20px;
   font-size: xx-large;
+  line-height: 1;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.selectbtn:focus-visible {
+  outline: 2px solid var(--lc-datepicker-focus-color, #5e666f);
+  outline-offset: -2px;
 }
 
 .timeDigit {
