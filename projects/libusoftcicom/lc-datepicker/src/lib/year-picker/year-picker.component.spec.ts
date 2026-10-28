@@ -8,6 +8,8 @@ import { LCYearPickerButtonComponent } from './year-picker-button.component';
 import { LuxonDateAdapterService } from '../../../../../../src/app/luxon-date-adapter.service';
 import { LCCalendarCellComponent } from '../calendar-cell/calendar-cell.component';
 import { LCCalendarGridComponent } from '../calendar-grid/calendar-grid.component';
+import { LcDatePickerHeaderDirective } from '../header/lc-date-picker-header.directive';
+import { withDatePickerHeader } from '../header/header-provider.class';
 
 describe('LCYearPickerComponent', () => {
     let component: LCYearPickerComponent;
@@ -20,12 +22,14 @@ describe('LCYearPickerComponent', () => {
                 LCYearPickerComponent,
                 LCYearPickerButtonComponent,
                 LCCalendarCellComponent,
-                LCCalendarGridComponent
+                LCCalendarGridComponent,
+                LcDatePickerHeaderDirective
             ],
             providers: [{
                 provide: LCDatePickerAdapter,
                 useClass: LuxonDateAdapterService
-            }]
+            },
+            withDatePickerHeader()]
         })
             .compileComponents()
             .then(() => {
@@ -35,7 +39,7 @@ describe('LCYearPickerComponent', () => {
               const today = dateAdapter.today();
 
               const config: IDatePickerConfiguration = {
-                value: dateAdapter.toISOString(today),
+                value: dateAdapter.toISOString(dateAdapter.setParts(today, {year: 2017})),
                 calendarType: ECalendarType.Year,
                 localization: 'hr',
                 minimumDate: dateAdapter.toISOString(dateAdapter.setParts(dateAdapter.getStartOfYear(today), {year: 1900})),

@@ -5,6 +5,8 @@ import { ECalendarType, EHourFormat, IDatePickerConfiguration, LCDatePickerContr
 import { LCDatePickerAdapter } from '../lc-date-picker-adapter.class';
 import { LCTimeSpinnerComponent } from './time-spinner.component';
 import { LuxonDateAdapterService } from '../../../../../../src/app/luxon-date-adapter.service';
+import { LcDatePickerHeaderDirective } from '../header/lc-date-picker-header.directive';
+import { withDatePickerHeader } from '../header/header-provider.class';
 
 describe('LCTimePickerComponent', () => {
   let component: LCTimePickerComponent;
@@ -15,12 +17,14 @@ describe('LCTimePickerComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         LCTimePickerComponent,
-        LCTimeSpinnerComponent
+        LCTimeSpinnerComponent,
+        LcDatePickerHeaderDirective
       ],
       providers: [{
         provide: LCDatePickerAdapter,
         useClass: LuxonDateAdapterService
-      }]
+      },
+      withDatePickerHeader()]
     })
       .compileComponents()
       .then(() => {

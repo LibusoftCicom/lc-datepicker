@@ -8,6 +8,8 @@ import { LCDayPickerButtonComponent } from './day-picker-button.component';
 import { IDatePickerConfiguration, LCDatePickerControl } from '../lc-date-picker-control';
 import { LCCalendarCellComponent } from '../calendar-cell/calendar-cell.component';
 import { LCCalendarGridComponent } from '../calendar-grid/calendar-grid.component';
+import { LcDatePickerHeaderDirective } from '../header/lc-date-picker-header.directive';
+import { withDatePickerHeader } from '../header/header-provider.class';
 
 describe('LCDayPickerComponent', () => {
     let component: LCDayPickerComponent;
@@ -21,8 +23,9 @@ describe('LCDayPickerComponent', () => {
                 LCDayPickerButtonComponent,
                 LCCalendarCellComponent,
                 LCCalendarGridComponent,
+                LcDatePickerHeaderDirective,
             ],
-            providers: [{provide: LCDatePickerAdapter, useClass: LuxonDateAdapterService}]
+            providers: [{provide: LCDatePickerAdapter, useClass: LuxonDateAdapterService}, withDatePickerHeader()]
         })
             .compileComponents()
             .then(() => {

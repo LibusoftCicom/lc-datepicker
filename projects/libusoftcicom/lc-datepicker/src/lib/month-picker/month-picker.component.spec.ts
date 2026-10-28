@@ -8,6 +8,8 @@ import { LCDatePickerAdapter } from '../lc-date-picker-adapter.class';
 import { LuxonDateAdapterService } from '../../../../../../src/app/luxon-date-adapter.service';
 import { LCCalendarCellComponent } from '../calendar-cell/calendar-cell.component';
 import { LCCalendarGridComponent } from '../calendar-grid/calendar-grid.component';
+import { LcDatePickerHeaderDirective } from '../header/lc-date-picker-header.directive';
+import { withDatePickerHeader } from '../header/header-provider.class';
 
 describe('LCMonthPickerComponent', () => {
   let component: LCMonthPickerComponent;
@@ -21,11 +23,13 @@ describe('LCMonthPickerComponent', () => {
         LCMonthPickerButtonComponent,
         LCCalendarCellComponent,
         LCCalendarGridComponent,
+        LcDatePickerHeaderDirective,
       ],
       providers: [{
         provide: LCDatePickerAdapter,
         useClass: LuxonDateAdapterService
-      }]
+      },
+      withDatePickerHeader()]
     })
       .compileComponents()
       .then(() => {
