@@ -76,6 +76,7 @@ export class LCDatePickerControl {
   private minimumDate: DateTime;
   private maximumDate: DateTime;
   private rangeSelectionComplete = true;
+  private valueSet = true;
   private readonly rangeSelectionChanged = new BehaviorSubject<boolean>(true);
 
   private readonly panelChanged: Subject<Panel> = new Subject();
@@ -222,6 +223,19 @@ export class LCDatePickerControl {
   public setRangeSelectionComplete(complete: boolean): void {
     this.rangeSelectionComplete = complete;
     this.rangeSelectionChanged.next(complete);
+  }
+
+  /**
+   * @internal
+   * False when an independent range side has no selected date; the value is then only used for calendar navigation.
+   */
+  public isValueSet(): boolean {
+    return this.valueSet;
+  }
+
+  /** @internal */
+  public setValueSet(valueSet: boolean): void {
+    this.valueSet = valueSet;
   }
 
   /** Emits when linked-range confirmation becomes available or unavailable. */
@@ -435,6 +449,7 @@ export class LCDatePickerControl {
   }
 
   public reset(): void {
+    this.valueSet = true;
     switch (this.getCalendarType()) {
       case ECalendarType.Date:
         this.setValue(this.dateAdapter.today(this.getTimezone()), true);
@@ -477,7 +492,8 @@ export class LCDatePickerControl {
   private initializeValue(): void {
 
     if (this.datePickerConfiguration.calendarType === ECalendarType.DateRange) {
-      if (this.datePickerConfiguration.value.trim() === '') {
+      const [from, to] = (this.datePickerConfiguration.value ?? '').trim().split('/');
+      if (!from && !to) {
         const today = this.adjustValueToCalendarType(this.dateAdapter.today(this.datePickerConfiguration.timezone));
         this.value = {
           dateTimeFrom: today,
@@ -485,10 +501,9 @@ export class LCDatePickerControl {
         };
       }
       else {
-        const dates = this.datePickerConfiguration.value.split('/');
         this.value = {
-          dateTimeFrom: this.adjustValueToCalendarType(this.dateAdapter.fromISOString(dates[0], this.datePickerConfiguration.timezone)),
-          dateTimeTo: this.adjustValueToCalendarType(this.dateAdapter.fromISOString(dates[1], this.datePickerConfiguration.timezone)),
+          dateTimeFrom: this.adjustValueToCalendarType(this.dateAdapter.fromISOString(from || to, this.datePickerConfiguration.timezone)),
+          dateTimeTo: this.adjustValueToCalendarType(this.dateAdapter.fromISOString(to || from, this.datePickerConfiguration.timezone)),
         };
       }
     }

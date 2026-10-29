@@ -246,6 +246,92 @@ describe('LCDateRangePickerComponent compatibility', () => {
     expect(component.config.getValue()).toBe(originalValue);
   });
 
+  describe('independent half ranges', () => {
+    function createIndependentPicker(value: string): void {
+      fixture = TestBed.createComponent(LCDateRangePickerComponent);
+      component = fixture.componentInstance;
+      component.config = new DatePickerConfig({
+        value, calendarType: ECalendarType.DateRange, selectionMode: 'explicit', timezone: 'UTC'
+      }, TestBed.inject(LCDatePickerAdapter));
+      fixture.detectChanges();
+      component.config.setOpen(true);
+      fixture.detectChanges();
+    }
+
+    function panels(): HTMLElement[] {
+      return Array.from(fixture.nativeElement.querySelectorAll('lc-day-picker')) as HTMLElement[];
+    }
+
+    function clickDay(panel: HTMLElement, day: string): void {
+      (Array.from(panel.querySelectorAll('lc-day-picker-button button') as NodeListOf<HTMLButtonElement>)
+        .find(button => !button.disabled && button.textContent.trim() === day) as HTMLButtonElement).click();
+      fixture.detectChanges();
+    }
+
+    function selectedDays(panel: HTMLElement): number {
+      return panel.querySelectorAll('button[aria-pressed="true"]').length;
+    }
+
+    it('starts empty, highlights nothing and emits only the clicked side', () => {
+      const adapter = TestBed.inject(LCDatePickerAdapter);
+      createIndependentPicker('');
+      expect(component.config.getValue()).toBe('');
+      panels().forEach(panel => expect(selectedDays(panel)).toBe(0));
+      const changed = jasmine.createSpy('dateChange');
+      component.dateChange.subscribe(changed);
+
+      clickDay(panels()[1], '20');
+      expect(selectedDays(panels()[0])).toBe(0);
+      expect(selectedDays(panels()[1])).toBe(1);
+      component.confirm();
+
+      const end = adapter.setParts(adapter.add(adapter.today('UTC'), 1, 'day'),
+        { date: 20, hour: 0, minute: 0, second: 0, millisecond: 0 });
+      expect(changed).toHaveBeenCalledOnceWith('/' + adapter.toISOString(end));
+    });
+
+    it('emits an open-ended range when only the start is clicked', () => {
+      const adapter = TestBed.inject(LCDatePickerAdapter);
+      createIndependentPicker('/');
+      clickDay(panels()[0], '5');
+
+      const start = adapter.setParts(adapter.today('UTC'), { date: 5, hour: 0, minute: 0, second: 0, millisecond: 0 });
+      expect(component.config.getValue()).toBe(adapter.toISOString(start) + '/');
+    });
+
+    it('keeps a half range from the value and opens the empty side on the other side\'s month', () => {
+      createIndependentPicker('2026-03-10T12:00:00.000Z/');
+
+      expect(component.config.getValue()).toMatch(/^2026-03-\d\dT[^/]+\/$/);
+      expect(selectedDays(panels()[0])).toBe(1);
+      expect(selectedDays(panels()[1])).toBe(0);
+      expect(component.config.getControl(DateType.TO).getValue().getMonth()).toBe(2);
+    });
+
+    it('restores a confirmed half range when an explicit selection is cancelled', () => {
+      createIndependentPicker('/2026-03-10T12:00:00.000Z');
+      const confirmed = component.config.getValue();
+      expect(confirmed).toMatch(/^\/2026-03-/);
+      clickDay(panels()[0], '5');
+      expect(component.config.getValue()).not.toMatch(/^\//);
+
+      component.setOpen(false);
+
+      expect(component.config.getValue()).toBe(confirmed);
+    });
+
+    it('clears both sides', () => {
+      createIndependentPicker('2026-03-05T00:00:00.000Z/2026-03-10T00:00:00.000Z');
+      const changed = jasmine.createSpy('dateChange');
+      component.dateChange.subscribe(changed);
+
+      component.clear();
+
+      expect(changed).toHaveBeenCalledOnceWith('');
+      expect(component.config.getValue()).toBe('');
+    });
+  });
+
   it('keeps linked selection panels independently navigable by default', () => {
     const adapter = TestBed.inject(LCDatePickerAdapter);
     const start = new DateTime(2026, 2, 10, 0, 0, 0, 0, 'UTC');

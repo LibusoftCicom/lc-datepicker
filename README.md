@@ -167,6 +167,11 @@ Use the following snippet inside your template for date-range-picker:
 - rangeSelectionMode?: 'independent' | 'linked' (for Date and DateRange; defaults to 'independent')
 - rangeNavigationMode?: 'independent' | 'synchronized' (for linked DateRange selection; defaults to 'independent')
 
+With the default `rangeSelectionMode: 'independent'`, the left panel sets only the start and
+the right panel only the end of a `DateRange`. Either side may stay empty: the value is then
+`startISO/` or `/endISO`, and an empty value (or `'/'`) leaves both sides unselected. An empty
+side highlights no date; its panel opens on the other side's month (or the current month).
+
 Set `rangeSelectionMode: 'linked'` to use a shared two-click selection in the range picker.
 Each panel initially shows its corresponding endpoint month, and both panels navigate
 independently by default. Set `rangeNavigationMode: 'synchronized'` to move the other panel

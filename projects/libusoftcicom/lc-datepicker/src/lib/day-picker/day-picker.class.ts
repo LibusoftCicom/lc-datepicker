@@ -231,7 +231,7 @@ export class DayPicker extends BaseDatePicker {
       item.current = true;
     }
 
-    if (this.sameDay(dateTime, this.control.getValue())) {
+    if (this.control.isValueSet() && this.sameDay(dateTime, this.control.getValue())) {
       item.active = true;
     }
 

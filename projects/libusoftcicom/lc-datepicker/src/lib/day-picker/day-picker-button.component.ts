@@ -40,6 +40,7 @@ export class LCDayPickerButtonComponent implements OnInit {
       { date: item.value }
     );
 
+    this.control.setValueSet(true);
     this.control.setValue(
       newDate,
       this.control.getCalendarType() === ECalendarType.Date && this.control.shouldConfirmSelection()

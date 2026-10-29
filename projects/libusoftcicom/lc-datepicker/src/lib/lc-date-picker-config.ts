@@ -28,6 +28,10 @@ export class DatePickerConfig {
         dateAdapter,
         this.config.calendarType === ECalendarType.DateRange ? DateType.TO : DateType.REGULAR
       );
+    if (this.isPartialRange()) {
+      this.control1.setValueSet(!!start?.trim());
+      this.control2.setValueSet(!!end?.trim());
+    }
     this.confirmedValue = this.getValue();
   }
 
@@ -130,15 +134,24 @@ export class DatePickerConfig {
    * @return ISO 8601 formatted string representing the selected date.
    */
   public getValue(): string {
-    if (this.hasRangeValue()) {
-      return this.control1.getAdapter().toISOString(this.control1.getValue()) + '/' + this.control1.getAdapter().toISOString(this.control2.getValue());
+    const adapter = this.control1.getAdapter();
+    if (this.isPartialRange()) {
+      const from = this.control1.isValueSet() ? adapter.toISOString(this.control1.getValue()) : '';
+      const to = this.control2.isValueSet() ? adapter.toISOString(this.control2.getValue()) : '';
+      return from || to ? `${from}/${to}` : '';
     }
 
-    return this.control1.getAdapter().toISOString(this.control1.getValue());
+    if (this.hasRangeValue()) {
+      return adapter.toISOString(this.control1.getValue()) + '/' + adapter.toISOString(this.control2.getValue());
+    }
+
+    return adapter.toISOString(this.control1.getValue());
   }
 
   /**
    * Sets the selected date.
+   *
+   * In an independent date range picker, either side of the range may be empty (e.g. `2026-10-29T00:00:00Z/`).
    *
    * @param {string} value - the ISO 8601 formatted string representing the new date.
    */
@@ -147,6 +160,14 @@ export class DatePickerConfig {
     const isRange = this.hasRangeValue();
     const transactionalSelection =
       this.config.selectionMode === 'explicit' || this.isLinkedRangeSelection();
+    if (this.isPartialRange()) {
+      this.setPartialRangeValue(isEmpty ? '' : value, true);
+      if (transactionalSelection) {
+        this.confirmedValue = this.getValue();
+      }
+      return;
+    }
+
     if (transactionalSelection && !isEmpty) {
       const adapter = this.control1.getAdapter();
       if (isRange) {
@@ -453,7 +474,33 @@ export class DatePickerConfig {
       (this.getCalendarType() === ECalendarType.Date && this.isLinkedRangeSelection());
   }
 
+  private isPartialRange(): boolean {
+    return this.getCalendarType() === ECalendarType.DateRange && !this.isLinkedRangeSelection();
+  }
+
+  /** Empty sides keep a navigation date (the other side, or today/tomorrow) but are marked as unset. */
+  private setPartialRangeValue(value: string, emit: boolean): void {
+    const adapter = this.control1.getAdapter();
+    const [from, to] = value.split('/').map(part => part?.trim() ?? '');
+    this.control1.setValueSet(!!from);
+    this.control2.setValueSet(!!to);
+    if (!from && !to) {
+      const today = adapter.today(this.control1.getTimezone());
+      this.control1.setValue(today, false);
+      this.control2.setValue(adapter.add(today, 1, 'day'), false);
+      return;
+    }
+
+    this.control1.setValue(adapter.fromISOString(from || to, this.control1.getTimezone()), emit);
+    this.control2.setValue(adapter.fromISOString(to || from, this.control2.getTimezone()), emit);
+  }
+
   private restoreConfirmedValue(): void {
+    if (this.isPartialRange()) {
+      this.setPartialRangeValue(this.confirmedValue, false);
+      return;
+    }
+
     if (this.hasRangeValue()) {
       const [from, to] = this.confirmedValue.split('/');
       this.control1.setValue(
