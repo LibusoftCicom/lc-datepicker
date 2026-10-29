@@ -321,7 +321,8 @@ describe('LCDateRangePickerComponent compatibility', () => {
       value: adapter.toISOString(start) + '/' + adapter.toISOString(end),
       calendarType: ECalendarType.DateRange,
       disabledDates: [adapter.toISOString(adapter.setParts(start, { date: 15 }))],
-      rangeSelectionMode: 'linked'
+      rangeSelectionMode: 'linked',
+      selectionMode: 'explicit'
     }, adapter);
     fixture.detectChanges();
     component.config.setOpen(true);
@@ -395,7 +396,8 @@ describe('LCDateRangePickerComponent compatibility', () => {
     component.config = new DatePickerConfig({
       value: adapter.toISOString(start) + '/' + adapter.toISOString(start),
       calendarType: ECalendarType.DateRange,
-      rangeSelectionMode: 'linked'
+      rangeSelectionMode: 'linked',
+      selectionMode: 'explicit'
     }, adapter);
     fixture.detectChanges();
     component.config.setOpen(true);
@@ -423,6 +425,42 @@ describe('LCDateRangePickerComponent compatibility', () => {
     expect(fixture.nativeElement.querySelectorAll('.range-end').length).toBe(2);
   });
 
+  it('confirms a linked range on the second click in immediate mode', () => {
+    const adapter = TestBed.inject(LCDatePickerAdapter);
+    const start = new DateTime(2026, 2, 5, 0, 0, 0, 0, 'UTC');
+    fixture = TestBed.createComponent(LCDateRangePickerComponent);
+    component = fixture.componentInstance;
+    component.config = new DatePickerConfig({
+      value: adapter.toISOString(start) + '/' + adapter.toISOString(start),
+      calendarType: ECalendarType.DateRange,
+      rangeSelectionMode: 'linked',
+      selectionMode: 'immediate'
+    }, adapter);
+    fixture.detectChanges();
+    component.config.setOpen(true);
+    const changed = jasmine.createSpy('dateChange');
+    component.dateChange.subscribe(changed);
+    const pickers = Array.from(fixture.nativeElement.querySelectorAll('lc-day-picker')) as HTMLElement[];
+    const selectDay = (picker: HTMLElement, day: string): void => {
+      const date = Array.from(
+        picker.querySelectorAll('lc-day-picker-button button') as NodeListOf<HTMLButtonElement>
+      ).find(button => !button.disabled && button.textContent.trim() === day) as HTMLButtonElement;
+      date.click();
+    };
+
+    selectDay(pickers[0], '10');
+    fixture.detectChanges();
+    expect(changed).not.toHaveBeenCalled();
+    expect(component.config.isOpen()).toBe(true);
+
+    selectDay(pickers[0], '20');
+
+    expect(changed).toHaveBeenCalledOnceWith(component.config.getValue());
+    expect(component.config.getControl(DateType.FROM).getValue().getDate()).toBe(10);
+    expect(component.config.getControl(DateType.TO).getValue().getDate()).toBe(20);
+    expect(component.config.isOpen()).toBe(false);
+  });
+
   it('restores the confirmed value when a linked range draft is cancelled', () => {
     const adapter = TestBed.inject(LCDatePickerAdapter);
     const start = new DateTime(2026, 2, 5, 0, 0, 0, 0, 'UTC');
@@ -432,7 +470,8 @@ describe('LCDateRangePickerComponent compatibility', () => {
     component.config = new DatePickerConfig({
       value: adapter.toISOString(start) + '/' + adapter.toISOString(end),
       calendarType: ECalendarType.DateRange,
-      rangeSelectionMode: 'linked'
+      rangeSelectionMode: 'linked',
+      selectionMode: 'explicit'
     }, adapter);
     fixture.detectChanges();
     component.config.setOpen(true);

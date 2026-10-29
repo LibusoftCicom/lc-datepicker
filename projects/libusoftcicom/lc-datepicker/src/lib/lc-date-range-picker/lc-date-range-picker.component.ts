@@ -275,6 +275,10 @@ export class LCDateRangePickerComponent implements OnInit, AfterViewInit, OnDest
       this.rangePreview = null;
       this.linkedRangeComplete = true;
       this.config.setRangeSelectionComplete(true);
+      if (this.fromControl.shouldConfirmSelection()) {
+        this.confirm();
+        return;
+      }
     }
 
     this.refreshLinkedRangeState();

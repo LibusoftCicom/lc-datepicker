@@ -193,12 +193,11 @@ const config = new DatePickerConfig({
 }, dateAdapter);
 ```
 
-In the single-calendar picker, the first click starts a draft and the second finishes it.
-`selectionMode: 'immediate'` (the default) emits once and closes on the second click;
-`'explicit'` waits for Apply. A third click starts a new draft. Selecting the same date twice
-creates a one-day range. Disabled days may lie inside the range, but cannot be endpoints.
-Month navigation does not alter selected endpoints. Existing two-calendar linked ranges
-continue to require Apply, regardless of `selectionMode`, for backward compatibility.
+In both the single-calendar and the two-calendar picker, the first click starts a draft and
+the second finishes it. `selectionMode: 'immediate'` (the default) emits once and closes on
+the second click; `'explicit'` waits for Apply. A third click starts a new draft. Selecting
+the same date twice creates a one-day range. Disabled days may lie inside the range, but
+cannot be endpoints. Month navigation does not alter selected endpoints.
 Linked selection is not supported for DateTime, Time, MonthYear or Year pickers.
 
 The library does not register global `keydown` or `keyup` handlers. Applications may

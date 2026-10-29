@@ -435,7 +435,6 @@ export class LCDatePickerControl {
   }
 
   public reset(): void {
-    console.log('reset');
     switch (this.getCalendarType()) {
       case ECalendarType.Date:
         this.setValue(this.dateAdapter.today(this.getTimezone()), true);
