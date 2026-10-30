@@ -36,12 +36,16 @@
                 {{ fromControl.getLabels().fromLabel }}
             </div>
             }
+            @if (linkedPanelFrom === Panel.Day) {
             <lc-day-picker
                 [control]="linkedFromControl"
                 (dateSelected)="onLinkedDateSelected($event)"
                 (datePreview)="onLinkedDatePreview($event)"
                 (monthViewed)="onLeftMonthViewed($event)">
             </lc-day-picker>
+            } @else {
+            <lc-active-calendar-panel [panel]="linkedPanelFrom" [control]="linkedFromControl"></lc-active-calendar-panel>
+            }
         </div>
 
         <div class="calendar">
@@ -51,12 +55,16 @@
                 {{ toControl.getLabels().toLabel }}
             </div>
             }
+            @if (linkedPanelTo === Panel.Day) {
             <lc-day-picker
                 [control]="linkedToControl"
                 (dateSelected)="onLinkedDateSelected($event)"
                 (datePreview)="onLinkedDatePreview($event)"
                 (monthViewed)="onRightMonthViewed($event)">
             </lc-day-picker>
+            } @else {
+            <lc-active-calendar-panel [panel]="linkedPanelTo" [control]="linkedToControl"></lc-active-calendar-panel>
+            }
         </div>
     </div>
     <ng-container lc-date-picker-footer [control]="fromControl"

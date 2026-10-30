@@ -176,6 +176,9 @@ Set `rangeSelectionMode: 'linked'` to use a shared two-click selection in the ra
 Each panel initially shows its corresponding endpoint month, and both panels navigate
 independently by default. Set `rangeNavigationMode: 'synchronized'` to move the other panel
 by the same number of months when either panel is navigated; the relative month offset is kept.
+Header month and year actions open the month and year pickers in each panel; choosing a month
+returns to that panel's day calendar without changing the selection (with synchronized
+navigation, the other panel moves by the same number of months).
 Select a start and end date; reversed selections are normalized automatically. The default
 Apply button remains disabled after selecting only the start date. Custom footers can check
 `control.isRangeSelectionComplete()` and subscribe to `control.getRangeSelectionChanges()`;

@@ -397,6 +397,88 @@ describe('LCDateRangePickerComponent compatibility', () => {
     expect(dayPickers[1].control.getValue().getMonth()).toBe(4);
   });
 
+  describe('linked month and year panels', () => {
+    function createLinkedPicker(rangeNavigationMode: 'independent' | 'synchronized' = 'independent'): void {
+      const adapter = TestBed.inject(LCDatePickerAdapter);
+      const start = new DateTime(2026, 2, 10, 0, 0, 0, 0, 'UTC');
+      const end = new DateTime(2026, 4, 20, 0, 0, 0, 0, 'UTC');
+      fixture = TestBed.createComponent(LCDateRangePickerComponent);
+      component = fixture.componentInstance;
+      component.config = new DatePickerConfig({
+        value: adapter.toISOString(start) + '/' + adapter.toISOString(end),
+        calendarType: ECalendarType.DateRange,
+        rangeSelectionMode: 'linked',
+        rangeNavigationMode
+      }, adapter);
+      fixture.detectChanges();
+      component.config.setOpen(true);
+    }
+
+    function calendars(): HTMLElement[] {
+      return Array.from(fixture.nativeElement.querySelectorAll('.linkedRangePicker .calendar'));
+    }
+
+    function shownPanel(calendar: HTMLElement): string {
+      return calendar.querySelector('lc-day-picker, lc-month-picker, lc-year-picker')?.tagName.toLowerCase();
+    }
+
+    function linkedDayPickers(): LCDayPickerComponent[] {
+      return fixture.debugElement.queryAll(By.directive(LCDayPickerComponent))
+        .map(element => element.componentInstance as LCDayPickerComponent);
+    }
+
+    function setLinkedPanel(index: number, panel: Panel): void {
+      linkedDayPickers()[index].control.setPanel(panel);
+      fixture.detectChanges();
+    }
+
+    it('opens month and year pickers and returns to the chosen month without changing the range', () => {
+      createLinkedPicker();
+      const originalValue = component.config.getValue();
+
+      setLinkedPanel(0, Panel.Month);
+      expect(calendars().map(shownPanel)).toEqual(['lc-month-picker', 'lc-day-picker']);
+      (calendars()[0].querySelectorAll('lc-month-picker-button button')[7] as HTMLElement).click();
+      fixture.detectChanges();
+      expect(calendars().map(shownPanel)).toEqual(['lc-day-picker', 'lc-day-picker']);
+      expect(linkedDayPickers().map(picker => picker.control.getValue().getMonth())).toEqual([7, 4]);
+
+      setLinkedPanel(1, Panel.Year);
+      expect(calendars().map(shownPanel)).toEqual(['lc-day-picker', 'lc-year-picker']);
+      const year = Array.from(calendars()[1].querySelectorAll('lc-year-picker-button button') as NodeListOf<HTMLElement>)
+        .find(button => button.textContent.trim() === '2027');
+      year.click();
+      fixture.detectChanges();
+      expect(shownPanel(calendars()[1])).toBe('lc-month-picker');
+      (calendars()[1].querySelectorAll('lc-month-picker-button button')[1] as HTMLElement).click();
+      fixture.detectChanges();
+      const right = linkedDayPickers()[1].control.getValue();
+      expect([right.getYear(), right.getMonth()]).toEqual([2027, 1]);
+      expect(component.config.getValue()).toBe(originalValue);
+    });
+
+    it('moves the other calendar by the same months in synchronized navigation', () => {
+      createLinkedPicker('synchronized');
+
+      setLinkedPanel(0, Panel.Month);
+      (calendars()[0].querySelectorAll('lc-month-picker-button button')[7] as HTMLElement).click();
+      fixture.detectChanges();
+
+      expect(linkedDayPickers().map(picker => picker.control.getValue().getMonth())).toEqual([7, 9]);
+    });
+
+    it('reopens on day calendars', () => {
+      createLinkedPicker();
+      setLinkedPanel(0, Panel.Year);
+
+      component.config.setOpen(false);
+      component.config.setOpen(true);
+      fixture.detectChanges();
+
+      expect(calendars().map(shownPanel)).toEqual(['lc-day-picker', 'lc-day-picker']);
+    });
+  });
+
   it('starts a linked range draft, swaps reversed endpoints and confirms once', () => {
     const adapter = TestBed.inject(LCDatePickerAdapter);
     const start = new DateTime(2026, 2, 5, 0, 0, 0, 0, 'UTC');
